@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/03 23:15:20 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/04 22:56:02 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,10 @@ int	key_hook(int key, t_mlx *mlx)
 {
 	char	*num1;
 
-	printf("keyboard = %d\n", key);
-//	if (key == 53) # escape
-//		mlx_destroy_window(mlx->mlx, mlx->win);
+	ft_putstr_fd("\nkeyboard = ", 1);
+	ft_putnbr_fd(key, 1);
+	if (key == K_ESCAPE)
+		exit(0);
 	num1 = ft_itoa(key);
 	mlx_clear_window(mlx->mlx, mlx->win);
 	mlx_string_put(mlx->mlx, mlx->win, 30, 30, 0xFFFFFF, num1);
@@ -54,6 +55,13 @@ void	ft_swap_points_xy(t_point *p1, t_point *p2)
 	p2->y = tmp.x;
 }
 
+void	pixel_put(t_img *img, int x, int y, int color)
+{
+	if (x < 0 || x >= img->size.x || y < 0 || y >= img->size.y)
+		return ;
+	img->data[y * img->size.x + x] = color;
+}
+
 void	draw_line(t_point p1, t_point p2, int cl, t_mlx *m)
 {
 	const t_point	d = {abs(p2.x - p1.x), abs(p2.y - p1.y)};
@@ -73,8 +81,8 @@ void	draw_line(t_point p1, t_point p2, int cl, t_mlx *m)
 	dir = (p2.y > p1.y) - (p2.y < p1.y);
 	while (p1.x < p2.x)
 	{
-		reverse ? mlx_pixel_put(m->mlx, m->win, cur % WIN_W, p1.x++ % WIN_H, cl)
-			: mlx_pixel_put(m->mlx, m->win, p1.x++ % WIN_W, cur % WIN_H, cl);
+		reverse ? pixel_put(&m->buf, cur, p1.x++, cl)
+			: pixel_put(&m->buf, p1.x++, cur, cl);
 		if ((error += d.y + 1) >= d.x + 1)
 		{
 			cur += dir;
@@ -83,54 +91,94 @@ void	draw_line(t_point p1, t_point p2, int cl, t_mlx *m)
 	}
 }
 
+void	demo_fillrate(int step, t_mlx *mlx)
+{
+	short		x;
+	short		y;
+	static char	shift;
+
+	if (!step)
+		return ;
+	y = 0;
+	while (y < WIN_H)
+	{
+		x = 0;
+		while (x < WIN_W)
+		{
+			pixel_put(&mlx->buf, x, y, x * y + shift);
+			x += step;
+		}
+		shift++;
+		y += step;
+	}
+}
+
+void	demo_radar(int rays, t_mlx *mlx)
+{
+	static short	shift;
+	const t_point	p1 = {WIN_W / 2, WIN_H / 2};
+	t_point			p2;
+	int				i;
+
+	i = 0;
+	while (i++ < rays)
+	{
+		p2 = (t_point) {p1.x + WIN_H * cos(((shift + i) * 2 * M_PI) / 360),
+						p1.y + WIN_H * sin(((shift + i) * 2 * M_PI) / 360)};
+		draw_line(p1, p2, 0xAFAF - i, mlx);
+	}
+	shift += 8;
+}
+
+void	img_clear(t_img *img)
+{
+	ft_bzero(img->data, 4 * img->size.x * img->size.y);
+}
+
 int	game_loop(t_mlx *mlx)
 {
-	static clock_t	start;
-	static clock_t	end;
-	static char		*fps;
-//	static short	col;
-//	int				i;
+	clock_t	start;
+	clock_t	end;
+	char	*fps;
 
 	start = clock();
-	mlx_clear_window(mlx->mlx, mlx->win);
-//	i = 0;
-//	while ((i += 24) < WIN_W * WIN_H)
-//		mlx_pixel_put(mlx->mlx, mlx->win, i % WIN_W, (i / WIN_W) % WIN_H, 0xFF);
-//
-//#define P1 WIN_W / 2, WIN_H / 2
-//#define P2 WIN_W / 2 + 300 * cos((col * 2 * M_PI) / 2048), WIN_H / 2 + 300 * sin((col * 2 * M_PI) / 2048)
-//	i = 0;
-//	while (i++ < 200)
-//		{draw_line((t_point){P1}, (t_point){P2}, 0xAFAF, mlx); col++;}
+	img_clear(&mlx->buf);
+
+	demo_fillrate(1, mlx);
+//	demo_radar(360, mlx);
+	mlx_put_image_to_window(mlx->mlx, mlx->win, mlx->buf.ptr, 0, 0);
+
 	end = clock();
 
+//	ft_putnbr_fd(CLOCKS_PER_SEC / (end - start), 1);
 	fps = ft_itoa(CLOCKS_PER_SEC / (end - start));
 	mlx_string_put(mlx->mlx, mlx->win, 0, 0, 0xFFFFFF, fps);
 	free(fps);
 	return (0);
 }
 
-int mouse_hook(int button, int x, int y, t_mlx *mlx)
-{
-	(void)mlx;
-	printf("button = %d, x = %d, y = %d\n", button, x, y);
-	return (0);
-}
+//int mouse_hook(int button, int x, int y, t_mlx *mlx)
+//{
+//	(void)mlx;
+//	printf("button = %d, x = %d, y = %d\n", button, x, y);
+//	return (0);
+//}
 
 int main()
 {
 	t_mlx	mlx;
+	int		tmp;
 
 	if ((mlx.mlx = mlx_init()) == NULL)
 		return (1);
-	if (!(mlx.win = mlx_new_window(mlx.mlx, WIN_W, WIN_H, "cub3D")))
+	if (!(mlx.win = mlx_new_window(mlx.mlx, WIN_W, WIN_H, "cub3D by nGragas")))
 		return (1);
-//	mlx_pixel_put(mlx.mlx, mlx.win, 251, 250, 0xFF0000);
-//	mlx_pixel_put(mlx.mlx, mlx.win, 250, 250, 0xFFFFFF);
+	mlx.buf.ptr = mlx_new_image(mlx.mlx, WIN_W, WIN_H);
+	mlx.buf.data = (int *)mlx_get_data_addr(mlx.buf.ptr, &tmp, &tmp, &tmp);
+	mlx.buf.size = (t_point){WIN_W, WIN_H};
 	mlx_key_hook(mlx.win, key_hook, &mlx);
-	mlx_mouse_hook(mlx.win, mouse_hook, &mlx);
+//	mlx_mouse_hook(mlx.win, mouse_hook, &mlx);
 	mlx_loop_hook(mlx.mlx, game_loop, &mlx);
 	mlx_loop(mlx.mlx);
-	printf("Hello, World!\n");
 	return (0);
 }

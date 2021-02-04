@@ -6,7 +6,7 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/02/03 19:48:10 by ngragas          ###   ########.fr        #
+#    Updated: 2021/02/04 22:46:49 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ OBJ_DIR = objects/
 LIB_DIR = libft/
 
 all:
-	$(MAKE) $(NAME) -j4
+	$(MAKE) $(NAME) -j8
 run: all
 	./cub3D
 bonus: all
