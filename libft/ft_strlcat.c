@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/05 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2020/11/20 15:00:51 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/02 21:14:48 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,13 @@
 
 size_t	ft_strlcat(char *dst, const char *src, size_t dstsize)
 {
-	size_t		len;
-	const char	*start = dst;
+	char	*cur;
 
-	while (dstsize && *dst)
-	{
-		dstsize--;
-		dst++;
-	}
-	if (dstsize)
-	{
-		while (--dstsize && *src)
-			*dst++ = *src++;
-		*dst = '\0';
-	}
-	len = dst - start;
-	start = src;
-	while (*src)
-		src++;
-	return (src - start + len);
+	if ((cur = ft_memchr(dst, '\0', dstsize)) == NULL)
+		return (ft_strlen(src) + dstsize);
+	dstsize -= cur - dst;
+	while (--dstsize && *src)
+		*cur++ = *src++;
+	*cur = '\0';
+	return (ft_strlen(src) + cur - dst);
 }

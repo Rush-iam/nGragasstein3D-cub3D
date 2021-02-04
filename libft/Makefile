@@ -6,12 +6,12 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/04 20:29:14 by ngragas           #+#    #+#              #
-#    Updated: 2021/01/26 18:20:34 by ngragas          ###   ########.fr        #
+#    Updated: 2021/02/02 14:25:29 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = libft.a
-CFLAGS = -Wall -Wextra -Werror -MMD -O2
+CFLAGS = -Wall -Wextra -Werror -O2
 HEADER = libft.h
 SRCS =		ft_isalpha.c	ft_isdigit.c	ft_isalnum.c	ft_isprint.c	\
 			ft_isascii.c	ft_toupper.c	ft_tolower.c	ft_strmapi.c	\
@@ -24,20 +24,19 @@ SRCS =		ft_isalpha.c	ft_isdigit.c	ft_isalnum.c	ft_isprint.c	\
 			ft_putchar_fd.c	ft_putstr_fd.c	ft_putendl_fd.c	ft_putnbr_fd.c	\
 		ft_lstnew.c			ft_lstadd_front.c		ft_lstadd_back.c		\
 		ft_lstdelone.c		ft_lstsize.c			ft_lstlast.c			\
-		ft_lstclear.c		ft_lstiter.c			ft_lstmap.c
+		ft_lstclear.c		ft_lstiter.c			ft_lstmap.c				\
+			ft_wchrto8.c	ft_wstrto8.c
 OBJS = $(SRCS:.c=.o)
-DEPS = $(OBJS:.o=.d)
 
 all: $(NAME)
 clean:
-	$(RM) $(OBJS)
-	$(RM) $(DEPS)
+	@$(RM) $(OBJS)
 fclean: clean
-	$(RM) $(NAME)
+	@$(RM) $(NAME)
 re: fclean all
 norm:
 	@norminette $(SRCS) $(HEADER)
--include $(DEPS)
+$(OBJS): $(HEADER)
 $(NAME): $(OBJS)
 	$(AR) rcs $(NAME) $?
 .PHONY: all clean fclean re norm

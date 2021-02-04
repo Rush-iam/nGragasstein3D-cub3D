@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/09 13:09:30 by ngragas           #+#    #+#             */
-/*   Updated: 2020/11/25 14:22:11 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/03 16:00:31 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,7 @@
 
 char	*ft_strnstr(const char *haystack, const char *needle, size_t len)
 {
-	const char	*check_haystack;
-	const char	*check_needle;
-	size_t		needle_len;
+	size_t	needle_len;
 
 	if (!*needle)
 		return ((char *)haystack);
@@ -27,14 +25,8 @@ char	*ft_strnstr(const char *haystack, const char *needle, size_t len)
 	while (len && *haystack)
 	{
 		if (*haystack == *needle)
-		{
-			check_haystack = haystack + 1;
-			check_needle = needle + 1;
-			while (*check_needle && *check_haystack++ == *check_needle)
-				check_needle++;
-			if (!*check_needle)
+			if (!ft_strncmp(haystack + 1, needle + 1, needle_len - 1))
 				return ((char *)haystack);
-		}
 		haystack++;
 		len--;
 	}

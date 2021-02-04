@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/09 19:47:33 by ngragas           #+#    #+#             */
-/*   Updated: 2020/11/09 21:12:36 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/03 17:07:58 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,22 @@
 
 void	*ft_memccpy(void *dst, const void *src, int c, size_t n)
 {
-	while (n && (*(char *)dst++ = *(char *)src++) != (char)c)
-		n--;
-	return (n ? dst : (NULL));
+	const void	*src_char_pos = ft_memchr(src, c, n);
+
+	if (src_char_pos)
+	{
+		ft_memcpy(dst, src, src_char_pos - src + 1);
+		return (dst + (src_char_pos - src + 1));
+	}
+	else
+	{
+		ft_memcpy(dst, src, n);
+		return (NULL);
+	}
 }
+
+/*
+**	while (n && (*(char *)dst++ = *(char *)src++) != (char)c)
+**		n--;
+**	return (n ? dst : NULL);
+*/
