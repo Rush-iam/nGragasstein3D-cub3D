@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/04 22:50:28 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/05 22:25:44 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,35 +15,54 @@
 
 # include <mlx.h>
 # include <math.h>
+# include <time.h>
 # include "libft.h"
-# include "time.h"
 
 # define WIN_W 1280
 # define WIN_H 720
 
-enum	e_keys
-{
-	K_ESCAPE = 53
-};
+# define COLOR_CEIL 60
+# define COLOR_FLOOR 105
 
-typedef struct
+typedef struct	s_point
 {
 	int	x;
 	int	y;
-}		t_point;
+}				t_point;
 
-typedef struct
+typedef struct	s_img
 {
 	void	*ptr;
 	int		*data;
 	t_point	size;
-}			t_img;
+}				t_img;
 
-typedef struct
+typedef struct	s_mlx
 {
 	void	*mlx;
 	void	*win;
 	t_img	buf;
-}			t_mlx;
+}				t_mlx;
+
+int				game_loop		(t_mlx *mlx);
+int				terminate		(void);
+
+int				hook_key_press		(int key, t_mlx *mlx);
+int				hook_key_release	(int key, t_mlx *mlx);
+int				hook_mouse_press	(int button, int x, int y, t_mlx *mlx);
+int				hook_mouse_release	(int button, int x, int y, t_mlx *mlx);
+int				hook_mouse_move		(int x, int y, t_mlx *mlx);
+
+void			img_clear				(t_img *img);
+void			img_clear_rgb			(t_img *img, int color);
+void			img_ceilfloor_fill		(t_img *img, unsigned char ceil,
+													unsigned char floor);
+void			img_ceilfloor_fill_rgb	(t_img *img, int ceil, int floor);
+
+void			pixel_put	(t_img *img, int x, int y, int color);
+void			draw_line	(t_img *img, t_point p1, t_point p2, int color);
+
+void			demo_fillrate	(t_mlx *mlx, int step);
+void			demo_radar		(t_mlx *mlx, int rays);
 
 #endif
