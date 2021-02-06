@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 19:32:14 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/05 19:38:51 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/06 15:29:54 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,33 @@ void	img_ceilfloor_fill_rgb(t_img *img, int ceil, int floor)
 		img->data[i++] = ceil;
 	while (i < full_screen)
 		img->data[i++] = floor;
+}
+
+void	fizzlefade(t_img *img, int color)
+{
+	static unsigned	rndval = 1;
+	static int		frames;
+	unsigned		lsb;
+	t_upoint		pos;
+	int				i;
+
+	if (frames == 256)
+		return ;
+	frames++;
+	i = 0;
+	while (i++ < 512)
+	{
+		pos.x = ((rndval & 0x1FF00) >> 8) * 2;
+		pos.y = (rndval & 0x000FF) * 2;
+		lsb = rndval & 1;
+		rndval >>= 1;
+		if (lsb)
+			rndval ^= 0x12000;
+		pixel_put(img, pos.x, pos.y, color);
+		pixel_put(img, pos.x + 1, pos.y, color);
+		pixel_put(img, pos.x, pos.y + 1, color);
+		pixel_put(img, pos.x + 1, pos.y + 1, color);
+	}
 }
 
 /*

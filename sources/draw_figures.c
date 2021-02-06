@@ -6,15 +6,15 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 19:33:42 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/05 21:19:02 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/06 18:41:49 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-void	pixel_put(t_img *img, int x, int y, int color)
+void	pixel_put(t_img *img, unsigned x, unsigned y, int color)
 {
-	if (x < 0 || x >= img->size.x || y < 0 || y >= img->size.y)
+	if (x >= img->size.x || y >= img->size.y)
 		return ;
 	img->data[y * img->size.x + x] = color;
 }
@@ -28,7 +28,7 @@ void	draw_line(t_img *img, t_point p1, t_point p2, int color)
 	int				error_2;
 
 	error = diff.x + diff.y;
-	while (1)
+	while (true)
 	{
 		pixel_put(img, p1.x, p1.y, color);
 		if (p1.x == p2.x && p1.y == p2.y)
@@ -45,4 +45,26 @@ void	draw_line(t_img *img, t_point p1, t_point p2, int color)
 			p1.y += step_y;
 		}
 	}
+}
+
+void	draw_4pts(t_img *img, t_point *pts, int color)
+{
+	draw_line(img, pts[0], pts[1], color);
+	draw_line(img, pts[1], pts[2], color);
+	draw_line(img, pts[2], pts[3], color);
+	draw_line(img, pts[3], pts[0], color);
+}
+
+void	draw_square(t_img *img, t_point center, int size, int color)
+{
+	const int	shift = size / 2;
+
+	center.x -= shift;
+	center.y -= shift;
+	draw_line(img, center, (t_point){center.x + size, center.y}, color);
+	draw_line(img, (t_point){center.x + size, center.y},
+					(t_point){center.x + size, center.y + size}, color);
+	draw_line(img, (t_point){center.x + size, center.y + size},
+					(t_point){center.x, center.y + size}, color);
+	draw_line(img, (t_point){center.x, center.y + size}, center, color);
 }
