@@ -6,12 +6,12 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/02/06 14:59:15 by ngragas          ###   ########.fr        #
+#    Updated: 2021/02/07 15:40:23 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = cub3D
-CFLAGS = -Wall -Wextra -Werror -MMD -O2
+CFLAGS = -Wall -Wextra -Werror -MMD -g -O2
 SRC =	main.c			\
 		hooks.c			\
 		draw_fills.c	\
@@ -29,8 +29,6 @@ LIB_DIR = libft/
 
 all:
 	$(MAKE) $(NAME) -j8
-debug: CFLAGS += -g -O0
-debug: all
 bonus: all
 $(LIB): FORCE
 	$(MAKE) -C $(LIB_DIR)

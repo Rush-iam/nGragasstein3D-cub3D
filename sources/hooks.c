@@ -6,13 +6,13 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 22:16:42 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/06 15:57:32 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/07 18:51:15 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-int	hook_key_press(int key, t_input *input)
+int	hook_key_press(int key, struct s_key *input)
 {
 	if (key >= (int)sizeof(input->k))
 		return (1);
@@ -22,7 +22,7 @@ int	hook_key_press(int key, t_input *input)
 	return (0);
 }
 
-int	hook_key_release(int key, t_input *input)
+int	hook_key_release(int key, struct s_key *input)
 {
 	if (key >= (int)sizeof(input->k))
 		return (1);
@@ -30,7 +30,7 @@ int	hook_key_release(int key, t_input *input)
 	return (0);
 }
 
-int	hook_mouse_press(int button, int x, int y, t_input *input)
+int	hook_mouse_press(int button, int x, int y, struct s_key *input)
 {
 	(void)x;
 	(void)y;
@@ -40,7 +40,7 @@ int	hook_mouse_press(int button, int x, int y, t_input *input)
 	return (0);
 }
 
-int	hook_mouse_release(int button, int x, int y, t_input *input)
+int	hook_mouse_release(int button, int x, int y, struct s_key *input)
 {
 	(void)x;
 	(void)y;
@@ -50,7 +50,7 @@ int	hook_mouse_release(int button, int x, int y, t_input *input)
 	return (0);
 }
 
-int	hook_mouse_move(int x, int y, t_input *input)
+int	hook_mouse_move(int x, int y, struct s_key *input)
 {
 	input->mdir.x = x - input->mpos.x;
 	input->mdir.y = y - input->mpos.y;

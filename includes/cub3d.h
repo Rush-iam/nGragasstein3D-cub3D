@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/06 21:29:52 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/07 20:39:52 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@
 # include "libft.h"
 # include "x_events.h"
 
-# define WIN_W 1200
-# define WIN_H 672
+# define WIN_W 1200 * 2
+# define WIN_H 672 * 2
 
 # define COLOR_CEIL		60
 # define COLOR_FLOOR	105
@@ -36,11 +36,10 @@
 # define TURN_LEFT		KEY_LEFT
 # define TURN_RIGHT		KEY_RIGHT
 
-# define MAP_SCALE		48
-# define MAP_RAYLEN		16 * MAP_SCALE
-# define PLAYER_SPEED	.05
-# define POV_ANGLE		60
-# define RAYS			3
+# define MAP_SCALE		32
+# define COL_SCALE		WIN_H
+# define PLAYER_SPEED	0.05
+# define POV_ANGLE		60.
 
 typedef struct	s_point
 {
@@ -67,49 +66,50 @@ typedef struct	s_img
 	t_upoint	size;
 }				t_img;
 
-typedef struct	s_input
-{
-	bool		k[280];
-	bool		m[10];
-	t_point		mpos;
-	t_point		mdir;
-}				t_input;
-
-typedef struct	s_player
-{
-	t_fpoint	pos;
-	float		angle;
-}				t_player;
-
-typedef struct	s_map
-{
-	t_upoint	size;
-	char		*grid[14];
-}				t_map;
-
 typedef struct	s_game
 {
 	void		*mlx;
 	void		*win;
 	t_img		img;
-	t_input		key;
-	t_player	p;
-	t_map		map;
+	struct		s_player
+	{
+		t_fpoint	pos;
+		float		angle;
+	}			p;
+	struct		s_key
+	{
+		bool		k[280];
+		bool		m[10];
+		t_point		mpos;
+		t_point		mdir;
+	}			key;
+	struct		s_map
+	{
+		t_upoint	size;
+		char		*grid[14];
+	}			map;
+	struct		s_column
+	{
+		unsigned	height;
+		double		distance;
+		t_fpoint	cell;
+		char		dir;
+	}			column[WIN_W];
 }				t_game;
 
 int				game_loop		(t_game *game);
 int				terminate		(void);
 
-int				hook_key_press		(int key, t_input *input);
-int				hook_key_release	(int key, t_input *input);
-int				hook_mouse_press	(int button, int x, int y, t_input *input);
-int				hook_mouse_release	(int button, int x, int y, t_input *input);
-int				hook_mouse_move		(int x, int y, t_input *input);
+int				hook_key_press		(int key, struct s_key *input);
+int				hook_key_release	(int key, struct s_key *input);
+int				hook_mouse_press	(int button, int x, int y, struct s_key *input);
+int				hook_mouse_release	(int button, int x, int y, struct s_key *input);
+int				hook_mouse_move		(int x, int y, struct s_key *input);
 
 void			img_clear				(t_img *img);
 void			img_clear_rgb			(t_img *img, int color);
 void			img_ceilfloor_fill		(t_img *img, unsigned char ceil,
-													unsigned char floor);
+												unsigned char floor);
 void			img_ceilfloor_fill_rgb	(t_img *img, int ceil, int floor);
 void			fizzlefade				(t_img *img, int color);
 
