@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/07 20:39:15 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/08 21:14:53 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,14 @@ int	main(void)
 		return (EXIT_FAILURE);
 	game.img.data = (int *)mlx_get_data_addr(game.img.ptr, &null, &null, &null);
 	game.img.size = (t_upoint){WIN_W, WIN_H};
-	game.map.size = (t_upoint){WIN_W, WIN_H};
+	game.map.size = (t_upoint){25, 14};
+	game.map.img.size = (t_upoint){game.map.size.x * MAP_SCALE,
+								game.map.size.y * MAP_SCALE};
+	if (!(game.map.img.ptr = mlx_new_image(game.mlx,
+							game.map.img.size.x, game.map.img.size.y)))
+		return (EXIT_FAILURE);
+	game.map.img.data = (int *)mlx_get_data_addr(game.map.img.ptr, &null, &null,
+																		&null);
 	mlx_do_key_autorepeatoff(game.mlx);
 	mlx_hook(game.win, EVENT_KEYPRESS, 0, hook_key_press, &game.key);
 	mlx_hook(game.win, EVENT_KEYRELEASE, 0, hook_key_release, &game.key);
@@ -58,7 +65,32 @@ int	main(void)
 		i++;
 	}
 	game.map.size = (t_upoint){25, 14};
-	game.p.pos = (t_fpoint){25. / 2, 14 / 2};
+	game.p.pos = (t_fpoint){12.1, 4};
+
+	if (!(game.wall[WALL_N].ptr = mlx_xpm_file_to_image(game.mlx, "resources/WALL_N.xpm",
+					(int *)&game.wall[WALL_N].size.x, (int *)&game.wall[WALL_N].size.y)))
+		return (EXIT_FAILURE);
+	game.wall[WALL_N].data = (int *)mlx_get_data_addr(game.wall[WALL_N].ptr, &null, &null, &null);
+	if (!(game.wall[WALL_S].ptr = mlx_xpm_file_to_image(game.mlx, "resources/WALL_S.xpm",
+					(int *)&game.wall[WALL_S].size.x, (int *)&game.wall[WALL_S].size.y)))
+		return (EXIT_FAILURE);
+	game.wall[WALL_S].data = (int *)mlx_get_data_addr(game.wall[WALL_S].ptr, &null, &null, &null);
+	if (!(game.wall[WALL_W].ptr = mlx_xpm_file_to_image(game.mlx, "resources/WALL_W.xpm",
+					(int *)&game.wall[WALL_W].size.x, (int *)&game.wall[WALL_W].size.y)))
+		return (EXIT_FAILURE);
+	game.wall[WALL_W].data = (int *)mlx_get_data_addr(game.wall[WALL_W].ptr, &null, &null, &null);
+	if (!(game.wall[WALL_E].ptr = mlx_xpm_file_to_image(game.mlx, "resources/WALL_E.xpm",
+					(int *)&game.wall[WALL_E].size.x, (int *)&game.wall[WALL_E].size.y)))
+		return (EXIT_FAILURE);
+	game.wall[WALL_E].data = (int *)mlx_get_data_addr(game.wall[WALL_E].ptr, &null, &null, &null);
+	if (!(game.sprite[0].img.ptr = mlx_xpm_file_to_image(game.mlx, "resources/sprite.xpm",
+					(int *)&game.sprite[0].img.size.x, (int *)&game.sprite[0].img.size.y)))
+		return (EXIT_FAILURE);
+	game.sprite[0].img.data = (int *)mlx_get_data_addr(game.sprite[0].img.ptr, &null, &null, &null);
+	game.sprite[0].frames = 1;
+	game.object[0].pos = (t_fpoint){21, 4};
+	game.object[0].sprite_index = 0;
+	game.object_count = 1;
 	mlx_loop(game.mlx);
 }
 
@@ -102,32 +134,6 @@ void	player_control(t_game *game)
 		game->p.pos.y = nextafter(game->map.size.y, game->map.size.y - 1);
 }
 
-void	draw_map(t_game *game)
-{
-	const unsigned	max_x = game->map.size.x * MAP_SCALE;
-	const unsigned	max_y = game->map.size.y * MAP_SCALE;
-	unsigned int	x;
-	unsigned int	y;
-
-	y = 0;
-	while (y < max_y)
-	{
-		x = 0;
-		while (x < max_x)
-		{
-			draw_line(&game->img, (t_point){x, y},
-									(t_point){x + MAP_SCALE, y}, 0x113322);
-			draw_line(&game->img, (t_point){x, y},
-									(t_point){x, y + MAP_SCALE}, 0x113322);
-			if (game->map.grid[y / MAP_SCALE][x / MAP_SCALE] == '1')
-				draw_square(&game->img, (t_point){
-				x + MAP_SCALE / 2, y + MAP_SCALE / 2}, MAP_SCALE - 4, 0x33AA99);
-			x += MAP_SCALE;
-		}
-		y += MAP_SCALE;
-	}
-}
-
 void	ray_intersect(t_game *game, double cur_angle, unsigned ray)
 {
 	t_fpoint	x_axis;
@@ -160,58 +166,130 @@ void	ray_intersect(t_game *game, double cur_angle, unsigned ray)
 	if (y_axis.x > game->map.size.x)
 		y_axis.x = game->map.size.x;
 	len.x = sqrt(pow(x_axis.x - game->p.pos.x, 2) + pow(x_axis.y - game->p.pos.y, 2));
+//	len.x = fabs((x_axis.y - game->p.pos.y) / sin(cur_angle));
 	len.y = sqrt(pow(y_axis.x - game->p.pos.x, 2) + pow(y_axis.y - game->p.pos.y, 2));
-	game->column[ray].distance = (len.x < len.y) ? len.x : len.y;
-	game->column[ray].height = COL_SCALE * 1. / sqrt(game->column[ray].distance);
+//	len.y = fabs((y_axis.x - game->p.pos.x) / cos(cur_angle));
+	game->column[ray].distance = (len.x < len.y ? len.x : len.y) *
+												cos(cur_angle - game->p.angle);
+	game->column[ray].height = COL_SCALE * 1. / game->column[ray].distance;
 	if (game->column[ray].height == 0 || game->column[ray].height > 8 * COL_SCALE)
 		game->column[ray].height = 8 * COL_SCALE;
 	game->column[ray].cell = (len.x < len.y) ? x_axis : y_axis;
 	game->column[ray].dir = (len.x < len.y) ?
 			"EW"[x_axis.x >= game->p.pos.x] : "NS"[y_axis.y >= game->p.pos.y];
+	game->column[ray].texture_pos = (len.x < len.y) ?
+		fabs(x_axis.y) - (int)x_axis.y : fabs(y_axis.x) - (int)y_axis.x;
 }
 
-void	draw_player(t_game *game)
+void	draw_map_player(t_game *game)
 {
 	unsigned	ray;
 
-	draw_square(&game->img, (t_point){game->p.pos.x * MAP_SCALE,
+	draw_square(&game->map.img, (t_point){game->p.pos.x * MAP_SCALE,
 									game->p.pos.y * MAP_SCALE}, 6, 0xFFFA80);
 	ray = 0;
 	while (ray < game->img.size.x)
 	{
-		draw_line(&game->img,
+		draw_line(&game->map.img,
 			(t_point){game->p.pos.x * MAP_SCALE, game->p.pos.y * MAP_SCALE},
 			(t_point){game->column[ray].cell.x * MAP_SCALE,
 					game->column[ray].cell.y * MAP_SCALE}, 0x888015);
-		ray++;
+		ray += 32;
 	}
-	draw_line(&game->img, (t_point){game->p.pos.x * MAP_SCALE,
+	draw_line(&game->map.img, (t_point){game->p.pos.x * MAP_SCALE,
 									game->p.pos.y * MAP_SCALE}, (t_point){
 		game->p.pos.x * MAP_SCALE + MAP_SCALE * cos(game->p.angle),
 		game->p.pos.y * MAP_SCALE + MAP_SCALE * sin(game->p.angle)}, 0xFF4020);
 }
 
+void	draw_map(t_game *game)
+{
+	unsigned	x;
+	unsigned	y;
+
+	img_clear_rgb(&game->map.img, 0xAA000000);
+	y = 0;
+	while (y < game->map.img.size.y)
+	{
+		x = 0;
+		while (x < game->map.img.size.x)
+		{
+			draw_line(&game->map.img, (t_point){x, y},
+					  (t_point){x + MAP_SCALE, y}, 0x113322);
+			draw_line(&game->map.img, (t_point){x, y},
+					  (t_point){x, y + MAP_SCALE}, 0x113322);
+			if (game->map.grid[y / MAP_SCALE][x / MAP_SCALE] == '1')
+				draw_square(&game->map.img, (t_point){
+				x + MAP_SCALE / 2, y + MAP_SCALE / 2}, MAP_SCALE - 4, 0x33AA99);
+			x += MAP_SCALE;
+		}
+		y += MAP_SCALE;
+	}
+	draw_map_player(game);
+	draw_square(&game->map.img, (t_point){game->object[0].pos.x * MAP_SCALE,
+							game->object[0].pos.y * MAP_SCALE}, 6, 0xFFFA80);
+	mlx_put_image_to_window(game->mlx, game->win, game->map.img.ptr, 0, 0);
+}
+
+int		pixel_fade(int pixel, double fade)
+{
+	return (((int)((pixel & 0xFF0000) * fade) & 0xFF0000) +
+	((int)((pixel & 0xFF00) * fade) & 0xFF00) + (int)((pixel & 0xFF) * fade));
+}
+
+void	draw_wall_scaled(t_game *game, t_img *src, unsigned ray, double fade)
+{
+	const double	step = (double)src->size.y / game->column[ray].height;
+	const unsigned	src_column = game->column[ray].texture_pos * src->size.x;
+	unsigned		cur;
+	double			cur_src;
+	unsigned		max_height;
+
+	cur_src = 0;
+	if (game->column[ray].height > game->img.size.y)
+	{
+		cur_src += (double)src->size.y * (game->column[ray].height -
+							game->img.size.y) / 2 / game->column[ray].height;
+		cur = 0;
+		max_height = game->img.size.y;
+	}
+	else
+	{
+		cur = game->img.size.y / 2 - game->column[ray].height / 2;
+		max_height = cur + game->column[ray].height;
+	}
+	while (cur < max_height)
+	{
+		if (fade == 1)
+			pixel_put(&game->img, ray, cur,
+				src->data[(unsigned)cur_src * src->size.x + src_column]);
+		else
+			pixel_put(&game->img, ray, cur, pixel_fade(
+				src->data[(unsigned)cur_src * src->size.x + src_column], fade));
+		cur_src += step;
+		cur++;
+	}
+}
+
 void	draw_walls(t_game *game)
 {
-	const unsigned	center = game->img.size.y / 2;
-	unsigned		ray;
-	unsigned		half_wall;
-	double			fade;
+	unsigned	ray;
+	double		fade;
+	unsigned	texture_id;
+	const char	*textures = "NSWE";
 
 	ray = 0;
 	while (ray < game->img.size.x)
 	{
-		half_wall = game->column[ray].height / 2;
-		if (half_wall > center)
-			half_wall = center;
-		fade = 4. / (double)game->column[ray].distance;
+		fade = 4. / game->column[ray].distance;
 		if (fade > 1)
 			fade = 1;
-		if (fade < .01)
-			fade = .01;
-		draw_line(&game->img, (t_point){ray, center - half_wall},
-								(t_point){ray, center + half_wall},
-			((int)(0x60 * fade) << 16) + ((int)(0x80 * fade) << 8) + (int)(0x80 * fade));
+		texture_id = ft_strchr(textures, game->column[ray].dir) - textures;
+		draw_wall_scaled(game, &game->wall[texture_id], ray, fade);
+//		draw_line(&game->img,
+//			(t_point){ray, game->img.size.y / 2 - game->column[ray].height / 2},
+//			(t_point){ray, game->img.size.y / 2 + game->column[ray].height / 2},
+//		((int)(0x60 * fade) << 16) + ((int)(0x80 * fade) << 8) + (int)(0x80 * fade));
 		ray++;
 	}
 }
@@ -224,8 +302,8 @@ void	get_wall_intersections(t_game *game)
 	ray = 0;
 	while (ray < game->img.size.x)
 	{
-		cur_angle = game->p.angle - POV_ANGLE / 2 * GRAD_TO_RAD +
-					POV_ANGLE * ray / (WIN_W - 1) * GRAD_TO_RAD;
+		cur_angle = game->p.angle - FOV / 2 * GRAD_TO_RAD +
+					FOV * ray / (game->img.size.x - 1) * GRAD_TO_RAD;
 		if (cur_angle < 0)
 			cur_angle += PI2;
 		if (cur_angle > PI2)
@@ -235,46 +313,70 @@ void	get_wall_intersections(t_game *game)
 	}
 }
 
+void	draw_sprites(t_game *game)
+{
+	unsigned int	i;
+	double			angle;
+	t_fpoint		dx;
+
+	//sort
+	i = 0;
+	while (i < game->object_count)
+	{
+		dx = (t_fpoint){game->object[i].pos.x - game->p.pos.x,
+						game->object[i].pos.y - game->p.pos.y};
+		angle = atan2(dx.y, dx.x);
+		if (angle < 0)
+			angle += PI2;
+		if (fabs(game->p.angle - angle) <= FOV * GRAD_TO_RAD / 2 ||
+			fabs(game->p.angle - (angle + PI2)) <= FOV * GRAD_TO_RAD / 2 ||
+			fabs(game->p.angle + PI2 - angle) <= FOV * GRAD_TO_RAD / 2)
+		{
+			ft_putnbr_fd((int)(angle * 100), 1);
+			write(1, "\n", 1);
+		}
+		i++;
+	}
+}
+
 int	game_loop(t_game *game)
 {
-	clock_t	start;
-	clock_t	end;
-	char	*fps;
+	static clock_t	tick;
+	char			*fps;
 
-	start = clock();
-
-	img_clear(&game->img);
-//	img_clear_rgb(&game->img, 0x051400);
-	img_ceilfloor_fill(&game->img, COLOR_CEIL, COLOR_FLOOR);
-//	img_ceilfloor_fill_rgb(&game->img, COLOR_CEIL, COLOR_FLOOR);
 	player_control(game);
+//	img_clear(&game->img);
+//	img_clear_rgb(&game->img, 0x051400);
+//	img_ceilfloor_fill(&game->img, COLOR_CEIL, COLOR_FLOOR);
+	img_ceilfloor_fill_rgb(&game->img, COLOR_CEIL, COLOR_FLOOR);
 	get_wall_intersections(game);
 	draw_walls(game);
-	draw_map(game);
-	draw_player(game);
+	draw_sprites(game);
 //	fizzlefade(&game->img, 0xFF0000);
 //	demo_fillrate(game, 1);
 //	demo_radar(game, 360);
 //	demo_cursor(game, 0xFF88FF);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
+//	mlx_put_image_to_window(game->mlx, game->win, game->sprite->img.ptr, 0, 0);
+//	draw_map(game);
 
-	end = clock();
-
-//	ft_putnbr_fd(CLOCKS_PER_SEC / (end - start), 1);
+//	ft_putnbr_fd(CLOCKS_PER_SEC / (clock() - start), 1);
 //	write(1, "\n", 1);
-	fps = ft_itoa(CLOCKS_PER_SEC / (end - start));
+	fps = ft_itoa(CLOCKS_PER_SEC / (clock() - tick));
+	tick = clock();
 	mlx_string_put(game->mlx, game->win, 0, 0, 0xFFFFFF, fps);
 	free(fps);
+
 //	write(1, "Player x", 9); ft_putnbr_fd((int)game->p.pos.x, 1);
 //	write(1, " y", 3); ft_putnbr_fd((int)game->p.pos.y, 1); write(1, "\n", 1);
-	write(1, "Column 0 height ", 16); ft_putnbr_fd(game->column[0].height, 1);
-	write(1, " cell x", 7); ft_putnbr_fd((int)game->column[0].cell.x, 1);
-	write(1, " y", 2); ft_putnbr_fd((int)game->column[0].cell.y, 1);
-	write(1, " dir=", 5); write(1, &(game->column[0].dir), 1); write(1, "\n", 1);
+//	write(1, "Column 0 height ", 16); ft_putnbr_fd(game->column[0].height, 1);
+//	write(1, " cell x", 7); ft_putnbr_fd((int)game->column[0].cell.x, 1);
+//	write(1, " y", 2); ft_putnbr_fd((int)game->column[0].cell.y, 1);
+//	write(1, " dir=", 5); write(1, &(game->column[0].dir), 1); write(1, "\n", 1);
 	return (0);
 }
 
-int	terminate(void)
+int	terminate(int status)
 {
-	exit(EXIT_SUCCESS);
+	exit(status);
 }

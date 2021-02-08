@@ -17,7 +17,7 @@ int	hook_key_press(int key, struct s_key *input)
 	if (key >= (int)sizeof(input->k))
 		return (1);
 	if (key == KEY_ESCAPE)
-		terminate();
+		terminate(EXIT_SUCCESS);
 	input->k[key] = true;
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/07 20:39:52 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/08 21:07:43 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,19 @@
 # include "libft.h"
 # include "x_events.h"
 
-# define WIN_W 1200 * 2
-# define WIN_H 672 * 2
+# define WIN_W (1200 * 2)
+# define WIN_H (672 * 2)
 
-# define COLOR_CEIL		60
-# define COLOR_FLOOR	105
+# define COLOR_CEIL		0x102040
+# define COLOR_FLOOR	0x203050
+
+# define WALL_N	0
+# define WALL_S	1
+# define WALL_W	2
+# define WALL_E	3
 
 # define PI2			(2 * M_PI)
-# define GRAD_TO_RAD	(1 / 360. * PI2)
+# define GRAD_TO_RAD	(PI2 / 360)
 
 # define MOVE_FORWARD	KEY_W
 # define MOVE_BACK		KEY_S
@@ -36,10 +41,10 @@
 # define TURN_LEFT		KEY_LEFT
 # define TURN_RIGHT		KEY_RIGHT
 
-# define MAP_SCALE		32
-# define COL_SCALE		WIN_H
+# define MAP_SCALE		((int)(WIN_W / 64))
+# define FOV			60.
+# define COL_SCALE		(WIN_W / 2 / tan(FOV * GRAD_TO_RAD / 2))
 # define PLAYER_SPEED	0.05
-# define POV_ANGLE		60.
 
 typedef struct	s_point
 {
@@ -66,6 +71,21 @@ typedef struct	s_img
 	t_upoint	size;
 }				t_img;
 
+typedef struct	s_sprite
+{
+	t_img		img;
+	bool		animated;
+	unsigned	frames;
+}				t_sprite;
+
+typedef struct	s_object
+{
+	unsigned	sprite_index;
+	t_fpoint	pos;
+	double		distance;
+
+}				t_object;
+
 typedef struct	s_game
 {
 	void		*mlx;
@@ -85,6 +105,7 @@ typedef struct	s_game
 	}			key;
 	struct		s_map
 	{
+		t_img		img;
 		t_upoint	size;
 		char		*grid[14];
 	}			map;
@@ -93,12 +114,17 @@ typedef struct	s_game
 		unsigned	height;
 		double		distance;
 		t_fpoint	cell;
+		double		texture_pos;
 		char		dir;
 	}			column[WIN_W];
+	t_img		wall[4];
+	t_sprite	sprite[1];
+	t_object	object[1];
+	unsigned	object_count;
 }				t_game;
 
 int				game_loop		(t_game *game);
-int				terminate		(void);
+int				terminate		(int status);
 
 int				hook_key_press		(int key, struct s_key *input);
 int				hook_key_release	(int key, struct s_key *input);
