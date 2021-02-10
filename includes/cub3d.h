@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/08 21:07:43 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/10 22:53:26 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,8 @@
 # define TURN_RIGHT		KEY_RIGHT
 
 # define MAP_SCALE		((int)(WIN_W / 64))
-# define FOV			60.
-# define COL_SCALE		(WIN_W / 2 / tan(FOV * GRAD_TO_RAD / 2))
+# define FOV			(60. * GRAD_TO_RAD)
+# define COL_SCALE		(WIN_W / 2 / tan(FOV / 2))
 # define PLAYER_SPEED	0.05
 
 typedef struct	s_point
@@ -80,10 +80,10 @@ typedef struct	s_sprite
 
 typedef struct	s_object
 {
-	unsigned	sprite_index;
-	t_fpoint	pos;
+	t_sprite	*sprite;
+	double		height;
 	double		distance;
-
+	t_fpoint	pos;
 }				t_object;
 
 typedef struct	s_game
@@ -94,7 +94,7 @@ typedef struct	s_game
 	struct		s_player
 	{
 		t_fpoint	pos;
-		float		angle;
+		double		angle;
 	}			p;
 	struct		s_key
 	{
@@ -119,7 +119,7 @@ typedef struct	s_game
 	}			column[WIN_W];
 	t_img		wall[4];
 	t_sprite	sprite[1];
-	t_object	object[1];
+	t_object	object[4];
 	unsigned	object_count;
 }				t_game;
 

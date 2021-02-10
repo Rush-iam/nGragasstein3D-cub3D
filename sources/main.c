@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/08 21:14:53 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/10 22:49:59 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ int	main(void)
 		i++;
 	}
 	game.map.size = (t_upoint){25, 14};
-	game.p.pos = (t_fpoint){12.1, 4};
+	game.p.pos = (t_fpoint){12.1, 3.5};
 
 	if (!(game.wall[WALL_N].ptr = mlx_xpm_file_to_image(game.mlx, "resources/WALL_N.xpm",
 					(int *)&game.wall[WALL_N].size.x, (int *)&game.wall[WALL_N].size.y)))
@@ -88,9 +88,15 @@ int	main(void)
 		return (EXIT_FAILURE);
 	game.sprite[0].img.data = (int *)mlx_get_data_addr(game.sprite[0].img.ptr, &null, &null, &null);
 	game.sprite[0].frames = 1;
-	game.object[0].pos = (t_fpoint){21, 4};
-	game.object[0].sprite_index = 0;
-	game.object_count = 1;
+	game.object[0].pos = (t_fpoint){20.5, 3.5};
+	game.object[0].sprite = &game.sprite[0];
+	game.object[1].pos = (t_fpoint){21.5, 3.5};
+	game.object[1].sprite = &game.sprite[0];
+	game.object[2].pos = (t_fpoint){22, 3.2};
+	game.object[2].sprite = &game.sprite[0];
+	game.object[3].pos = (t_fpoint){22, 3};
+	game.object[3].sprite = &game.sprite[0];
+	game.object_count = 4;
 	mlx_loop(game.mlx);
 }
 
@@ -171,7 +177,7 @@ void	ray_intersect(t_game *game, double cur_angle, unsigned ray)
 //	len.y = fabs((y_axis.x - game->p.pos.x) / cos(cur_angle));
 	game->column[ray].distance = (len.x < len.y ? len.x : len.y) *
 												cos(cur_angle - game->p.angle);
-	game->column[ray].height = COL_SCALE * 1. / game->column[ray].distance;
+	game->column[ray].height = COL_SCALE / game->column[ray].distance;
 	if (game->column[ray].height == 0 || game->column[ray].height > 8 * COL_SCALE)
 		game->column[ray].height = 8 * COL_SCALE;
 	game->column[ray].cell = (len.x < len.y) ? x_axis : y_axis;
@@ -296,20 +302,78 @@ void	draw_walls(t_game *game)
 
 void	get_wall_intersections(t_game *game)
 {
-	unsigned	ray;
-	double		cur_angle;
+	unsigned		ray;
+	const double	start_angle = game->p.angle - FOV / 2;
+	double			cur_angle;
 
 	ray = 0;
 	while (ray < game->img.size.x)
 	{
-		cur_angle = game->p.angle - FOV / 2 * GRAD_TO_RAD +
-					FOV * ray / (game->img.size.x - 1) * GRAD_TO_RAD;
+		cur_angle = start_angle + FOV * ray / (game->img.size.x - 1);
 		if (cur_angle < 0)
 			cur_angle += PI2;
-		if (cur_angle > PI2)
+		else if (cur_angle > PI2)
 			cur_angle -= PI2;
 		ray_intersect(game, cur_angle, ray);
 		ray++;
+	}
+}
+
+void	draw_sprite_scaled(t_game *game, t_object *obj, int ray, unsigned src_col)
+{
+	const double	step = (double)obj->sprite->img.size.y / obj->height;
+	unsigned		cur;
+	double			cur_src;
+	unsigned		max_height;
+	int				src_pixel;
+
+	cur_src = 0;
+	if (obj->height > game->img.size.y)
+	{
+		cur_src += (double)obj->sprite->img.size.y * (obj->height -
+					game->img.size.y) / 2 / obj->height;
+		cur = 0;
+		max_height = game->img.size.y;
+	}
+	else
+	{
+		cur = game->img.size.y / 2 - obj->height / 2;
+		max_height = cur + obj->height;
+	}
+	while (cur < max_height)
+	{
+		src_pixel = obj->sprite->img.data[(unsigned)cur_src * obj->sprite->img.size.x + src_col];
+		if ((src_pixel >> 24) == 0)
+			pixel_put(&game->img, ray, cur, src_pixel);
+		cur_src += step;
+		cur++;
+	}
+}
+
+void	sprites_sort(t_game *game)
+{
+	unsigned	i;
+	bool		sorted;
+	t_object	tmp;
+
+	if (game->object_count == 0)
+		return ;
+	sorted = false;
+	while (sorted == false)
+	{
+		sorted = true;
+		i = 0;
+		while (i < game->object_count - 1)
+		{
+			if (game->object[i].distance < game->object[i + 1].distance)
+			{
+				sorted = false;
+				tmp = game->object[i];
+				game->object[i] = game->object[i + 1];
+				game->object[i + 1] = tmp;
+			}
+			i++;
+		}
 	}
 }
 
@@ -317,23 +381,35 @@ void	draw_sprites(t_game *game)
 {
 	unsigned int	i;
 	double			angle;
-	t_fpoint		dx;
+	t_fpoint		diff;
+	int				cur_ray;
+	int				max_ray;
 
-	//sort
+	sprites_sort(game);
 	i = 0;
 	while (i < game->object_count)
 	{
-		dx = (t_fpoint){game->object[i].pos.x - game->p.pos.x,
+		diff = (t_fpoint){game->object[i].pos.x - game->p.pos.x,
 						game->object[i].pos.y - game->p.pos.y};
-		angle = atan2(dx.y, dx.x);
-		if (angle < 0)
+		angle = atan2(diff.y, diff.x);
+		if (fabs(game->p.angle - angle - PI2) <= FOV / 2)
 			angle += PI2;
-		if (fabs(game->p.angle - angle) <= FOV * GRAD_TO_RAD / 2 ||
-			fabs(game->p.angle - (angle + PI2)) <= FOV * GRAD_TO_RAD / 2 ||
-			fabs(game->p.angle + PI2 - angle) <= FOV * GRAD_TO_RAD / 2)
+		angle = game->p.angle - angle;
+		if (fabs(angle) <= FOV / 2)
 		{
-			ft_putnbr_fd((int)(angle * 100), 1);
-			write(1, "\n", 1);
+			game->object[i].distance = sqrt(pow(diff.x, 2) + pow(diff.y, 2));
+			game->object[i].height = COL_SCALE / game->object[i].distance;
+			cur_ray = (1. - (angle + FOV / 2) / FOV) * game->img.size.x;
+			cur_ray -= game->object[i].height / 2;
+			max_ray = cur_ray + game->object[i].height;
+			while (cur_ray < max_ray && cur_ray < (int)game->img.size.x)
+			{
+				if (cur_ray >= 0 && game->column[cur_ray].distance > game->object[i].distance)
+					draw_sprite_scaled(game, &game->object[i], cur_ray,
+				(1. - (double)(max_ray - cur_ray) / game->object[i].height) *
+						game->object[i].sprite->img.size.x);
+				cur_ray++;
+			}
 		}
 		i++;
 	}
@@ -348,18 +424,18 @@ int	game_loop(t_game *game)
 //	img_clear(&game->img);
 //	img_clear_rgb(&game->img, 0x051400);
 //	img_ceilfloor_fill(&game->img, COLOR_CEIL, COLOR_FLOOR);
+
 	img_ceilfloor_fill_rgb(&game->img, COLOR_CEIL, COLOR_FLOOR);
 	get_wall_intersections(game);
 	draw_walls(game);
 	draw_sprites(game);
+	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
+	draw_map(game);
+
 //	fizzlefade(&game->img, 0xFF0000);
 //	demo_fillrate(game, 1);
 //	demo_radar(game, 360);
 //	demo_cursor(game, 0xFF88FF);
-	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
-//	mlx_put_image_to_window(game->mlx, game->win, game->sprite->img.ptr, 0, 0);
-//	draw_map(game);
-
 //	ft_putnbr_fd(CLOCKS_PER_SEC / (clock() - start), 1);
 //	write(1, "\n", 1);
 	fps = ft_itoa(CLOCKS_PER_SEC / (clock() - tick));
