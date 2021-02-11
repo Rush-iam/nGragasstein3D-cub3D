@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/10 22:53:26 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/12 00:02:24 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,18 +21,15 @@
 # include "x_events.h"
 
 # define WIN_W (1200 * 2)
-# define WIN_H (672 * 2)
+# define WIN_H (600 * 2)
 
-# define COLOR_CEIL		0x102040
-# define COLOR_FLOOR	0x203050
+# define COLOR_CEIL		0x201010
+# define COLOR_FLOOR	0x503020
 
 # define WALL_N	0
 # define WALL_S	1
 # define WALL_W	2
 # define WALL_E	3
-
-# define PI2			(2 * M_PI)
-# define GRAD_TO_RAD	(PI2 / 360)
 
 # define MOVE_FORWARD	KEY_W
 # define MOVE_BACK		KEY_S
@@ -41,9 +38,11 @@
 # define TURN_LEFT		KEY_LEFT
 # define TURN_RIGHT		KEY_RIGHT
 
+# define PI2			(2 * M_PI)
+# define GRAD_TO_RAD	(PI2 / 360)
 # define MAP_SCALE		((int)(WIN_W / 64))
 # define FOV			(60. * GRAD_TO_RAD)
-# define COL_SCALE		(WIN_W / 2 / tan(FOV / 2))
+# define COL_SCALE		(WIN_W / 2 / tan(FOV / 2) * 1.1)
 # define PLAYER_SPEED	0.05
 
 typedef struct	s_point
@@ -81,6 +80,7 @@ typedef struct	s_sprite
 typedef struct	s_object
 {
 	t_sprite	*sprite;
+	double		width;
 	double		height;
 	double		distance;
 	t_fpoint	pos;

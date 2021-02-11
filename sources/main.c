@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/10 22:49:59 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/12 00:04:23 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,28 +67,29 @@ int	main(void)
 	game.map.size = (t_upoint){25, 14};
 	game.p.pos = (t_fpoint){12.1, 3.5};
 
-	if (!(game.wall[WALL_N].ptr = mlx_xpm_file_to_image(game.mlx, "resources/WALL_N.xpm",
+	if (!(game.wall[WALL_N].ptr = mlx_xpm_file_to_image(game.mlx, "resources/wall_1.xpm",
 					(int *)&game.wall[WALL_N].size.x, (int *)&game.wall[WALL_N].size.y)))
 		return (EXIT_FAILURE);
 	game.wall[WALL_N].data = (int *)mlx_get_data_addr(game.wall[WALL_N].ptr, &null, &null, &null);
-	if (!(game.wall[WALL_S].ptr = mlx_xpm_file_to_image(game.mlx, "resources/WALL_S.xpm",
+	if (!(game.wall[WALL_S].ptr = mlx_xpm_file_to_image(game.mlx, "resources/wall_2.xpm",
 					(int *)&game.wall[WALL_S].size.x, (int *)&game.wall[WALL_S].size.y)))
 		return (EXIT_FAILURE);
 	game.wall[WALL_S].data = (int *)mlx_get_data_addr(game.wall[WALL_S].ptr, &null, &null, &null);
-	if (!(game.wall[WALL_W].ptr = mlx_xpm_file_to_image(game.mlx, "resources/WALL_W.xpm",
+	if (!(game.wall[WALL_W].ptr = mlx_xpm_file_to_image(game.mlx, "resources/wall_3.xpm",
 					(int *)&game.wall[WALL_W].size.x, (int *)&game.wall[WALL_W].size.y)))
 		return (EXIT_FAILURE);
 	game.wall[WALL_W].data = (int *)mlx_get_data_addr(game.wall[WALL_W].ptr, &null, &null, &null);
-	if (!(game.wall[WALL_E].ptr = mlx_xpm_file_to_image(game.mlx, "resources/WALL_E.xpm",
+	if (!(game.wall[WALL_E].ptr = mlx_xpm_file_to_image(game.mlx, "resources/wall_4.xpm",
 					(int *)&game.wall[WALL_E].size.x, (int *)&game.wall[WALL_E].size.y)))
 		return (EXIT_FAILURE);
 	game.wall[WALL_E].data = (int *)mlx_get_data_addr(game.wall[WALL_E].ptr, &null, &null, &null);
-	if (!(game.sprite[0].img.ptr = mlx_xpm_file_to_image(game.mlx, "resources/sprite.xpm",
+
+	if (!(game.sprite[0].img.ptr = mlx_xpm_file_to_image(game.mlx, "resources/sprite_3.xpm",
 					(int *)&game.sprite[0].img.size.x, (int *)&game.sprite[0].img.size.y)))
 		return (EXIT_FAILURE);
 	game.sprite[0].img.data = (int *)mlx_get_data_addr(game.sprite[0].img.ptr, &null, &null, &null);
 	game.sprite[0].frames = 1;
-	game.object[0].pos = (t_fpoint){20.5, 3.5};
+	game.object[0].pos = (t_fpoint){23.95, 3.5};
 	game.object[0].sprite = &game.sprite[0];
 	game.object[1].pos = (t_fpoint){21.5, 3.5};
 	game.object[1].sprite = &game.sprite[0];
@@ -106,6 +107,11 @@ void	player_control(t_game *game)
 		game->p.angle -= 0.02;
 	if (game->key.k[TURN_RIGHT])
 		game->p.angle += 0.02;
+//	if (game->key.mdir.x)
+//	{
+//		game->p.angle += (double)game->key.mdir.x / 1000;
+//		game->key.mdir.x = 0;
+//	}
 	if (game->p.angle > PI2)
 		game->p.angle -= PI2;
 	if (game->p.angle < 0)
@@ -149,42 +155,31 @@ void	ray_intersect(t_game *game, double cur_angle, unsigned ray)
 
 	step = (cur_angle < M_PI_2 || cur_angle > 3 * M_PI_2) ?
 			(t_fpoint){1, tan(cur_angle)} : (t_fpoint){-1, -tan(cur_angle)};
-	x_axis.x = floor(game->p.pos.x + (step.x > 0));
-	x_axis.y = game->p.pos.y + step.y *
-			(step.x > 0 ? 1 - (game->p.pos.x - (int)game->p.pos.x) :
-								game->p.pos.x - (int)game->p.pos.x);
+	x_axis.x = (int)game->p.pos.x + (step.x > 0);
+	x_axis.y = game->p.pos.y + step.y * (step.x > 0 ? 1 - (game->p.pos.x
+			- (int)game->p.pos.x) : game->p.pos.x - (int)game->p.pos.x);
 	while ((unsigned)x_axis.y < game->map.size.y &&
 			(unsigned)x_axis.x - (step.x < 0) < game->map.size.x &&
 			game->map.grid[(int)x_axis.y][(int)x_axis.x - (step.x < 0)] != '1')
-		x_axis = (t_fpoint){round(x_axis.x + step.x), x_axis.y + step.y};
-	if (x_axis.y > game->map.size.y)
-		x_axis.y = game->map.size.y;
-	step = (cur_angle < M_PI) ?
-			(t_fpoint){tan(M_PI_2 - cur_angle), 1} : (t_fpoint){-tan(M_PI_2 - cur_angle), -1};
-	y_axis.y = floor(game->p.pos.y + (step.y > 0));
-	y_axis.x = game->p.pos.x + step.x *
-			(step.y > 0 ? 1 - (game->p.pos.y - (int)game->p.pos.y) :
-								game->p.pos.y - (int)game->p.pos.y);
+		x_axis = (t_fpoint){x_axis.x + step.x, x_axis.y + step.y};
+	step = (cur_angle < M_PI) ? (t_fpoint){1 / tan(cur_angle), 1} :
+								(t_fpoint){-1 / tan(cur_angle), -1};
+	y_axis.y = (int)game->p.pos.y + (step.y > 0);
+	y_axis.x = game->p.pos.x + step.x * (step.y > 0 ? 1 - (game->p.pos.y
+			- (int)game->p.pos.y) : game->p.pos.y - (int)game->p.pos.y);
 	while ((unsigned)y_axis.y - (step.y < 0) < game->map.size.y &&
 			(unsigned)y_axis.x < game->map.size.x &&
 			game->map.grid[(int)y_axis.y - (step.y < 0)][(int)y_axis.x] != '1')
-		y_axis = (t_fpoint){y_axis.x + step.x, round(y_axis.y + step.y)};
-	if (y_axis.x > game->map.size.x)
-		y_axis.x = game->map.size.x;
-	len.x = sqrt(pow(x_axis.x - game->p.pos.x, 2) + pow(x_axis.y - game->p.pos.y, 2));
-//	len.x = fabs((x_axis.y - game->p.pos.y) / sin(cur_angle));
-	len.y = sqrt(pow(y_axis.x - game->p.pos.x, 2) + pow(y_axis.y - game->p.pos.y, 2));
-//	len.y = fabs((y_axis.x - game->p.pos.x) / cos(cur_angle));
-	game->column[ray].distance = (len.x < len.y ? len.x : len.y) *
-												cos(cur_angle - game->p.angle);
+		y_axis = (t_fpoint){y_axis.x + step.x, y_axis.y + step.y};
+	len.x = cos(game->p.angle) * (x_axis.x - game->p.pos.x) + sin(game->p.angle) * (x_axis.y - game->p.pos.y);
+	len.y = cos(game->p.angle) * (y_axis.x - game->p.pos.x) + sin(game->p.angle) * (y_axis.y - game->p.pos.y);
+	game->column[ray].distance = (len.x < len.y) ? len.x : len.y;
 	game->column[ray].height = COL_SCALE / game->column[ray].distance;
-	if (game->column[ray].height == 0 || game->column[ray].height > 8 * COL_SCALE)
-		game->column[ray].height = 8 * COL_SCALE;
 	game->column[ray].cell = (len.x < len.y) ? x_axis : y_axis;
 	game->column[ray].dir = (len.x < len.y) ?
 			"EW"[x_axis.x >= game->p.pos.x] : "NS"[y_axis.y >= game->p.pos.y];
 	game->column[ray].texture_pos = (len.x < len.y) ?
-		fabs(x_axis.y) - (int)x_axis.y : fabs(y_axis.x) - (int)y_axis.x;
+		x_axis.y - (int)x_axis.y : y_axis.x - (int)y_axis.x;
 }
 
 void	draw_map_player(t_game *game)
@@ -310,6 +305,8 @@ void	get_wall_intersections(t_game *game)
 	while (ray < game->img.size.x)
 	{
 		cur_angle = start_angle + FOV * ray / (game->img.size.x - 1);
+//		cur_angle += pow(game->p.angle - cur_angle, 3) / 4;
+//		cur_angle += pow(game->p.angle - cur_angle, 3) / 4;
 		if (cur_angle < 0)
 			cur_angle += PI2;
 		else if (cur_angle > PI2)
@@ -379,11 +376,11 @@ void	sprites_sort(t_game *game)
 
 void	draw_sprites(t_game *game)
 {
-	unsigned int	i;
-	double			angle;
-	t_fpoint		diff;
-	int				cur_ray;
-	int				max_ray;
+	unsigned	i;
+	double		angle;
+	t_fpoint	diff;
+	int			cur_ray;
+	int			max_ray;
 
 	sprites_sort(game);
 	i = 0;
@@ -392,21 +389,25 @@ void	draw_sprites(t_game *game)
 		diff = (t_fpoint){game->object[i].pos.x - game->p.pos.x,
 						game->object[i].pos.y - game->p.pos.y};
 		angle = atan2(diff.y, diff.x);
-		if (fabs(game->p.angle - angle - PI2) <= FOV / 2)
+		if (fabs(game->p.angle - angle - PI2) <= M_PI)
 			angle += PI2;
-		angle = game->p.angle - angle;
-		if (fabs(angle) <= FOV / 2)
+		angle -= game->p.angle;
+		if (fabs(angle) < 70. * GRAD_TO_RAD)
 		{
-			game->object[i].distance = sqrt(pow(diff.x, 2) + pow(diff.y, 2));
+			game->object[i].distance = cos(game->p.angle) * diff.x + sin(game->p.angle) * diff.y;
 			game->object[i].height = COL_SCALE / game->object[i].distance;
-			cur_ray = (1. - (angle + FOV / 2) / FOV) * game->img.size.x;
-			cur_ray -= game->object[i].height / 2;
-			max_ray = cur_ray + game->object[i].height;
+			game->object[i].width = game->object[i].sprite->img.size.x *
+					game->object[i].height / game->object[i].sprite->img.size.y;
+			cur_ray = (angle / FOV + 0.5) * game->img.size.x;
+			cur_ray -= game->object[i].width / 2;
+			max_ray = cur_ray + game->object[i].width;
+			if (cur_ray < 0)
+				cur_ray = 0;
 			while (cur_ray < max_ray && cur_ray < (int)game->img.size.x)
 			{
-				if (cur_ray >= 0 && game->column[cur_ray].distance > game->object[i].distance)
+				if (game->column[cur_ray].distance > game->object[i].distance)
 					draw_sprite_scaled(game, &game->object[i], cur_ray,
-				(1. - (double)(max_ray - cur_ray) / game->object[i].height) *
+				(1. - (double)(max_ray - cur_ray) / game->object[i].width) *
 						game->object[i].sprite->img.size.x);
 				cur_ray++;
 			}
