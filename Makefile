@@ -6,12 +6,12 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/02/11 22:59:16 by ngragas          ###   ########.fr        #
+#    Updated: 2021/02/12 21:14:04 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = cub3D
-CFLAGS = -Wall -Wextra -Werror -MMD -g -O2
+CFLAGS = -Wall -Wextra -Werror -MMD -g -Ofast
 SRC =	main.c			\
 		hooks.c			\
 		draw_fills.c	\

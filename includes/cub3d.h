@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/12 00:02:24 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/12 23:45:30 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # include "libft.h"
 # include "x_events.h"
 
-# define WIN_W (1200 * 2)
+# define WIN_W (1200 / 4)
 # define WIN_H (600 * 2)
 
 # define COLOR_CEIL		0x201010
@@ -42,7 +42,7 @@
 # define GRAD_TO_RAD	(PI2 / 360)
 # define MAP_SCALE		((int)(WIN_W / 64))
 # define FOV			(60. * GRAD_TO_RAD)
-# define COL_SCALE		(WIN_W / 2 / tan(FOV / 2) * 1.1)
+# define COL_SCALE		(WIN_W / 2 / tan(FOV / 2))
 # define PLAYER_SPEED	0.05
 
 typedef struct	s_point
@@ -107,12 +107,12 @@ typedef struct	s_game
 	{
 		t_img		img;
 		t_upoint	size;
-		char		*grid[14];
+		char		**grid;
 	}			map;
 	struct		s_column
 	{
-		unsigned	height;
 		double		distance;
+		unsigned	height;
 		t_fpoint	cell;
 		double		texture_pos;
 		char		dir;
