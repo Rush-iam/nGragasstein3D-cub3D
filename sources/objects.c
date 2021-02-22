@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 16:34:37 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/22 18:51:00 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/22 21:45:10 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,9 @@ void	draw_objects(t_game *game)
 									sin(game->p.angle) * diff.y;
 		if (fabs(angle) < FOV)
 		{
-			game->object[i].height = COL_SCALE / game->object[i].distance;
-			game->object[i].width = COL_SCALE / sqrt(pow(diff.x, 2) +
-							pow(diff.y, 2)) * game->object[i].sprite->aspect;
+			game->object[i].width = game->img.size.x / COL_SCALE /
+									sqrt(pow(diff.x, 2) + pow(diff.y, 2)) *
+									game->object[i].sprite->aspect;
 			draw_sprite(game, &game->object[i], angle);
 		}
 		i++;
@@ -75,6 +75,7 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 	int				max_ray;
 	const double	scale_x = obj->width / obj->sprite->img.size.x;
 
+	obj->height = game->img.size.x / COL_SCALE / obj->distance;
 	start_ray = (angle / FOV + 0.5) * game->img.size.x - obj->width / 2;
 	cur = start_ray;
 	max_ray = cur + obj->width;
@@ -90,7 +91,8 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 	}
 }
 
-void	draw_sprite_scaled(t_game *game, t_object *obj, int x, unsigned src_x)
+void	draw_sprite_scaled(t_game *game, t_object *obj, unsigned x,
+																unsigned src_x)
 {
 	const double	step = (double)obj->sprite->img.size.y / obj->height;
 	int				y;

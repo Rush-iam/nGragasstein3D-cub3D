@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/22 18:53:17 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/22 23:22:06 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,10 @@
 # include <mlx.h>
 # include "libft.h"
 # include "x_events.h"
+
+# define ERROR_ARGS		1
+# define ERROR_PARSE	2
+# define ERROR_MEMORY	3
 
 # define WIN_W (1200 * 2)
 # define WIN_H (600 * 2)
@@ -40,10 +44,14 @@
 
 # define PI2			(2 * M_PI)
 # define GRAD_TO_RAD	(PI2 / 360)
-# define MAP_SCALE		((int)(WIN_W / 64))
+# define MAP_SCALE		32
 # define FOV			(60. * GRAD_TO_RAD)
-# define COL_SCALE		(WIN_W / 2 / tan(FOV / 2))
-# define PLAYER_SPEED	0.05
+/*
+** tan(FOV / 2) if FOV 60 == .57735
+*/
+# define TAN_60_2		.57735
+# define COL_SCALE		(2 * TAN_60_2)
+# define PL_SPEED		0.05
 
 typedef struct	s_point
 {
@@ -82,7 +90,7 @@ typedef struct	s_object
 {
 	t_sprite	*sprite;
 	double		width;
-	unsigned 	height;
+	unsigned	height;
 	double		distance;
 	t_fpoint	pos;
 }				t_object;
@@ -125,13 +133,20 @@ typedef struct	s_game
 }				t_game;
 
 int				game_loop		(t_game *game);
-int				terminate		(int status);
 
 int				hook_key_press		(int key_code, struct s_key *key);
 int				hook_key_release	(int key_code, struct s_key *key);
 int				hook_mouse_press	(int btn, int x, int y, struct s_key *key);
 int				hook_mouse_release	(int btn, int x, int y, struct s_key *key);
 int				hook_mouse_move		(int x, int y, struct s_key *key);
+
+void			player_control			(t_game *game);
+void			player_control_borders	(t_game *game);
+
+void			ray_cast		(t_game *game);
+void			ray_intersect	(t_game *game, double cur_angle, unsigned ray);
+t_fpoint		ray_intersect_x	(t_game *game, t_fpoint step);
+t_fpoint		ray_intersect_y	(t_game *game, t_fpoint step);
 
 void			img_clear				(t_img *img);
 void			img_clear_rgb			(t_img *img, int color);
@@ -150,17 +165,18 @@ void			draw_map(t_game *game);
 void			draw_map_player(t_game *game);
 
 void			draw_walls		(t_game *game);
-void			draw_wall_scaled(t_game *game, t_img *src, unsigned x, double fade);
+void			draw_wall_scaled(t_game *game, t_img *src, unsigned x,
+						double fade);
 void			draw_wall_solid	(t_game *game, unsigned ray, double fade);
 
 void			draw_objects		(t_game *game);
 void			objects_sort		(t_game *game);
 void			draw_sprite			(t_game *game, t_object *obj, double angle);
-void			draw_sprite_scaled	(t_game *game, t_object *obj, int x,
-									unsigned src_x);
+void			draw_sprite_scaled	(t_game *game, t_object *obj, unsigned x,
+																unsigned src_x);
 
 t_point			points_sum	(t_point p1, t_point p2);
-int				terminate	(int status);
+int				terminate	(int return_value, char *message);
 
 void			demo_fillrate	(t_game *mlx, int step);
 void			demo_radar		(t_game *mlx, int rays);

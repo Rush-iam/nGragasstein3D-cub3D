@@ -6,20 +6,59 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/22 18:38:14 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/22 23:38:53 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <fcntl.h>
+#include <string.h>
+#include <errno.h>
 #include "cub3d.h"
 #include "x_events.h"
 
-int	main(void)
+int		write_screenshot()
+{
+	return (EXIT_SUCCESS);
+}
+
+void	parse_scene(int file_fd, t_game *game)
+{
+	*game = (t_game){0};
+}
+
+void	parse_file(int args, char *av[], t_game *game)
+{
+	int		file_fd;
+
+	if (args == 1)
+		terminate(ERROR_ARGS, "Please specify scene filename");
+	else if (args >= 4)
+		terminate(ERROR_ARGS, "Too many arguments");
+	av++;
+	if (ft_strlen(*av) < 5 || ft_strncmp(".cub", *av + ft_strlen(*av) - 4, 5))
+		terminate(ERROR_ARGS, "Wrong scene filename");
+	if ((file_fd = open(*av, O_RDONLY)) == -1)
+		terminate(ERROR_ARGS, strerror(errno));
+	parse_scene(file_fd, game);
+	if (close(file_fd) == -1)
+		terminate(ERROR_PARSE, strerror(errno));
+	if (args == 3)
+	{
+		if (ft_strncmp("--save", *++av, 7) == 0)
+			write_screenshot();
+		else
+			terminate(ERROR_ARGS, "Invalid option");
+	}
+}
+
+int	main(int args, char *av[])
 {
 	t_game	game;
 	int		null;
 
-	game = (t_game){0};
-	if ((game.mlx = mlx_init()) == NULL)
+	errno = 0;
+	parse_file(args, av, &game);
+	if (!(game.mlx = mlx_init()))
 		return (EXIT_FAILURE);
 	if (!(game.win = mlx_new_window(game.mlx, WIN_W, WIN_H, "cub3D. nGragas")))
 		return (EXIT_FAILURE);
@@ -98,166 +137,6 @@ int	main(void)
 	mlx_loop(game.mlx);
 }
 
-void	player_control(t_game *game)
-{
-	if (game->key.k[TURN_LEFT])
-		game->p.angle -= 0.02;
-	if (game->key.k[TURN_RIGHT])
-		game->p.angle += 0.02;
-	if (game->p.angle > PI2)
-		game->p.angle -= PI2;
-	if (game->p.angle < 0)
-		game->p.angle += PI2;
-	if (game->key.k[MOVE_FORWARD])
-	{
-		game->p.pos.x += PLAYER_SPEED * cos(game->p.angle);
-		game->p.pos.y += PLAYER_SPEED * sin(game->p.angle);
-	}
-	if (game->key.k[MOVE_BACK])
-	{
-		game->p.pos.x -= PLAYER_SPEED * cos(game->p.angle);
-		game->p.pos.y -= PLAYER_SPEED * sin(game->p.angle);
-	}
-	if (game->key.k[MOVE_LEFT])
-	{
-		game->p.pos.x += PLAYER_SPEED * sin(game->p.angle);
-		game->p.pos.y -= PLAYER_SPEED * cos(game->p.angle);
-	}
-	if (game->key.k[MOVE_RIGHT])
-	{
-		game->p.pos.x -= PLAYER_SPEED * sin(game->p.angle);
-		game->p.pos.y += PLAYER_SPEED * cos(game->p.angle);
-	}
-	if (game->p.pos.x < 0)
-		game->p.pos.x = 0.0001;
-	if (game->p.pos.y < 0)
-		game->p.pos.y = 0.0001;
-	if (game->p.pos.x >= game->map.size.x)
-		game->p.pos.x = game->map.size.x - 0.0001;
-	if (game->p.pos.y >= game->map.size.y)
-		game->p.pos.y = game->map.size.y - 0.0001;
-}
-
-/*
-** == ping-pong intersect detection (0.5% faster?)
-**void	ray_intersect_n(t_game *game, double cur_angle, unsigned ray)
-**{
-**	t_fpoint	x_axis;
-**	t_fpoint	y_axis;
-**	t_fpoint	x_step;
-**	t_fpoint	y_step;
-**	t_fpoint	dist;
-**	t_fpoint	dist_step;
-**
-**	x_step = (cur_angle < M_PI_2 || cur_angle > 3 * M_PI_2) ?
-**		(t_fpoint){1, tan(cur_angle)} : (t_fpoint){-1, -tan(cur_angle)};
-**	x_axis.x = (int)game->p.pos.x + (x_step.x > 0) - (x_step.x < 0);
-**	x_axis.y = game->p.pos.y + x_step.y * (x_step.x > 0 ? 1 - (game->p.pos.x
-**			- (int)game->p.pos.x) : game->p.pos.x - (int)game->p.pos.x);
-**	y_step = (cur_angle < M_PI) ?
-**		(t_fpoint){1 / tan(cur_angle), 1} : (t_fpoint){-1 / tan(cur_angle), -1};
-**	y_axis.y = (int)game->p.pos.y + (y_step.y > 0) - (y_step.y < 0) ;
-**	y_axis.x = game->p.pos.x + y_step.x * (y_step.y > 0 ? 1 - (game->p.pos.y
-**			- (int)game->p.pos.y) : game->p.pos.y - (int)game->p.pos.y);
-**	dist_step.x = cos(game->p.angle) * x_step.x + sin(game->p.angle) * x_step.y;
-**	dist_step.y = cos(game->p.angle) * y_step.x + sin(game->p.angle) * y_step.y;
-**	dist.x = cos(game->p.angle) * (x_axis.x - game->p.pos.x + (x_step.x < 0)) +
-**			 sin(game->p.angle) * (x_axis.y - game->p.pos.y);
-**	dist.y = cos(game->p.angle) * (y_axis.x - game->p.pos.x) +
-**			 sin(game->p.angle) * (y_axis.y - game->p.pos.y + (y_step.y < 0));
-**	while (true)
-**	{
-**		while (dist.x < dist.y)
-**		{
-**			if ((unsigned)x_axis.y >= game->map.size.y ||
-**				(unsigned)x_axis.x >= game->map.size.x ||
-**				game->map.grid[(int)x_axis.y][(int)x_axis.x] == '1')
-**			{
-**				x_axis.x += (x_step.x < 0);
-**				game->column[ray] = (struct s_column){dist.x,
-**					COL_SCALE / dist.x, x_axis, x_axis.y - (int)x_axis.y,
-**					"EW"[x_axis.x >= game->p.pos.x]};
-**				return ;
-**			}
-**			x_axis = (t_fpoint){x_axis.x + x_step.x, x_axis.y + x_step.y};
-**			dist.x += dist_step.x;
-**		}
-**		while (dist.y < dist.x)
-**		{
-**			if ((unsigned)y_axis.y >= game->map.size.y ||
-**				(unsigned)y_axis.x >= game->map.size.x ||
-**				game->map.grid[(int)y_axis.y][(int)y_axis.x] == '1')
-**			{
-**				y_axis.y += (y_step.y < 0);
-**				game->column[ray] = (struct s_column){dist.y,
-**					  COL_SCALE / dist.y, y_axis, y_axis.x - (int)y_axis.x,
-**					  "NS"[y_axis.y >= game->p.pos.y]};
-**				return ;
-**			}
-**			y_axis = (t_fpoint){y_axis.x + y_step.x, y_axis.y + y_step.y};
-**			dist.y += dist_step.y;
-**		}
-**	}
-**}
-*/
-
-void	ray_intersect(t_game *game, double cur_angle, unsigned ray)
-{
-	t_fpoint	x1;
-	t_fpoint	y1;
-	t_fpoint	distance;
-	t_fpoint	step;
-
-	step = (cur_angle < M_PI_2 || cur_angle > 3 * M_PI_2) ?
-		(t_fpoint){1, tan(cur_angle)} : (t_fpoint){-1, -tan(cur_angle)};
-	x1.x = (int)game->p.pos.x + (step.x > 0) - (step.x < 0);
-	x1.y = game->p.pos.y + step.y * (step.x > 0 ? 1 - (game->p.pos.x -
-					(int)game->p.pos.x) : game->p.pos.x - (int)game->p.pos.x);
-	while ((unsigned)x1.y < game->map.size.y &&
-			(unsigned)x1.x < game->map.size.x &&
-			game->map.grid[(int)x1.y][(int)x1.x] != '1')
-		x1 = (t_fpoint){x1.x + step.x, x1.y + step.y};
-	x1.x += (step.x < 0);
-	step = (cur_angle < M_PI) ?
-		(t_fpoint){1 / tan(cur_angle), 1} : (t_fpoint){-1 / tan(cur_angle), -1};
-	y1.y = (int)game->p.pos.y + (step.y > 0) - (step.y < 0);
-	y1.x = game->p.pos.x + step.x * (step.y > 0 ? 1 - (game->p.pos.y -
-					(int)game->p.pos.y) : game->p.pos.y - (int)game->p.pos.y);
-	while ((unsigned)y1.y < game->map.size.y &&
-			(unsigned)y1.x < game->map.size.x &&
-			game->map.grid[(int)y1.y][(int)y1.x] != '1')
-		y1 = (t_fpoint){y1.x + step.x, y1.y + step.y};
-	y1.y += (step.y < 0);
-	distance.x = cos(game->p.angle) * (x1.x - game->p.pos.x) +
-					sin(game->p.angle) * (x1.y - game->p.pos.y);
-	distance.y = cos(game->p.angle) * (y1.x - game->p.pos.x) +
-					sin(game->p.angle) * (y1.y - game->p.pos.y);
-	game->column[ray] = (distance.x < distance.y) ?
-		(struct s_column){distance.x, COL_SCALE / distance.x, x1,
-							x1.y - (int)x1.y, "EW"[x1.x >= game->p.pos.x]} :
-		(struct s_column){distance.y, COL_SCALE / distance.y, y1,
-							y1.x - (int)y1.x, "NS"[y1.y >= game->p.pos.y]};
-}
-
-void	get_wall_intersections(t_game *game)
-{
-	unsigned		ray;
-	const double	start_angle = game->p.angle - FOV / 2;
-	double			cur_angle;
-
-	ray = 0;
-	while (ray < game->img.size.x)
-	{
-		cur_angle = start_angle + FOV * ray / (game->img.size.x - 1);
-		if (cur_angle < 0)
-			cur_angle += PI2;
-		else if (cur_angle > PI2)
-			cur_angle -= PI2;
-		ray_intersect(game, cur_angle, ray);
-		ray++;
-	}
-}
-
 int	game_loop(t_game *game)
 {
 	static clock_t	tick;
@@ -270,7 +149,7 @@ int	game_loop(t_game *game)
 
 	img_ceilfloor_fill_rgb(&game->img, COLOR_CEIL, COLOR_FLOOR);
 //	for (int i = 0; i < 1000; ++i)
-		get_wall_intersections(game);
+	ray_cast(game);
 	draw_walls(game);
 	draw_objects(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
