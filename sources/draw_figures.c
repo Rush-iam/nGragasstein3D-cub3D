@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 19:33:42 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/06 18:41:49 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/22 17:59:15 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,13 @@ void	pixel_put(t_img *img, unsigned x, unsigned y, int color)
 	if (x >= img->size.x || y >= img->size.y)
 		return ;
 	img->data[y * img->size.x + x] = color;
+}
+
+int		pixel_fade(int color, double fade)
+{
+	return (((int)((color & 0xFF0000) * fade) & 0xFF0000) +
+			((int)((color & 0xFF00) * fade) & 0xFF00) +
+			(int)((color & 0xFF) * fade));
 }
 
 void	draw_line(t_img *img, t_point p1, t_point p2, int color)

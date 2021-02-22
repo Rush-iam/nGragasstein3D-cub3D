@@ -12,49 +12,49 @@
 
 #include "cub3d.h"
 
-int	hook_key_press(int key, struct s_key *input)
+int	hook_key_press(int key_code, struct s_key *key)
 {
-	if (key >= (int)sizeof(input->k))
+	if (key_code >= (int)sizeof(key->k))
 		return (1);
-	if (key == KEY_ESCAPE)
+	if (key_code == KEY_ESCAPE)
 		terminate(EXIT_SUCCESS);
-	input->k[key] = true;
+	key->k[key_code] = true;
 	return (0);
 }
 
-int	hook_key_release(int key, struct s_key *input)
+int	hook_key_release(int key_code, struct s_key *key)
 {
-	if (key >= (int)sizeof(input->k))
+	if (key_code >= (int)sizeof(key->k))
 		return (1);
-	input->k[key] = false;
+	key->k[key_code] = false;
 	return (0);
 }
 
-int	hook_mouse_press(int button, int x, int y, struct s_key *input)
+int	hook_mouse_press(int btn, int x, int y, struct s_key *key)
 {
 	(void)x;
 	(void)y;
-	if (button >= (int)sizeof(input->m))
+	if (btn >= (int)sizeof(key->m))
 		return (1);
-	input->m[button] = true;
+	key->m[btn] = true;
 	return (0);
 }
 
-int	hook_mouse_release(int button, int x, int y, struct s_key *input)
+int	hook_mouse_release(int btn, int x, int y, struct s_key *key)
 {
 	(void)x;
 	(void)y;
-	if (button >= (int)sizeof(input->m))
+	if (btn >= (int)sizeof(key->m))
 		return (1);
-	input->m[button] = false;
+	key->m[btn] = false;
 	return (0);
 }
 
-int	hook_mouse_move(int x, int y, struct s_key *input)
+int	hook_mouse_move(int x, int y, struct s_key *key)
 {
-	input->mdir.x = x - input->mpos.x;
-	input->mdir.y = y - input->mpos.y;
-	input->mpos.x = x;
-	input->mpos.y = y;
+	key->mdir.x = x - key->mpos.x;
+	key->mdir.y = y - key->mpos.y;
+	key->mpos.x = x;
+	key->mpos.y = y;
 	return (0);
 }

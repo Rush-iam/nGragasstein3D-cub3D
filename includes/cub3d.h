@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/12 23:45:30 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/22 18:53:17 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # include "libft.h"
 # include "x_events.h"
 
-# define WIN_W (1200 / 4)
+# define WIN_W (1200 * 2)
 # define WIN_H (600 * 2)
 
 # define COLOR_CEIL		0x201010
@@ -73,6 +73,7 @@ typedef struct	s_img
 typedef struct	s_sprite
 {
 	t_img		img;
+	double		aspect;
 	bool		animated;
 	unsigned	frames;
 }				t_sprite;
@@ -81,7 +82,7 @@ typedef struct	s_object
 {
 	t_sprite	*sprite;
 	double		width;
-	double		height;
+	unsigned 	height;
 	double		distance;
 	t_fpoint	pos;
 }				t_object;
@@ -126,25 +127,40 @@ typedef struct	s_game
 int				game_loop		(t_game *game);
 int				terminate		(int status);
 
-int				hook_key_press		(int key, struct s_key *input);
-int				hook_key_release	(int key, struct s_key *input);
-int				hook_mouse_press	(int button, int x, int y, struct s_key *input);
-int				hook_mouse_release	(int button, int x, int y, struct s_key *input);
-int				hook_mouse_move		(int x, int y, struct s_key *input);
+int				hook_key_press		(int key_code, struct s_key *key);
+int				hook_key_release	(int key_code, struct s_key *key);
+int				hook_mouse_press	(int btn, int x, int y, struct s_key *key);
+int				hook_mouse_release	(int btn, int x, int y, struct s_key *key);
+int				hook_mouse_move		(int x, int y, struct s_key *key);
 
 void			img_clear				(t_img *img);
 void			img_clear_rgb			(t_img *img, int color);
 void			img_ceilfloor_fill		(t_img *img, unsigned char ceil,
-												unsigned char floor);
+										unsigned char floor);
 void			img_ceilfloor_fill_rgb	(t_img *img, int ceil, int floor);
 void			fizzlefade				(t_img *img, int color);
 
 void			pixel_put	(t_img *img, unsigned x, unsigned y, int color);
+int				pixel_fade	(int color, double fade);
 void			draw_line	(t_img *img, t_point p1, t_point p2, int color);
-void			draw_square(t_img *img, t_point center, int size, int color);
+void			draw_square	(t_img *img, t_point center, int size, int color);
 void			draw_4pts	(t_img *img, t_point *pts, int color);
 
+void			draw_map(t_game *game);
+void			draw_map_player(t_game *game);
+
+void			draw_walls		(t_game *game);
+void			draw_wall_scaled(t_game *game, t_img *src, unsigned x, double fade);
+void			draw_wall_solid	(t_game *game, unsigned ray, double fade);
+
+void			draw_objects		(t_game *game);
+void			objects_sort		(t_game *game);
+void			draw_sprite			(t_game *game, t_object *obj, double angle);
+void			draw_sprite_scaled	(t_game *game, t_object *obj, int x,
+									unsigned src_x);
+
 t_point			points_sum	(t_point p1, t_point p2);
+int				terminate	(int status);
 
 void			demo_fillrate	(t_game *mlx, int step);
 void			demo_radar		(t_game *mlx, int rays);

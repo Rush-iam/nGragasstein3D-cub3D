@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/12 23:54:13 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/22 18:38:14 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	main(void)
 	game = (t_game){0};
 	if ((game.mlx = mlx_init()) == NULL)
 		return (EXIT_FAILURE);
-	if (!(game.win = mlx_new_window(game.mlx, WIN_W, WIN_H, "cub3D by nGragas")))
+	if (!(game.win = mlx_new_window(game.mlx, WIN_W, WIN_H, "cub3D. nGragas")))
 		return (EXIT_FAILURE);
 	if (!(game.img.ptr = mlx_new_image(game.mlx, WIN_W, WIN_H)))
 		return (EXIT_FAILURE);
@@ -84,6 +84,8 @@ int	main(void)
 		return (EXIT_FAILURE);
 	game.sprite[0].img.data = (int *)mlx_get_data_addr(game.sprite[0].img.ptr, &null, &null, &null);
 	game.sprite[0].frames = 1;
+	game.sprite[0].aspect = game.sprite[0].img.size.x /
+													game.sprite[0].img.size.y;
 	game.object[0].pos = (t_fpoint){23.95, 3.5};
 	game.object[0].sprite = &game.sprite[0];
 	game.object[1].pos = (t_fpoint){21.5, 3.5};
@@ -136,65 +138,68 @@ void	player_control(t_game *game)
 		game->p.pos.y = game->map.size.y - 0.0001;
 }
 
-void	ray_intersect_n(t_game *game, double cur_angle, unsigned ray)
-{
-	t_fpoint	x_axis;
-	t_fpoint	y_axis;
-	t_fpoint	x_step;
-	t_fpoint	y_step;
-	t_fpoint	dist;
-	t_fpoint	dist_step;
-
-	x_step = (cur_angle < M_PI_2 || cur_angle > 3 * M_PI_2) ?
-		(t_fpoint){1, tan(cur_angle)} : (t_fpoint){-1, -tan(cur_angle)};
-	x_axis.x = (int)game->p.pos.x + (x_step.x > 0) - (x_step.x < 0);
-	x_axis.y = game->p.pos.y + x_step.y * (x_step.x > 0 ? 1 - (game->p.pos.x
-			- (int)game->p.pos.x) : game->p.pos.x - (int)game->p.pos.x);
-	y_step = (cur_angle < M_PI) ?
-			 (t_fpoint){1 / tan(cur_angle), 1} : (t_fpoint){-1 / tan(cur_angle), -1};
-	y_axis.y = (int)game->p.pos.y + (y_step.y > 0) - (y_step.y < 0) ;
-	y_axis.x = game->p.pos.x + y_step.x * (y_step.y > 0 ? 1 - (game->p.pos.y
-			- (int)game->p.pos.y) : game->p.pos.y - (int)game->p.pos.y);
-	dist_step.x = cos(game->p.angle) * x_step.x + sin(game->p.angle) * x_step.y;
-	dist_step.y = cos(game->p.angle) * y_step.x + sin(game->p.angle) * y_step.y;
-	dist.x = cos(game->p.angle) * (x_axis.x - game->p.pos.x + (x_step.x < 0)) +
-			 sin(game->p.angle) * (x_axis.y - game->p.pos.y);
-	dist.y = cos(game->p.angle) * (y_axis.x - game->p.pos.x) +
-			 sin(game->p.angle) * (y_axis.y - game->p.pos.y + (y_step.y < 0));
-	while (true)
-	{
-		while (dist.x < dist.y)
-		{
-			if ((unsigned)x_axis.y >= game->map.size.y ||
-				(unsigned)x_axis.x >= game->map.size.x ||
-				game->map.grid[(int)x_axis.y][(int)x_axis.x] == '1')
-			{
-				x_axis.x += (x_step.x < 0);
-				game->column[ray] = (struct s_column){dist.x,
-					COL_SCALE / dist.x, x_axis, x_axis.y - (int)x_axis.y,
-					"EW"[x_axis.x >= game->p.pos.x]};
-				return ;
-			}
-			x_axis = (t_fpoint){x_axis.x + x_step.x, x_axis.y + x_step.y};
-			dist.x += dist_step.x;
-		}
-		while (dist.y < dist.x)
-		{
-			if ((unsigned)y_axis.y >= game->map.size.y ||
-				(unsigned)y_axis.x >= game->map.size.x ||
-				game->map.grid[(int)y_axis.y][(int)y_axis.x] == '1')
-			{
-				y_axis.y += (y_step.y < 0);
-				game->column[ray] = (struct s_column){dist.y,
-					  COL_SCALE / dist.y, y_axis, y_axis.x - (int)y_axis.x,
-					  "NS"[y_axis.y >= game->p.pos.y]};
-				return ;
-			}
-			y_axis = (t_fpoint){y_axis.x + y_step.x, y_axis.y + y_step.y};
-			dist.y += dist_step.y;
-		}
-	}
-}
+/*
+** == ping-pong intersect detection (0.5% faster?)
+**void	ray_intersect_n(t_game *game, double cur_angle, unsigned ray)
+**{
+**	t_fpoint	x_axis;
+**	t_fpoint	y_axis;
+**	t_fpoint	x_step;
+**	t_fpoint	y_step;
+**	t_fpoint	dist;
+**	t_fpoint	dist_step;
+**
+**	x_step = (cur_angle < M_PI_2 || cur_angle > 3 * M_PI_2) ?
+**		(t_fpoint){1, tan(cur_angle)} : (t_fpoint){-1, -tan(cur_angle)};
+**	x_axis.x = (int)game->p.pos.x + (x_step.x > 0) - (x_step.x < 0);
+**	x_axis.y = game->p.pos.y + x_step.y * (x_step.x > 0 ? 1 - (game->p.pos.x
+**			- (int)game->p.pos.x) : game->p.pos.x - (int)game->p.pos.x);
+**	y_step = (cur_angle < M_PI) ?
+**		(t_fpoint){1 / tan(cur_angle), 1} : (t_fpoint){-1 / tan(cur_angle), -1};
+**	y_axis.y = (int)game->p.pos.y + (y_step.y > 0) - (y_step.y < 0) ;
+**	y_axis.x = game->p.pos.x + y_step.x * (y_step.y > 0 ? 1 - (game->p.pos.y
+**			- (int)game->p.pos.y) : game->p.pos.y - (int)game->p.pos.y);
+**	dist_step.x = cos(game->p.angle) * x_step.x + sin(game->p.angle) * x_step.y;
+**	dist_step.y = cos(game->p.angle) * y_step.x + sin(game->p.angle) * y_step.y;
+**	dist.x = cos(game->p.angle) * (x_axis.x - game->p.pos.x + (x_step.x < 0)) +
+**			 sin(game->p.angle) * (x_axis.y - game->p.pos.y);
+**	dist.y = cos(game->p.angle) * (y_axis.x - game->p.pos.x) +
+**			 sin(game->p.angle) * (y_axis.y - game->p.pos.y + (y_step.y < 0));
+**	while (true)
+**	{
+**		while (dist.x < dist.y)
+**		{
+**			if ((unsigned)x_axis.y >= game->map.size.y ||
+**				(unsigned)x_axis.x >= game->map.size.x ||
+**				game->map.grid[(int)x_axis.y][(int)x_axis.x] == '1')
+**			{
+**				x_axis.x += (x_step.x < 0);
+**				game->column[ray] = (struct s_column){dist.x,
+**					COL_SCALE / dist.x, x_axis, x_axis.y - (int)x_axis.y,
+**					"EW"[x_axis.x >= game->p.pos.x]};
+**				return ;
+**			}
+**			x_axis = (t_fpoint){x_axis.x + x_step.x, x_axis.y + x_step.y};
+**			dist.x += dist_step.x;
+**		}
+**		while (dist.y < dist.x)
+**		{
+**			if ((unsigned)y_axis.y >= game->map.size.y ||
+**				(unsigned)y_axis.x >= game->map.size.x ||
+**				game->map.grid[(int)y_axis.y][(int)y_axis.x] == '1')
+**			{
+**				y_axis.y += (y_step.y < 0);
+**				game->column[ray] = (struct s_column){dist.y,
+**					  COL_SCALE / dist.y, y_axis, y_axis.x - (int)y_axis.x,
+**					  "NS"[y_axis.y >= game->p.pos.y]};
+**				return ;
+**			}
+**			y_axis = (t_fpoint){y_axis.x + y_step.x, y_axis.y + y_step.y};
+**			dist.y += dist_step.y;
+**		}
+**	}
+**}
+*/
 
 void	ray_intersect(t_game *game, double cur_angle, unsigned ray)
 {
@@ -234,119 +239,6 @@ void	ray_intersect(t_game *game, double cur_angle, unsigned ray)
 							y1.x - (int)y1.x, "NS"[y1.y >= game->p.pos.y]};
 }
 
-void	draw_map_player(t_game *game)
-{
-	unsigned	ray;
-
-	draw_square(&game->map.img, (t_point){game->p.pos.x * MAP_SCALE,
-									game->p.pos.y * MAP_SCALE}, 6, 0xFFFA80);
-	ray = 0;
-	while (ray < game->img.size.x)
-	{
-		draw_line(&game->map.img,
-			(t_point){game->p.pos.x * MAP_SCALE, game->p.pos.y * MAP_SCALE},
-			(t_point){game->column[ray].cell.x * MAP_SCALE,
-					game->column[ray].cell.y * MAP_SCALE}, 0x888015);
-		ray += 32;
-	}
-	draw_line(&game->map.img, (t_point){game->p.pos.x * MAP_SCALE,
-									game->p.pos.y * MAP_SCALE}, (t_point){
-		game->p.pos.x * MAP_SCALE + MAP_SCALE * cos(game->p.angle),
-		game->p.pos.y * MAP_SCALE + MAP_SCALE * sin(game->p.angle)}, 0xFF4020);
-}
-
-void	draw_map(t_game *game)
-{
-	unsigned	x;
-	unsigned	y;
-
-	img_clear_rgb(&game->map.img, 0xAA000000);
-	y = 0;
-	while (y < game->map.img.size.y)
-	{
-		x = 0;
-		while (x < game->map.img.size.x)
-		{
-			draw_line(&game->map.img, (t_point){x, y},
-					  (t_point){x + MAP_SCALE, y}, 0x113322);
-			draw_line(&game->map.img, (t_point){x, y},
-					  (t_point){x, y + MAP_SCALE}, 0x113322);
-			if (game->map.grid[y / MAP_SCALE][x / MAP_SCALE] == '1')
-				draw_square(&game->map.img, (t_point){
-				x + MAP_SCALE / 2, y + MAP_SCALE / 2}, MAP_SCALE - 4, 0x33AA99);
-			x += MAP_SCALE;
-		}
-		y += MAP_SCALE;
-	}
-	draw_map_player(game);
-	draw_square(&game->map.img, (t_point){game->object[0].pos.x * MAP_SCALE,
-							game->object[0].pos.y * MAP_SCALE}, 6, 0xFFFA80);
-	mlx_put_image_to_window(game->mlx, game->win, game->map.img.ptr, 0, 0);
-}
-
-int		pixel_fade(int pixel, double fade)
-{
-	return (((int)((pixel & 0xFF0000) * fade) & 0xFF0000) +
-	((int)((pixel & 0xFF00) * fade) & 0xFF00) + (int)((pixel & 0xFF) * fade));
-}
-
-void	draw_wall_scaled(t_game *game, t_img *src, unsigned ray, double fade)
-{
-	const double	step = (double)src->size.y / game->column[ray].height;
-	const unsigned	src_column = game->column[ray].texture_pos * src->size.x;
-	unsigned		cur;
-	double			cur_src;
-	unsigned		max_height;
-
-	cur_src = 0;
-	if (game->column[ray].height > game->img.size.y)
-	{
-		cur_src += (double)src->size.y * (game->column[ray].height -
-							game->img.size.y) / 2 / game->column[ray].height;
-		cur = 0;
-		max_height = game->img.size.y;
-	}
-	else
-	{
-		cur = game->img.size.y / 2 - game->column[ray].height / 2;
-		max_height = cur + game->column[ray].height;
-	}
-	while (cur < max_height)
-	{
-		if (fade == 1)
-			pixel_put(&game->img, ray, cur,
-				src->data[(unsigned)cur_src * src->size.x + src_column]);
-		else
-			pixel_put(&game->img, ray, cur, pixel_fade(
-				src->data[(unsigned)cur_src * src->size.x + src_column], fade));
-		cur_src += step;
-		cur++;
-	}
-}
-
-void	draw_walls(t_game *game)
-{
-	unsigned	ray;
-	double		fade;
-	unsigned	texture_id;
-	const char	*textures = "NSWE";
-
-	ray = 0;
-	while (ray < game->img.size.x)
-	{
-		fade = 4. / game->column[ray].distance;
-		if (fade > 1)
-			fade = 1;
-		texture_id = ft_strchr(textures, game->column[ray].dir) - textures;
-		draw_wall_scaled(game, &game->wall[texture_id], ray, fade);
-//		draw_line(&game->img,
-//			(t_point){ray, game->img.size.y / 2 - game->column[ray].height / 2},
-//			(t_point){ray, game->img.size.y / 2 + game->column[ray].height / 2},
-//		((int)(0x60 * fade) << 16) + ((int)(0x80 * fade) << 8) + (int)(0x80 * fade));
-		ray++;
-	}
-}
-
 void	get_wall_intersections(t_game *game)
 {
 	unsigned		ray;
@@ -357,114 +249,12 @@ void	get_wall_intersections(t_game *game)
 	while (ray < game->img.size.x)
 	{
 		cur_angle = start_angle + FOV * ray / (game->img.size.x - 1);
-//		cur_angle += pow(game->p.angle - cur_angle, 3) / 4;
 		if (cur_angle < 0)
 			cur_angle += PI2;
 		else if (cur_angle > PI2)
 			cur_angle -= PI2;
 		ray_intersect(game, cur_angle, ray);
 		ray++;
-	}
-}
-
-void	draw_sprite_scaled(t_game *game, t_object *obj, int ray, unsigned src_col)
-{
-	const double	step = (double)obj->sprite->img.size.y / obj->height;
-	unsigned		cur;
-	double			cur_src;
-	unsigned		max_height;
-	int				src_pixel;
-
-	cur_src = 0;
-	if (obj->height > game->img.size.y)
-	{
-		cur_src += (double)obj->sprite->img.size.y * (obj->height -
-					game->img.size.y) / 2 / obj->height;
-		cur = 0;
-		max_height = game->img.size.y;
-	}
-	else
-	{
-		cur = game->img.size.y / 2 - obj->height / 2;
-		max_height = cur + obj->height;
-	}
-	while (cur < max_height)
-	{
-		src_pixel = obj->sprite->img.data[(unsigned)cur_src * obj->sprite->img.size.x + src_col];
-		if ((src_pixel >> 24) == 0)
-			pixel_put(&game->img, ray, cur, src_pixel);
-		cur_src += step;
-		cur++;
-	}
-}
-
-void	sprites_sort(t_game *game)
-{
-	unsigned	i;
-	bool		sorted;
-	t_object	tmp;
-
-	if (game->object_count == 0)
-		return ;
-	sorted = false;
-	while (sorted == false)
-	{
-		sorted = true;
-		i = 0;
-		while (i < game->object_count - 1)
-		{
-			if (game->object[i].distance < game->object[i + 1].distance)
-			{
-				sorted = false;
-				tmp = game->object[i];
-				game->object[i] = game->object[i + 1];
-				game->object[i + 1] = tmp;
-			}
-			i++;
-		}
-	}
-}
-
-void	draw_sprites(t_game *game)
-{
-	unsigned	i;
-	double		angle;
-	t_fpoint	diff;
-	int			cur_ray;
-	int			max_ray;
-
-	sprites_sort(game);
-	i = 0;
-	while (i < game->object_count)
-	{
-		diff = (t_fpoint){game->object[i].pos.x - game->p.pos.x,
-						game->object[i].pos.y - game->p.pos.y};
-		angle = atan2(diff.y, diff.x);
-		if (fabs(game->p.angle - angle - PI2) <= M_PI)
-			angle += PI2;
-		angle -= game->p.angle;
-		if (fabs(angle) < FOV)
-		{
-			game->object[i].distance = cos(game->p.angle) * diff.x + sin(game->p.angle) * diff.y;
-			game->object[i].height = COL_SCALE / game->object[i].distance;
-			game->object[i].width = COL_SCALE / sqrt(pow(diff.x, 2) + pow(diff.y, 2));
-			game->object[i].width *= game->object[i].sprite->img.size.x /
-										game->object[i].sprite->img.size.y;
-			cur_ray = (angle / FOV + 0.5) * game->img.size.x;
-			cur_ray -= game->object[i].width / 2;
-			max_ray = cur_ray + game->object[i].width;
-			if (cur_ray < 0)
-				cur_ray = 0;
-			while (cur_ray < max_ray && cur_ray < (int)game->img.size.x)
-			{
-				if (game->column[cur_ray].distance > game->object[i].distance)
-					draw_sprite_scaled(game, &game->object[i], cur_ray,
-				(1. - (double)(max_ray - cur_ray) / game->object[i].width) *
-						game->object[i].sprite->img.size.x);
-				cur_ray++;
-			}
-		}
-		i++;
 	}
 }
 
@@ -478,13 +268,13 @@ int	game_loop(t_game *game)
 //	img_clear_rgb(&game->img, 0x051400);
 //	img_ceilfloor_fill(&game->img, COLOR_CEIL, COLOR_FLOOR);
 
-//	img_ceilfloor_fill_rgb(&game->img, COLOR_CEIL, COLOR_FLOOR);
-	for (int i = 0; i < 1000; ++i)
+	img_ceilfloor_fill_rgb(&game->img, COLOR_CEIL, COLOR_FLOOR);
+//	for (int i = 0; i < 1000; ++i)
 		get_wall_intersections(game);
-//	draw_walls(game);
-//	draw_sprites(game);
+	draw_walls(game);
+	draw_objects(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
-//	draw_map(game);
+	draw_map(game);
 
 //	fizzlefade(&game->img, 0xFF0000);
 //	demo_fillrate(game, 1);
@@ -504,9 +294,4 @@ int	game_loop(t_game *game)
 //	write(1, " y", 2); ft_putnbr_fd((int)game->column[0].cell.y, 1);
 //	write(1, " dir=", 5); write(1, &(game->column[0].dir), 1); write(1, "\n", 1);
 	return (0);
-}
-
-int	terminate(int status)
-{
-	exit(status);
 }

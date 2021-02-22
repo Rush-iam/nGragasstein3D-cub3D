@@ -6,7 +6,7 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/02/12 21:14:04 by ngragas          ###   ########.fr        #
+#    Updated: 2021/02/22 18:38:14 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,9 @@ SRC =	main.c			\
 		hooks.c			\
 		draw_fills.c	\
 		draw_figures.c	\
+		draw_map.c		\
+		walls.c			\
+		objects.c		\
 		utils.c			\
 		demo_tools.c
 

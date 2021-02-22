@@ -16,3 +16,8 @@ t_point	points_sum(t_point p1, t_point p2)
 {
 	return (t_point){p1.x + p2.x, p1.y + p2.y};
 }
+
+int		terminate(int status)
+{
+	exit(status);
+}
