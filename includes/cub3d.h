@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/22 23:22:06 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/23 16:19:25 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,10 @@
 # include <time.h>
 # include <math.h>
 # include <stdbool.h>
+# include <limits.h>
 # include <mlx.h>
 # include "libft.h"
+# include "get_next_line.h"
 # include "x_events.h"
 
 # define ERROR_ARGS		1
@@ -26,9 +28,6 @@
 
 # define WIN_W (1200 * 2)
 # define WIN_H (600 * 2)
-
-# define COLOR_CEIL		0x201010
-# define COLOR_FLOOR	0x503020
 
 # define WALL_N	0
 # define WALL_S	1
@@ -74,7 +73,7 @@ typedef struct	s_fpoint
 typedef struct	s_img
 {
 	void		*ptr;
-	int			*data;
+	unsigned	*data;
 	t_upoint	size;
 }				t_img;
 
@@ -98,6 +97,7 @@ typedef struct	s_object
 typedef struct	s_game
 {
 	void		*mlx;
+	t_upoint	res;
 	void		*win;
 	t_img		img;
 	struct		s_player
@@ -125,10 +125,12 @@ typedef struct	s_game
 		t_fpoint	cell;
 		double		texture_pos;
 		char		dir;
-	}			column[WIN_W];
+	}			column[WIN_W]; //
+	unsigned	color_ceil;
+	unsigned	color_floor;
 	t_img		wall[4];
 	t_sprite	sprite[1];
-	t_object	object[4];
+	t_object	object[4]; //
 	unsigned	object_count;
 }				t_game;
 

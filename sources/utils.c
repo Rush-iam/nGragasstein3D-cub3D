@@ -23,6 +23,8 @@ int		terminate(int return_value, char *message)
 	{
 		ft_putendl_fd("Error", 2);
 		ft_putendl_fd(message, 2);
+		if (return_value == ERROR_PARSE)
+			ft_putendl_fd("Plese fix scene file", 2);
 		if (return_value == ERROR_ARGS)
 			ft_putendl_fd("Usage: ./cub3D scene_name.cub [--save]", 2);
 	}

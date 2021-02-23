@@ -6,7 +6,7 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/04 20:29:14 by ngragas           #+#    #+#              #
-#    Updated: 2021/02/05 17:26:29 by ngragas          ###   ########.fr        #
+#    Updated: 2021/02/23 15:18:32 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,8 @@ SRCS =		ft_isalpha.c	ft_isdigit.c	ft_isalnum.c	ft_isprint.c	\
 		ft_lstnew.c			ft_lstadd_front.c		ft_lstadd_back.c		\
 		ft_lstdelone.c		ft_lstsize.c			ft_lstlast.c			\
 		ft_lstclear.c		ft_lstiter.c			ft_lstmap.c				\
-			ft_wchrto8.c	ft_wstrto8.c
+			ft_wchrto8.c	ft_wstrto8.c									\
+			get_next_line.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)

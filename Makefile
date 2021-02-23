@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 NAME = cub3D
-CFLAGS = -Wall -Wextra -Werror -MMD -g -Ofast
+CFLAGS = -Wall -Wextra -Werror -MMD -g #-Ofast
 SRC =	main.c			\
 		hooks.c			\
 		control.c		\
