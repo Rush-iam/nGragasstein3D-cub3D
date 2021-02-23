@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 16:34:37 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/22 21:45:10 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/23 21:04:13 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 	int				start_ray;
 	int				cur;
 	int				max_ray;
-	const double	scale_x = obj->width / obj->sprite->img.size.x;
+	const double	scale_x = obj->width / obj->sprite->size.x;
 
 	obj->height = game->img.size.x / COL_SCALE / obj->distance;
 	start_ray = (angle / FOV + 0.5) * game->img.size.x - obj->width / 2;
@@ -86,37 +86,37 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 	while (cur < max_ray)
 	{
 		if (obj->distance < game->column[cur].distance)
-			draw_sprite_scaled(game, obj, cur, (cur - start_ray) / scale_x);
+			draw_sprite_scaled(&game->img, obj, cur, (cur - start_ray) / scale_x);
 		cur++;
 	}
 }
 
-void	draw_sprite_scaled(t_game *game, t_object *obj, unsigned x,
+void	draw_sprite_scaled(t_img *img, t_object *obj, unsigned x,
 																unsigned src_x)
 {
-	const double	step = (double)obj->sprite->img.size.y / obj->height;
+	const double	step = (double)obj->sprite->size.y / obj->height;
 	int				y;
 	double			src_y;
 	int				max_height;
 	int				src_pixel;
 
-	if (obj->height > game->img.size.y)
+	if (obj->height > img->size.y)
 	{
-		src_y = step * (obj->height - game->img.size.y) / 2;
+		src_y = step * (obj->height - img->size.y) / 2;
 		y = -1;
-		max_height = game->img.size.y;
+		max_height = img->size.y;
 	}
 	else
 	{
 		src_y = 0;
-		y = -1 + (game->img.size.y - obj->height) / 2;
+		y = -1 + (img->size.y - obj->height) / 2;
 		max_height = y + obj->height;
 	}
 	while (++y < max_height)
 	{
-		if (((src_pixel = obj->sprite->img.data[(unsigned)src_y *
-						obj->sprite->img.size.x + src_x]) & 0xFF000000) == 0)
-			game->img.data[y * game->img.size.x + x] = src_pixel;
+		if (((src_pixel = obj->sprite->data[(unsigned)src_y *
+						obj->sprite->size.x + src_x]) & 0xFF000000) == 0)
+			img->data[y * img->size.x + x] = src_pixel;
 		src_y += step;
 	}
 }

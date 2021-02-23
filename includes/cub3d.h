@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/23 16:19:25 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/23 21:02:57 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,17 +22,21 @@
 # include "get_next_line.h"
 # include "x_events.h"
 
-# define ERROR_ARGS		1
-# define ERROR_PARSE	2
-# define ERROR_MEMORY	3
+# define ERROR_MLX		1
+# define ERROR_ARGS		2
+# define ERROR_PARSE	3
+# define ERROR_MEMORY	4
+
+# define WINDOW_TITLE	"cub3D by nGragas"
 
 # define WIN_W (1200 * 2)
-# define WIN_H (600 * 2)
+//# define WIN_H (600 * 2)
 
 # define WALL_N	0
 # define WALL_S	1
 # define WALL_W	2
 # define WALL_E	3
+# define SPRITE 4
 
 # define MOVE_FORWARD	KEY_W
 # define MOVE_BACK		KEY_S
@@ -75,19 +79,19 @@ typedef struct	s_img
 	void		*ptr;
 	unsigned	*data;
 	t_upoint	size;
+	double		aspect;
 }				t_img;
 
-typedef struct	s_sprite
-{
-	t_img		img;
-	double		aspect;
-	bool		animated;
-	unsigned	frames;
-}				t_sprite;
+//typedef struct	s_sprite
+//{
+//	t_img		img;
+//	bool		animated;
+//	unsigned	frames;
+//}				t_sprite;
 
 typedef struct	s_object
 {
-	t_sprite	*sprite;
+	t_img		*sprite;
 	double		width;
 	unsigned	height;
 	double		distance;
@@ -97,7 +101,6 @@ typedef struct	s_object
 typedef struct	s_game
 {
 	void		*mlx;
-	t_upoint	res;
 	void		*win;
 	t_img		img;
 	struct		s_player
@@ -128,8 +131,8 @@ typedef struct	s_game
 	}			column[WIN_W]; //
 	unsigned	color_ceil;
 	unsigned	color_floor;
-	t_img		wall[4];
-	t_sprite	sprite[1];
+	t_img		texture[5];
+//	t_sprite	sprite;
 	t_object	object[4]; //
 	unsigned	object_count;
 }				t_game;
@@ -174,11 +177,13 @@ void			draw_wall_solid	(t_game *game, unsigned ray, double fade);
 void			draw_objects		(t_game *game);
 void			objects_sort		(t_game *game);
 void			draw_sprite			(t_game *game, t_object *obj, double angle);
-void			draw_sprite_scaled	(t_game *game, t_object *obj, unsigned x,
+void			draw_sprite_scaled	(t_img *img, t_object *obj, unsigned x,
 																unsigned src_x);
 
-t_point			points_sum	(t_point p1, t_point p2);
-int				terminate	(int return_value, char *message);
+t_point			points_sum		(t_point p1, t_point p2);
+char			*atoi_limited	(unsigned *dst_int, const char *src_string,
+															unsigned limit);
+int				terminate		(int return_value, char *message);
 
 void			demo_fillrate	(t_game *mlx, int step);
 void			demo_radar		(t_game *mlx, int rays);

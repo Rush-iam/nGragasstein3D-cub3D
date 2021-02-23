@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 18:37:14 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/22 18:46:22 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/23 20:55:45 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	draw_walls(t_game *game)
 		if (fade > 1)
 			fade = 1;
 		texture_id = ft_strchr(textures, game->column[ray].dir) - textures;
-		draw_wall_scaled(game, &game->wall[texture_id], ray, fade);
+		draw_wall_scaled(game, &game->texture[texture_id], ray, fade);
 		ray++;
 	}
 }

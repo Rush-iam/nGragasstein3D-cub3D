@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/23 17:38:20 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/23 23:23:22 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,22 +21,7 @@ int		write_screenshot()
 	return (EXIT_SUCCESS);
 }
 
-char	*atoi_limited(unsigned *dst_int, const char *src_string, unsigned limit)
-{
-	while (*src_string == ' ')
-		src_string++;
-	while (ft_isdigit(*src_string))
-	{
-		*dst_int = *dst_int * 10 + *src_string++ - '0';
-		if (*dst_int > limit)
-			return (NULL);
-	}
-	while (*src_string == ' ')
-		src_string++;
-	return ((char *)src_string);
-}
-
-void	set_res(const char *res_string, t_upoint *res)
+void	set_resolution(const char *res_string, t_upoint *res)
 {
 	if (res->x)
 		terminate(ERROR_PARSE, "Duplicated R(esolution) setting in scene file");
@@ -76,37 +61,102 @@ void	set_colors(const char *color_string, unsigned *target)
 	*target = (r << 16) | (g << 8) | b;
 }
 
-void	parse_scene(int file_id, t_game *game)
+void	set_textures(char *string, t_game *game)
 {
-	char	*line;
-	int		status;
+	int	id;
+	int null;
 
-	*game = (t_game){0};
+	if (string[0] == 'S' && string[1] == ' ')
+		id = SPRITE;
+	else if (string[0] == 'N' && string[1] == 'O')
+		id = WALL_N;
+	else if (string[0] == 'S' && string[1] == 'O')
+		id = WALL_S;
+	else if (string[0] == 'W' && string[1] == 'E')
+		id = WALL_W;
+	else if (string[0] == 'E' && string[1] == 'A')
+		id = WALL_E;
+	string += 2;
+	while (*string == ' ')
+		string++;
+	if (game->texture[id].ptr != NULL)
+		terminate(ERROR_PARSE, "Duplicated texture setting in scene file");
+	if (!(game->texture[id].ptr = mlx_xpm_file_to_image(game->mlx, string,
+		(int *)&game->texture[id].size.x, (int *)&game->texture[id].size.y)))
+		terminate(ERROR_PARSE, "Something went wrong while loading texture");
+	game->texture[id].data = (unsigned *)mlx_get_data_addr
+								(game->texture[id].ptr, &null, &null, &null);
+	game->texture[id].aspect = game->texture[id].size.x /
+								game->texture[id].size.y;
+}
+
+void	parse_scene(int file_id, char **line, t_game *game)
+{
+	int	status;
+
 	game->color_floor = -1;
 	game->color_ceil = -1;
-	while ((status = get_next_line(file_id, &line)) >= 0)
+	while ((status = get_next_line(file_id, line)) >= 0)
 	{
-		if (*line == 'R')
-			set_res(line, &game->res);
-		else if (*line == 'C')
-			set_colors(line, &game->color_ceil);
-		else if (*line == 'F')
-			set_colors(line, &game->color_floor);
-//		else if (*line == 'N' || *line == 'S' || *line == 'W' || *line == 'E')
-//			set_textures(line, game);
-//		else if (*line != '\0')
-//			set_map();
-		free(line);
+		if (**line == 'R')
+			set_resolution(*line, &game->img.size);
+		else if (**line == 'C')
+			set_colors(*line, &game->color_ceil);
+		else if (**line == 'F')
+			set_colors(*line, &game->color_floor);
+		else if (**line == 'N' || **line == 'S' ||
+				**line == 'W' || **line == 'E')
+			set_textures(*line, game);
+		else if (**line != '\0')
+			return ;
+		free(*line);
 		if (status == 0)
-			break ;
+			terminate(ERROR_PARSE, "There is no map in scene file");
 	}
 	if (status == -1)
 		terminate(ERROR_PARSE, "Something went wrong while reading scene file");
 }
 
+void	parse_map(int file_id, char *line, t_game *game)
+{
+	t_list		*map;
+	int			status;
+	unsigned	line_len;
+	unsigned	i;
+
+	map = ft_lstnew(line);
+	game->map.size = (t_upoint){ft_strlen(line), 1};
+	while ((status = get_next_line(file_id, &line)) >= 0 && *line != '\0')
+	{
+		ft_lstadd_front(&map, ft_lstnew(line));
+		if ((line_len = ft_strlen(line)) > game->map.size.x)
+			game->map.size.x = line_len;
+		game->map.size.y++;
+	}
+	if (status == -1)
+		terminate(ERROR_PARSE, "Something went wrong while reading scene file");
+	free(line);
+	if (status != 0)
+		terminate(ERROR_PARSE, "Empty lines in map content are not allowed");
+	if ((game->map.grid = malloc(sizeof(char *) * game->map.size.y)) == NULL)
+		terminate(ERROR_MEMORY, "Memory allocation failed (map rows)");
+	i = game->map.size.y;
+	while (i > 0)
+	{
+		i--;
+		if ((game->map.grid[i] = malloc(game->map.size.x)) == NULL)
+			terminate(ERROR_MEMORY, "Memory allocation failed (map cols)");
+		line = ft_lstpop(&map);
+		line_len = ft_strlcpy(game->map.grid[i], line, game->map.size.x);
+		ft_memset(game->map.grid[i] + line_len, ' ', game->map.size.x - line_len);
+		free(line);
+	}
+}
+
 void	parse_file(int args, char *av[], t_game *game)
 {
 	int		file_id;
+	char	*line;
 
 	if (args == 1)
 		terminate(ERROR_ARGS, "Please specify scene filename");
@@ -117,7 +167,8 @@ void	parse_file(int args, char *av[], t_game *game)
 		terminate(ERROR_ARGS, "Wrong scene filename");
 	if ((file_id = open(*av, O_RDONLY)) == -1)
 		terminate(ERROR_ARGS, strerror(errno));
-	parse_scene(file_id, game);
+	parse_scene(file_id, &line, game);
+	parse_map(file_id, line, game);
 	if (close(file_id) == -1)
 		terminate(ERROR_PARSE, strerror(errno));
 	if (args == 3)
@@ -129,23 +180,40 @@ void	parse_file(int args, char *av[], t_game *game)
 	}
 }
 
+void	initialize(t_game *game)
+{
+	t_upoint	max_res = {2000, 1200};
+	t_upoint	min_res = {2, 1};
+	int			n;
+
+	if (game->img.size.x > max_res.x)
+		game->img.size.x = max_res.x;
+	if (game->img.size.y > max_res.y)
+		game->img.size.y = max_res.y;
+	if (game->img.size.x < min_res.x)
+		game->img.size.x = min_res.x;
+	if (!(game->win = mlx_new_window(
+			game->mlx, game->img.size.x, game->img.size.y, WINDOW_TITLE)))
+		terminate(ERROR_MLX, strerror(errno));
+	if (!(game->img.ptr = mlx_new_image(
+			game->mlx, game->img.size.x, game->img.size.y)))
+		terminate(ERROR_MLX, strerror(errno));
+	game->img.data = (unsigned *)mlx_get_data_addr(game->img.ptr, &n, &n, &n);
+}
+
 int	main(int args, char *av[])
 {
 	t_game	game;
 	int		null;
 
 	errno = 0;
+	game = (t_game){0};
+	if (!(game.mlx = mlx_init()))
+		terminate(ERROR_MLX, strerror(errno));
 	parse_file(args, av, &game);
+	initialize(&game);
 	ft_putendl_fd("OK!", 1);
 	exit(0);
-	if (!(game.mlx = mlx_init()))
-		return (EXIT_FAILURE);
-	if (!(game.win = mlx_new_window(game.mlx, WIN_W, WIN_H, "cub3D. nGragas")))
-		return (EXIT_FAILURE);
-	if (!(game.img.ptr = mlx_new_image(game.mlx, WIN_W, WIN_H)))
-		return (EXIT_FAILURE);
-	game.img.data = (unsigned *)mlx_get_data_addr(game.img.ptr, &null, &null, &null);
-	game.img.size = (t_upoint){WIN_W, WIN_H};
 	game.map.size = (t_upoint){25, 14};
 	game.map.img.size = (t_upoint){game.map.size.x * MAP_SCALE,
 								game.map.size.y * MAP_SCALE};
@@ -181,38 +249,14 @@ int	main(int args, char *av[])
 	game.p.pos = (t_fpoint){12, 3.5};
 	game.p.angle = 0;
 
-	if (!(game.wall[WALL_N].ptr = mlx_xpm_file_to_image(game.mlx, "resources/wall_1.xpm",
-					(int *)&game.wall[WALL_N].size.x, (int *)&game.wall[WALL_N].size.y)))
-		return (EXIT_FAILURE);
-	game.wall[WALL_N].data = (unsigned *)mlx_get_data_addr(game.wall[WALL_N].ptr, &null, &null, &null);
-	if (!(game.wall[WALL_S].ptr = mlx_xpm_file_to_image(game.mlx, "resources/wall_2.xpm",
-					(int *)&game.wall[WALL_S].size.x, (int *)&game.wall[WALL_S].size.y)))
-		return (EXIT_FAILURE);
-	game.wall[WALL_S].data = (unsigned *)mlx_get_data_addr(game.wall[WALL_S].ptr, &null, &null, &null);
-	if (!(game.wall[WALL_W].ptr = mlx_xpm_file_to_image(game.mlx, "resources/wall_3.xpm",
-					(int *)&game.wall[WALL_W].size.x, (int *)&game.wall[WALL_W].size.y)))
-		return (EXIT_FAILURE);
-	game.wall[WALL_W].data = (unsigned *)mlx_get_data_addr(game.wall[WALL_W].ptr, &null, &null, &null);
-	if (!(game.wall[WALL_E].ptr = mlx_xpm_file_to_image(game.mlx, "resources/wall_4.xpm",
-					(int *)&game.wall[WALL_E].size.x, (int *)&game.wall[WALL_E].size.y)))
-		return (EXIT_FAILURE);
-	game.wall[WALL_E].data = (unsigned *)mlx_get_data_addr(game.wall[WALL_E].ptr, &null, &null, &null);
-
-	if (!(game.sprite[0].img.ptr = mlx_xpm_file_to_image(game.mlx, "resources/sprite_3.xpm",
-					(int *)&game.sprite[0].img.size.x, (int *)&game.sprite[0].img.size.y)))
-		return (EXIT_FAILURE);
-	game.sprite[0].img.data = (unsigned *)mlx_get_data_addr(game.sprite[0].img.ptr, &null, &null, &null);
-	game.sprite[0].frames = 1;
-	game.sprite[0].aspect = game.sprite[0].img.size.x /
-													game.sprite[0].img.size.y;
 	game.object[0].pos = (t_fpoint){23.95, 3.5};
-	game.object[0].sprite = &game.sprite[0];
+	game.object[0].sprite = &game.texture[SPRITE];
 	game.object[1].pos = (t_fpoint){21.5, 3.5};
-	game.object[1].sprite = &game.sprite[0];
+	game.object[1].sprite = &game.texture[SPRITE];
 	game.object[2].pos = (t_fpoint){22, 3.2};
-	game.object[2].sprite = &game.sprite[0];
+	game.object[2].sprite = &game.texture[SPRITE];
 	game.object[3].pos = (t_fpoint){22, 3};
-	game.object[3].sprite = &game.sprite[0];
+	game.object[3].sprite = &game.texture[SPRITE];
 	game.object_count = 4;
 	mlx_loop(game.mlx);
 }
