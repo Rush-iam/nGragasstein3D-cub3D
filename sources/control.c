@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 20:55:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/22 21:03:45 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/26 17:55:10 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,17 +19,17 @@ void	player_control(t_game *game)
 	if (game->key.k[TURN_RIGHT])
 		game->p.angle += PL_SPEED / 2;
 	if (game->key.k[MOVE_FORWARD])
-		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * cos(game->p.angle),
-								game->p.pos.y + PL_SPEED * sin(game->p.angle)};
+		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.cossin.x,
+								game->p.pos.y + PL_SPEED * game->p.cossin.y};
 	if (game->key.k[MOVE_BACK])
-		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * cos(game->p.angle),
-								game->p.pos.y - PL_SPEED * sin(game->p.angle)};
+		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.cossin.x,
+								game->p.pos.y - PL_SPEED * game->p.cossin.y};
 	if (game->key.k[MOVE_LEFT])
-		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * sin(game->p.angle),
-								game->p.pos.y - PL_SPEED * cos(game->p.angle)};
+		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.cossin.y,
+								game->p.pos.y - PL_SPEED * game->p.cossin.x};
 	if (game->key.k[MOVE_RIGHT])
-		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * sin(game->p.angle),
-								game->p.pos.y + PL_SPEED * cos(game->p.angle)};
+		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.cossin.y,
+								game->p.pos.y + PL_SPEED * game->p.cossin.x};
 	player_control_borders(game);
 }
 

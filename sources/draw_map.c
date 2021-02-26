@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 18:52:51 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/23 20:57:10 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/26 23:36:54 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,30 +14,30 @@
 
 void	draw_map(t_game *game)
 {
-	unsigned	x;
-	unsigned	y;
+	t_point	pt;
 
 	img_clear_rgb(&game->map.img, 0xAA000000);
-	y = 0;
-	while (y < game->map.img.size.y)
+	pt.y = 0;
+	while (pt.y < (int)game->map.img.size.y)
 	{
-		x = 0;
-		while (x < game->map.img.size.x)
+		pt.x = 0;
+		while (pt.x < (int)game->map.img.size.x)
 		{
-			draw_line(&game->map.img, (t_point){x, y},
-					(t_point){x + MAP_SCALE, y}, 0x113322);
-			draw_line(&game->map.img, (t_point){x, y},
-					(t_point){x, y + MAP_SCALE}, 0x113322);
-			if (game->map.grid[y / MAP_SCALE][x / MAP_SCALE] == '1')
-				draw_square(&game->map.img, (t_point){
-				x + MAP_SCALE / 2, y + MAP_SCALE / 2}, MAP_SCALE - 4, 0x33AA99);
-			x += MAP_SCALE;
+			draw_line(&game->map.img, pt,
+					(t_point){pt.x + MAP_SCALE, pt.y}, 0x113322);
+			draw_line(&game->map.img, pt,
+					(t_point){pt.x, pt.y + MAP_SCALE}, 0x113322);
+			if (game->map.grid[pt.y / MAP_SCALE][pt.x / MAP_SCALE] == '1')
+				draw_square(&game->map.img, (t_point){pt.x + MAP_SCALE / 2,
+								pt.y + MAP_SCALE / 2}, MAP_SCALE - 4, 0x33AA99);
+			pt.x += MAP_SCALE;
 		}
-		y += MAP_SCALE;
+		pt.y += MAP_SCALE;
 	}
 	draw_map_player(game);
-	draw_square(&game->map.img, (t_point){game->object[0].pos.x * MAP_SCALE,
-							game->object[0].pos.y * MAP_SCALE}, 6, 0xFFFA80);
+	draw_square(&game->map.img, (t_point){
+		((t_object *)game->objects->content)->pos.x * MAP_SCALE,
+		((t_object *)game->objects->content)->pos.y * MAP_SCALE}, 6, 0xFFFA80);
 	mlx_put_image_to_window(game->mlx, game->win, game->map.img.ptr, 0, 0);
 }
 

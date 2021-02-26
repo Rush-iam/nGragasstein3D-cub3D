@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/23 21:02:57 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/26 22:08:59 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,10 +92,10 @@ typedef struct	s_img
 typedef struct	s_object
 {
 	t_img		*sprite;
+	t_fpoint	pos;
 	double		width;
 	unsigned	height;
 	double		distance;
-	t_fpoint	pos;
 }				t_object;
 
 typedef struct	s_game
@@ -107,6 +107,7 @@ typedef struct	s_game
 	{
 		t_fpoint	pos;
 		double		angle;
+		t_fpoint	cossin;
 	}			p;
 	struct		s_key
 	{
@@ -132,9 +133,7 @@ typedef struct	s_game
 	unsigned	color_ceil;
 	unsigned	color_floor;
 	t_img		texture[5];
-//	t_sprite	sprite;
-	t_object	object[4]; //
-	unsigned	object_count;
+	t_list		*objects;
 }				t_game;
 
 int				game_loop		(t_game *game);
@@ -175,7 +174,7 @@ void			draw_wall_scaled(t_game *game, t_img *src, unsigned x,
 void			draw_wall_solid	(t_game *game, unsigned ray, double fade);
 
 void			draw_objects		(t_game *game);
-void			objects_sort		(t_game *game);
+int				objects_sort		(t_object *obj1, t_object *obj2);
 void			draw_sprite			(t_game *game, t_object *obj, double angle);
 void			draw_sprite_scaled	(t_img *img, t_object *obj, unsigned x,
 																unsigned src_x);

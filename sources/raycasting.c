@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 20:04:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/23 20:56:07 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/26 18:52:09 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,10 @@ void		ray_intersect(t_game *game, double cur_angle, unsigned ray)
 	y1 = (cur_angle < M_PI) ?
 		ray_intersect_y(game, (t_fpoint){1 / tan(cur_angle), 1}) :
 		ray_intersect_y(game, (t_fpoint){-1 / tan(cur_angle), -1});
-	distance.x = cos(game->p.angle) * (x1.x - game->p.pos.x) +
-				sin(game->p.angle) * (x1.y - game->p.pos.y);
-	distance.y = cos(game->p.angle) * (y1.x - game->p.pos.x) +
-				sin(game->p.angle) * (y1.y - game->p.pos.y);
+	distance.x = game->p.cossin.x * (x1.x - game->p.pos.x) +
+			game->p.cossin.y * (x1.y - game->p.pos.y);
+	distance.y = game->p.cossin.x * (y1.x - game->p.pos.x) +
+			game->p.cossin.y * (y1.y - game->p.pos.y);
 	if (distance.x < distance.y)
 		game->column[ray] = (struct s_column)
 			{distance.x, game->img.size.x / COL_SCALE / distance.x, x1,

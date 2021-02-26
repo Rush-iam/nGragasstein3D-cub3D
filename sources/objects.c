@@ -6,65 +6,43 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 16:34:37 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/23 21:04:13 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/26 23:27:39 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-void	objects_sort(t_game *game)
+int		objects_sort(t_object *obj1, t_object *obj2)
 {
-	unsigned	i;
-	bool		sorted;
-	t_object	tmp;
-
-	if (game->object_count == 0)
-		return ;
-	sorted = false;
-	while (sorted == false)
-	{
-		sorted = true;
-		i = 0;
-		while (i < game->object_count - 1)
-		{
-			if (game->object[i].distance < game->object[i + 1].distance)
-			{
-				sorted = false;
-				tmp = game->object[i];
-				game->object[i] = game->object[i + 1];
-				game->object[i + 1] = tmp;
-			}
-			i++;
-		}
-	}
+	return (obj1->distance < obj2->distance);
 }
 
 void	draw_objects(t_game *game)
 {
-	unsigned	i;
+	t_list		*cur_list;
+	t_object	*obj;
 	double		angle;
 	t_fpoint	diff;
 
-	objects_sort(game);
-	i = 0;
-	while (i < game->object_count)
+	ft_lstsort(&game->objects, objects_sort);
+	cur_list = game->objects;
+	while (cur_list)
 	{
-		diff = (t_fpoint){game->object[i].pos.x - game->p.pos.x,
-						game->object[i].pos.y - game->p.pos.y};
+		obj = (t_object *)cur_list->content;
+		diff = (t_fpoint){obj->pos.x - game->p.pos.x,
+						obj->pos.y - game->p.pos.y};
 		angle = atan2(diff.y, diff.x);
 		if (fabs(game->p.angle - angle - PI2) <= M_PI)
 			angle += PI2;
 		angle -= game->p.angle;
-		game->object[i].distance = cos(game->p.angle) * diff.x +
-									sin(game->p.angle) * diff.y;
+		obj->distance = game->p.cossin.x * diff.x + game->p.cossin.y * diff.y;
 		if (fabs(angle) < FOV)
 		{
-			game->object[i].width = game->img.size.x / COL_SCALE /
-									sqrt(pow(diff.x, 2) + pow(diff.y, 2)) *
-									game->object[i].sprite->aspect;
-			draw_sprite(game, &game->object[i], angle);
+			obj->width = game->img.size.x / COL_SCALE /
+								hypot(diff.x, diff.y) * obj->sprite->aspect;
+			draw_sprite(game, obj, angle);
 		}
-		i++;
+		cur_list = cur_list->next;
 	}
 }
 
@@ -86,7 +64,8 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 	while (cur < max_ray)
 	{
 		if (obj->distance < game->column[cur].distance)
-			draw_sprite_scaled(&game->img, obj, cur, (cur - start_ray) / scale_x);
+			draw_sprite_scaled(
+					&game->img, obj, cur, (cur - start_ray) / scale_x);
 		cur++;
 	}
 }
