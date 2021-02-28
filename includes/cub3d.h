@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/28 18:27:32 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/28 20:13:06 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,15 +25,13 @@
 # include "get_next_line.h"
 # include "x_events.h"
 
+# define WINDOW_TITLE	"cub3D by nGragas"
+
 # define ERROR_MLX		1
 # define ERROR_ARGS		2
 # define ERROR_PARSE	3
 # define ERROR_MEMORY	4
-
-# define WINDOW_TITLE	"cub3D by nGragas"
-
-# define WIN_W (1200 * 2)
-//# define WIN_H (600 * 2)
+# define ERROR_BMP		5
 
 # define WALL_N	0
 # define WALL_S	1
@@ -48,16 +46,17 @@
 # define TURN_LEFT		KEY_LEFT
 # define TURN_RIGHT		KEY_RIGHT
 
+# define PL_SPEED		0.05
+# define MAP_SCALE		24
+
 # define PI2			(2 * M_PI)
 # define GRAD_TO_RAD	(PI2 / 360)
-# define MAP_SCALE		24
 # define FOV			(60. * GRAD_TO_RAD)
 /*
 ** tan(FOV / 2) if FOV 60 == .57735
 */
 # define TAN_60_2		.57735
 # define COL_SCALE		(2 * TAN_60_2)
-# define PL_SPEED		0.05
 
 typedef struct	s_point
 {
@@ -141,7 +140,7 @@ typedef struct	s_game
 
 int				game_loop		(t_game *game);
 void			initialize(t_game *game);
-void			initialize_objects_distance(t_game *game);
+int				write_screenshot(t_game *game);
 
 void			parse(int args, char **av, t_game *game);
 void			parse_scene(int file_id, char **line, t_game *game);
@@ -153,6 +152,7 @@ void			parse_map(int file_id, char *line, t_game *game);
 void			set_map(t_game *game, t_list *map);
 void			set_map_process(t_game *game);
 void			set_map_check_cell(t_game *game, char **map, t_upoint pt);
+void			set_map_objects(t_game *game);
 
 int				hook_key_press		(int key_code, struct s_key *key);
 int				hook_key_release	(int key_code, struct s_key *key);

@@ -59,6 +59,7 @@ void	set_map(t_game *game, t_list *map)
 	set_map_process(game);
 	if (game->p.pos.x == 0)
 		terminate(ERROR_PARSE, "Player position character (NSWE) not found");
+	set_map_objects(game);
 }
 
 void	set_map_process(t_game *game)
@@ -109,5 +110,21 @@ void	set_map_check_cell(t_game *game, char **map, t_upoint pt)
 		game->p.pos = (t_fpoint){pt.x + 0.5, pt.y + 0.5};
 		game->p.angle = M_PI_2 * (ft_strchr(dirs, map[pt.y][pt.x]) - dirs);
 		game->map.grid[pt.y][pt.x] = '0';
+	}
+}
+
+void	set_map_objects(t_game *game)
+{
+	t_list		*cur_list;
+	t_object	*obj;
+
+	__sincos(game->p.angle, &game->p.cossin.y, &game->p.cossin.x);
+	cur_list = game->objects;
+	while (cur_list)
+	{
+		obj = (t_object *)cur_list->content;
+		obj->distance = game->p.cossin.x * (obj->pos.x - game->p.pos.x) +
+						game->p.cossin.y * (obj->pos.y - game->p.pos.y);
+		cur_list = cur_list->next;
 	}
 }

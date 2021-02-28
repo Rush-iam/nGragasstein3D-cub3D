@@ -33,7 +33,7 @@ void	parse(int args, char **av, t_game *game)
 	if (args == 3)
 	{
 		if (ft_strncmp("--save", *++av, 7) == 0)
-			write_screenshot();
+			write_screenshot(game);
 		else
 			terminate(ERROR_ARGS, "Invalid option");
 	}

@@ -6,15 +6,29 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/28 18:44:20 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/28 20:48:27 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 #include "x_events.h"
 
-int		write_screenshot()
+int		write_screenshot(t_game *game)
 {
+	int		file_id;
+	unsigned	size;
+
+	(void)game;
+	if ((file_id = open("shot.bmp", O_WRONLY)) == -1)
+		terminate(ERROR_ARGS, strerror(errno));
+	write(file_id, "MB", 2);
+	size = 256;
+	size = ((size & 0xFF) << 24) | ((size & 0xFF00) << 16) |
+			((size & 0xFF0000) << 8) | (size & 0xFF000000);
+	write(file_id, &size, 4);
+	write(file_id, "\0\0\0\0\x8A\0\0\0", 8);
+
+
 	return (EXIT_SUCCESS);
 }
 
@@ -64,26 +78,7 @@ void	initialize(t_game *game)
 	while (n < (int)game->img.size.x)
 		if ((game->column[n++] = ft_calloc(1, sizeof(struct s_column))) == NULL)
 			terminate(ERROR_MEMORY, "Memory allocation failed (single column)");
-	initialize_objects_distance(game);
 	draw_map_init(game);
-}
-
-void	initialize_objects_distance(t_game *game)
-{
-	t_list		*cur_list;
-	t_object	*obj;
-	t_fpoint	diff;
-
-	__sincos(game->p.angle, &game->p.cossin.y, &game->p.cossin.x);
-	cur_list = game->objects;
-	while (cur_list)
-	{
-		obj = (t_object *)cur_list->content;
-		diff = (t_fpoint){obj->pos.x - game->p.pos.x,
-						  obj->pos.y - game->p.pos.y};
-		obj->distance = game->p.cossin.x * diff.x + game->p.cossin.y * diff.y;
-		cur_list = cur_list->next;
-	}
 }
 
 int	game_loop(t_game *game)

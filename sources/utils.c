@@ -40,10 +40,12 @@ int		terminate(int return_value, char *message)
 		ft_putendl_fd(message, 2);
 		if (return_value == ERROR_MLX)
 			ft_putendl_fd("MLX/X11 crashed", 2);
-		if (return_value == ERROR_PARSE)
+		else if (return_value == ERROR_PARSE)
 			ft_putendl_fd("Plese fix scene file", 2);
-		if (return_value == ERROR_ARGS)
+		else if (return_value == ERROR_ARGS)
 			ft_putendl_fd("Usage: ./cub3D scene_name.cub [--save]", 2);
+		else if (return_value == ERROR_BMP)
+			ft_putendl_fd("Unable to save screenshot", 2);
 	}
 	exit(return_value);
 }
