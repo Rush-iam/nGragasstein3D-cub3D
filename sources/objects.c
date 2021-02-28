@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 16:34:37 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/26 23:27:39 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/28 18:36:56 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 		max_ray = (int)game->img.size.x;
 	while (cur < max_ray)
 	{
-		if (obj->distance < game->column[cur].distance)
+		if (obj->distance < game->column[cur]->distance)
 			draw_sprite_scaled(
 					&game->img, obj, cur, (cur - start_ray) / scale_x);
 		cur++;

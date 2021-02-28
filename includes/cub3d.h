@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/26 22:08:59 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/28 18:27:32 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,11 @@
 # define CUB3D_H
 
 # include <time.h>
+# include <fcntl.h>
 # include <math.h>
 # include <stdbool.h>
+# include <errno.h>
+# include <string.h>
 # include <limits.h>
 # include <mlx.h>
 # include "libft.h"
@@ -47,7 +50,7 @@
 
 # define PI2			(2 * M_PI)
 # define GRAD_TO_RAD	(PI2 / 360)
-# define MAP_SCALE		32
+# define MAP_SCALE		24
 # define FOV			(60. * GRAD_TO_RAD)
 /*
 ** tan(FOV / 2) if FOV 60 == .57735
@@ -129,7 +132,7 @@ typedef struct	s_game
 		t_fpoint	cell;
 		double		texture_pos;
 		char		dir;
-	}			column[WIN_W]; //
+	}			**column;
 	unsigned	color_ceil;
 	unsigned	color_floor;
 	t_img		texture[5];
@@ -137,6 +140,19 @@ typedef struct	s_game
 }				t_game;
 
 int				game_loop		(t_game *game);
+void			initialize(t_game *game);
+void			initialize_objects_distance(t_game *game);
+
+void			parse(int args, char **av, t_game *game);
+void			parse_scene(int file_id, char **line, t_game *game);
+void			set_resolution(const char *res_string, t_upoint *res);
+void			set_colors(const char *color_string, unsigned *target);
+void			set_textures(char *string, t_game *game);
+
+void			parse_map(int file_id, char *line, t_game *game);
+void			set_map(t_game *game, t_list *map);
+void			set_map_process(t_game *game);
+void			set_map_check_cell(t_game *game, char **map, t_upoint pt);
 
 int				hook_key_press		(int key_code, struct s_key *key);
 int				hook_key_release	(int key_code, struct s_key *key);
@@ -165,8 +181,9 @@ void			draw_line	(t_img *img, t_point p1, t_point p2, int color);
 void			draw_square	(t_img *img, t_point center, int size, int color);
 void			draw_4pts	(t_img *img, t_point *pts, int color);
 
-void			draw_map(t_game *game);
-void			draw_map_player(t_game *game);
+void			draw_map_init	(t_game *game);
+void			draw_map		(t_game *game);
+void			draw_map_player	(t_game *game);
 
 void			draw_walls		(t_game *game);
 void			draw_wall_scaled(t_game *game, t_img *src, unsigned x,

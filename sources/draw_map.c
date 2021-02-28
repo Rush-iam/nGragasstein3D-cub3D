@@ -6,11 +6,24 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 18:52:51 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/26 23:36:54 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/02/28 18:19:49 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
+
+void	draw_map_init(t_game *game)
+{
+	int	null;
+
+	game->map.img.size = (t_upoint){game->map.size.x * MAP_SCALE,
+									game->map.size.y * MAP_SCALE};
+	if (!(game->map.img.ptr = mlx_new_image(game->mlx, game->map.img.size.x,
+														game->map.img.size.y)))
+		terminate(ERROR_MEMORY, "Memory allocation failed (draw map)");
+	game->map.img.data = (unsigned *)mlx_get_data_addr(game->map.img.ptr, &null,
+																&null, &null);
+}
 
 void	draw_map(t_game *game)
 {
@@ -53,8 +66,8 @@ void	draw_map_player(t_game *game)
 	{
 		draw_line(&game->map.img,
 				(t_point){game->p.pos.x * MAP_SCALE, game->p.pos.y * MAP_SCALE},
-				(t_point){game->column[ray].cell.x * MAP_SCALE,
-						game->column[ray].cell.y * MAP_SCALE}, 0x888015);
+				(t_point){game->column[ray]->cell.x * MAP_SCALE,
+						game->column[ray]->cell.y * MAP_SCALE}, 0x888015);
 		ray += 32;
 	}
 	draw_line(&game->map.img, (t_point){game->p.pos.x * MAP_SCALE,

@@ -6,13 +6,15 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/02/27 00:11:46 by ngragas          ###   ########.fr        #
+#    Updated: 2021/02/28 18:41:24 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = cub3D
 CFLAGS = -Wall -Wextra -Werror -MMD -g -Ofast
 SRC =	main.c			\
+		parse.c			\
+		parse_map.c		\
 		hooks.c			\
 		control.c		\
 		raycasting.c	\

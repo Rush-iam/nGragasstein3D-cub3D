@@ -48,11 +48,11 @@ void		ray_intersect(t_game *game, double cur_angle, unsigned ray)
 	distance.y = game->p.cossin.x * (y1.x - game->p.pos.x) +
 			game->p.cossin.y * (y1.y - game->p.pos.y);
 	if (distance.x < distance.y)
-		game->column[ray] = (struct s_column)
+		*game->column[ray] = (struct s_column)
 			{distance.x, game->img.size.x / COL_SCALE / distance.x, x1,
 				x1.y - (int)x1.y, (x1.x < game->p.pos.x) ? 'E' : 'W'};
 	else
-		game->column[ray] = (struct s_column)
+		*game->column[ray] = (struct s_column)
 			{distance.y, game->img.size.x / COL_SCALE / distance.y, y1,
 				y1.x - (int)y1.x, (y1.y < game->p.pos.y) ? 'N' : 'S'};
 }

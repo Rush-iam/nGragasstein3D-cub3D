@@ -31,6 +31,7 @@ void	player_control(t_game *game)
 		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.cossin.y,
 								game->p.pos.y + PL_SPEED * game->p.cossin.x};
 	player_control_borders(game);
+	__sincos(game->p.angle, &game->p.cossin.y, &game->p.cossin.x);
 }
 
 void	player_control_borders(t_game *game)
