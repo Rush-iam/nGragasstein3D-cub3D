@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/28 20:13:06 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/01 23:10:40 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # include <errno.h>
 # include <string.h>
 # include <limits.h>
-# include <mlx.h>
+# include "mlx.h"
 # include "libft.h"
 # include "get_next_line.h"
 # include "x_events.h"
@@ -47,7 +47,7 @@
 # define TURN_RIGHT		KEY_RIGHT
 
 # define PL_SPEED		0.05
-# define MAP_SCALE		24
+# define MAP_SCALE		20
 
 # define PI2			(2 * M_PI)
 # define GRAD_TO_RAD	(PI2 / 360)
@@ -138,21 +138,22 @@ typedef struct	s_game
 	t_list		*objects;
 }				t_game;
 
+void			validate_scene		(t_game *game);
+void			initialize			(t_game *game, bool screenshot);
+void			initialize_objects	(t_game *game);
+
 int				game_loop		(t_game *game);
-void			initialize(t_game *game);
-int				write_screenshot(t_game *game);
 
-void			parse(int args, char **av, t_game *game);
-void			parse_scene(int file_id, char **line, t_game *game);
-void			set_resolution(const char *res_string, t_upoint *res);
-void			set_colors(const char *color_string, unsigned *target);
-void			set_textures(char *string, t_game *game);
+int				parse			(int args, char **av, t_game *game);
+void			parse_scene		(int file_id, char **line, t_game *game);
+void			set_resolution	(const char *res_string, t_upoint *res);
+void			set_colors		(const char *color_string, unsigned *target);
+void			set_textures	(char *string, t_game *game);
 
-void			parse_map(int file_id, char *line, t_game *game);
-void			set_map(t_game *game, t_list *map);
-void			set_map_process(t_game *game);
-void			set_map_check_cell(t_game *game, char **map, t_upoint pt);
-void			set_map_objects(t_game *game);
+void			parse_map			(int file_id, char *line, t_game *game);
+void			set_map				(t_game *game, t_list *map);
+void			set_map_process		(t_game *game);
+void			set_map_check_cell	(t_game *game, char **map, t_upoint pt);
 
 int				hook_key_press		(int key_code, struct s_key *key);
 int				hook_key_release	(int key_code, struct s_key *key);
@@ -184,6 +185,7 @@ void			draw_4pts	(t_img *img, t_point *pts, int color);
 void			draw_map_init	(t_game *game);
 void			draw_map		(t_game *game);
 void			draw_map_player	(t_game *game);
+void			draw_map_objects(t_game *game);
 
 void			draw_walls		(t_game *game);
 void			draw_wall_scaled(t_game *game, t_img *src, unsigned x,
@@ -196,10 +198,11 @@ void			draw_sprite			(t_game *game, t_object *obj, double angle);
 void			draw_sprite_scaled	(t_img *img, t_object *obj, unsigned x,
 																unsigned src_x);
 
-t_point			points_sum		(t_point p1, t_point p2);
 char			*atoi_limited	(unsigned *dst_int, const char *src_string,
 															unsigned limit);
-int				terminate		(int return_value, char *message);
+int				terminate					(int return_value, char *message);
+void			write_screenshot_and_exit	(t_game *game);
+void			write_screenshot_and_exit_2	(t_img *img, int file_id);
 
 void			demo_fillrate	(t_game *mlx, int step);
 void			demo_radar		(t_game *mlx, int rays);

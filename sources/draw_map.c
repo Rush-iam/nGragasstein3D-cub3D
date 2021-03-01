@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 18:52:51 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/28 18:19:49 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/01 16:01:27 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,7 @@ void	draw_map(t_game *game)
 		pt.y += MAP_SCALE;
 	}
 	draw_map_player(game);
-	draw_square(&game->map.img, (t_point){
-		((t_object *)game->objects->content)->pos.x * MAP_SCALE,
-		((t_object *)game->objects->content)->pos.y * MAP_SCALE}, 6, 0xFFFA80);
+	draw_map_objects(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->map.img.ptr, 0, 0);
 }
 
@@ -74,4 +72,19 @@ void	draw_map_player(t_game *game)
 										game->p.pos.y * MAP_SCALE}, (t_point){
 		game->p.pos.x * MAP_SCALE + MAP_SCALE * cos(game->p.angle),
 		game->p.pos.y * MAP_SCALE + MAP_SCALE * sin(game->p.angle)}, 0xFF4020);
+}
+
+void	draw_map_objects(t_game *game)
+{
+	t_list		*cur_list;
+	t_object	*obj;
+
+	cur_list = game->objects;
+	while (cur_list)
+	{
+		obj = (t_object *)cur_list->content;
+		draw_square(&game->map.img, (t_point){
+				obj->pos.x * MAP_SCALE, obj->pos.y * MAP_SCALE}, 2, 0xFF7A40);
+		cur_list = cur_list->next;
+	}
 }

@@ -6,13 +6,13 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/28 18:27:20 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/28 18:55:54 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/01 23:13:28 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-void	parse(int args, char **av, t_game *game)
+int		parse(int args, char **av, t_game *game)
 {
 	int		file_id;
 	char	*line;
@@ -33,18 +33,19 @@ void	parse(int args, char **av, t_game *game)
 	if (args == 3)
 	{
 		if (ft_strncmp("--save", *++av, 7) == 0)
-			write_screenshot(game);
+			return (true);
 		else
 			terminate(ERROR_ARGS, "Invalid option");
 	}
+	return (false);
 }
 
 void	parse_scene(int file_id, char **line, t_game *game)
 {
 	int	status;
 
-	game->color_floor = -1;
-	game->color_ceil = -1;
+	game->color_floor = -1U;
+	game->color_ceil = -1U;
 	while ((status = get_next_line(file_id, line)) >= 0)
 	{
 		if (**line == 'R')
@@ -71,14 +72,16 @@ void	set_resolution(const char *res_string, t_upoint *res)
 	if (res->x)
 		terminate(ERROR_PARSE, "Duplicated R(esolution) setting in scene file");
 	res_string++;
-	res_string = atoi_limited(&res->x, res_string, USHRT_MAX);
+	res_string = atoi_limited(&res->x, res_string, SHRT_MAX);
 	if (res_string == NULL)
-		terminate(ERROR_PARSE, "R(esolution) X setting is too large (>65535)");
-	res_string = atoi_limited(&res->y, res_string, USHRT_MAX);
+		terminate(ERROR_PARSE, "R(esolution) X setting is too large (>32767)");
+	res_string = atoi_limited(&res->y, res_string, SHRT_MAX);
 	if (res_string == NULL)
-		terminate(ERROR_PARSE, "R(esolution) Y setting is too large (>65535)");
+		terminate(ERROR_PARSE, "R(esolution) Y setting is too large (>32767)");
 	if (*res_string != '\0' || res->x == 0 || res->y == 0)
 		terminate(ERROR_PARSE, "Wrong R(esolution) setting");
+	if (res->x * res->y > 512000000)
+		terminate(ERROR_PARSE, "R(esolution) X*Y should be less than 512 Mpix");
 }
 
 void	set_colors(const char *color_string, unsigned *target)
@@ -95,17 +98,17 @@ void	set_colors(const char *color_string, unsigned *target)
 	color_string++;
 	color_string = atoi_limited(&r, color_string, UCHAR_MAX);
 	if (color_string == NULL)
-		terminate(ERROR_PARSE, "F or C color R(ed) value is too large (>255)");
+		terminate(ERROR_PARSE, "F or C color Red is wrong (range: 0-255)");
 	if (*color_string++ != ',')
 		terminate(ERROR_PARSE, "F or C color format: 'F R,G,B' or 'C R,G,B'");
 	color_string = atoi_limited(&g, color_string, UCHAR_MAX);
 	if (color_string == NULL)
-		terminate(ERROR_PARSE, "F or C color R(ed) value is too large (>255)");
+		terminate(ERROR_PARSE, "F or C color Green is wrong (range: 0-255)");
 	if (*color_string++ != ',')
 		terminate(ERROR_PARSE, "F or C color format: 'F R,G,B' or 'C R,G,B'");
 	color_string = atoi_limited(&b, color_string, UCHAR_MAX);
 	if (color_string == NULL)
-		terminate(ERROR_PARSE, "F or C color R(ed) value is too large (>255)");
+		terminate(ERROR_PARSE, "F or C color Blue is wrong (range: 0-255)");
 	*target = (r << 16) | (g << 8) | b;
 }
 

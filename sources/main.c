@@ -6,43 +6,27 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/28 20:48:27 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/01 23:54:22 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 #include "x_events.h"
 
-int		write_screenshot(t_game *game)
-{
-	int		file_id;
-	unsigned	size;
-
-	(void)game;
-	if ((file_id = open("shot.bmp", O_WRONLY)) == -1)
-		terminate(ERROR_ARGS, strerror(errno));
-	write(file_id, "MB", 2);
-	size = 256;
-	size = ((size & 0xFF) << 24) | ((size & 0xFF00) << 16) |
-			((size & 0xFF0000) << 8) | (size & 0xFF000000);
-	write(file_id, &size, 4);
-	write(file_id, "\0\0\0\0\x8A\0\0\0", 8);
-
-
-	return (EXIT_SUCCESS);
-}
-
 int	main(int args, char *av[])
 {
 	t_game	game;
+	bool	screenshot_only;
 
 	errno = 0;
 	game = (t_game){0};
 	if (!(game.mlx = mlx_init()))
 		terminate(ERROR_MLX, strerror(errno));
-	parse(args, av, &game);
-	initialize(&game);
+	screenshot_only = parse(args, av, &game);
+	validate_scene(&game);
+	initialize(&game, screenshot_only);
 	mlx_do_key_autorepeatoff(game.mlx);
+	mlx_mouse_hide();
 	mlx_hook(game.win, EVENT_KEYPRESS, 0, hook_key_press, &game.key);
 	mlx_hook(game.win, EVENT_KEYRELEASE, 0, hook_key_release, &game.key);
 	mlx_hook(game.win, EVENT_BUTTONPRESS, 0, hook_mouse_press, &game.key);
@@ -53,32 +37,84 @@ int	main(int args, char *av[])
 	mlx_loop(game.mlx);
 }
 
-void	initialize(t_game *game)
+void	validate_scene(t_game *game)
+{
+	if (game->p.pos.x == 0)
+		terminate(ERROR_PARSE, "Player position character (NSWE) not found");
+	if (game->color_floor == -1U)
+		terminate(ERROR_PARSE, "Floor color not found. Format: 'F R,G,B'");
+	if (game->color_ceil == -1U)
+		terminate(ERROR_PARSE, "Ceil color not found. Format: 'C R,G,B'");
+	if (game->img.size.x == 0 || game->img.size.y == 0)
+		terminate(ERROR_PARSE,
+		"Resolution doesn't set. Format: 'R WIDTH HEIGHT' (max 32767x32767)");
+	if (game->texture[WALL_N].ptr == NULL)
+		terminate(ERROR_PARSE,
+					"North wall texture doesn't set. Format: 'NO ./path.xpm'");
+	if (game->texture[WALL_S].ptr == NULL)
+		terminate(ERROR_PARSE,
+					"South wall texture doesn't set. Format: 'SO ./path.xpm'");
+	if (game->texture[WALL_W].ptr == NULL)
+		terminate(ERROR_PARSE,
+					"West wall texture doesn't set. Format: 'WE ./path.xpm'");
+	if (game->texture[WALL_E].ptr == NULL)
+		terminate(ERROR_PARSE,
+					"East wall texture doesn't set. Format: 'EA ./path.xpm'");
+	if (game->texture[SPRITE].ptr == NULL)
+		terminate(ERROR_PARSE,
+					"Sprite texture doesn't set. Format: 'S ./path.xpm'");
+}
+
+void	initialize(t_game *game, bool screenshot)
 {
 	t_upoint	max_res = {5400, 2200}; //
 	t_upoint	min_res = {2, 1};
 	int			n;
 
-	if (game->img.size.x > max_res.x)
-		game->img.size.x = max_res.x;
-	if (game->img.size.y > max_res.y)
-		game->img.size.y = max_res.y;
 	if (game->img.size.x < min_res.x)
 		game->img.size.x = min_res.x;
-	if (!(game->win = mlx_new_window(
-			game->mlx, game->img.size.x, game->img.size.y, WINDOW_TITLE)))
-		terminate(ERROR_MLX, strerror(errno));
+	if (screenshot == false)
+	{
+//		max_res.x = ;
+//		max_res.y = ;
+		if (game->img.size.x > max_res.x)
+			game->img.size.x = max_res.x;
+		if (game->img.size.y > max_res.y)
+			game->img.size.y = max_res.y;
+		if (!(game->win = mlx_new_window(
+				game->mlx, game->img.size.x, game->img.size.y, WINDOW_TITLE)))
+			terminate(ERROR_MLX, strerror(errno));
+	}
 	if (!(game->img.ptr = mlx_new_image(
 			game->mlx, game->img.size.x, game->img.size.y)))
 		terminate(ERROR_MLX, strerror(errno));
 	game->img.data = (unsigned *)mlx_get_data_addr(game->img.ptr, &n, &n, &n);
 	if (!(game->column = malloc(sizeof(struct s_column *) * game->img.size.x)))
-		terminate(ERROR_MEMORY, "Memory allocation failed (window columns)");
+		terminate(ERROR_MEMORY, "Memory allocation failed (ray columns)");
 	n = 0;
 	while (n < (int)game->img.size.x)
 		if ((game->column[n++] = ft_calloc(1, sizeof(struct s_column))) == NULL)
 			terminate(ERROR_MEMORY, "Memory allocation failed (single column)");
 	draw_map_init(game);
+	initialize_objects(game);
+	if (screenshot == true)
+		write_screenshot_and_exit(game);
+}
+
+void	initialize_objects(t_game *game)
+{
+	t_list		*cur_list;
+	t_object	*obj;
+
+	__sincos(game->p.angle, &game->p.cossin.y, &game->p.cossin.x);
+	cur_list = game->objects;
+	while (cur_list)
+	{
+		obj = (t_object *)cur_list->content;
+		obj->distance = game->p.cossin.x * (obj->pos.x - game->p.pos.x) +
+						game->p.cossin.y * (obj->pos.y - game->p.pos.y);
+		cur_list = cur_list->next;
+	}
 }
 
 int	game_loop(t_game *game)
@@ -92,18 +128,18 @@ int	game_loop(t_game *game)
 	draw_walls(game);
 //	for (int i = 0; i < 250; ++i)
 		draw_objects(game);
+	demo_cursor(game, 0xFF88FF);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
 	draw_map(game);
 
 //	fizzlefade(&game->img, 0xFF0000);
 //	demo_fillrate(game, 1);
 //	demo_radar(game, 360);
-//	demo_cursor(game, 0xFF88FF);
 //	ft_putnbr_fd(CLOCKS_PER_SEC / (clock() - start), 1);
 //	write(1, "\n", 1);
 	fps = ft_itoa(CLOCKS_PER_SEC / (clock() - tick));
 	tick = clock();
-	mlx_string_put(game->mlx, game->win, 0, 0, 0xFFFFFF, fps);
+	mlx_string_put(game->mlx, game->win, 0, 10, 0xFFFFFF, fps);
 	free(fps);
 
 //	write(1, "Player x", 9); ft_putnbr_fd((int)game->p.pos.x, 1);

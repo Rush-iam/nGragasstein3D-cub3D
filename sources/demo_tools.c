@@ -54,5 +54,6 @@ void	demo_radar(t_game *mlx, int rays)
 void	demo_cursor(t_game *game, int color)
 {
 	draw_line(&game->img, game->key.mpos,
-			points_sum(game->key.mpos, game->key.mdir), color);
+		(t_point){game->key.mpos.x + game->key.mdir.x,
+			game->key.mpos.y + game->key.mdir.y}, color);
 }
