@@ -1,4 +1,4 @@
-R 2400 1200
+R 640 640
 NO ./resources/wall_1.xpm
 SO ./resources/wall_2.xpm
 WE ./resources/wall_3.xpm

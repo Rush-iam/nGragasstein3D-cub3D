@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/01 23:10:40 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/02 22:09:14 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@
 # define TURN_RIGHT		KEY_RIGHT
 
 # define PL_SPEED		0.05
-# define MAP_SCALE		20
+# define MAP_SCALE		64
 
 # define PI2			(2 * M_PI)
 # define GRAD_TO_RAD	(PI2 / 360)
@@ -115,7 +115,6 @@ typedef struct	s_game
 	{
 		bool		k[280];
 		bool		m[10];
-		t_point		mpos;
 		t_point		mdir;
 	}			key;
 	struct		s_map
@@ -144,7 +143,7 @@ void			initialize_objects	(t_game *game);
 
 int				game_loop		(t_game *game);
 
-int				parse			(int args, char **av, t_game *game);
+bool			parse			(int args, char **av, t_game *game);
 void			parse_scene		(int file_id, char **line, t_game *game);
 void			set_resolution	(const char *res_string, t_upoint *res);
 void			set_colors		(const char *color_string, unsigned *target);
@@ -159,7 +158,6 @@ int				hook_key_press		(int key_code, struct s_key *key);
 int				hook_key_release	(int key_code, struct s_key *key);
 int				hook_mouse_press	(int btn, int x, int y, struct s_key *key);
 int				hook_mouse_release	(int btn, int x, int y, struct s_key *key);
-int				hook_mouse_move		(int x, int y, struct s_key *key);
 
 void			player_control			(t_game *game);
 void			player_control_borders	(t_game *game);

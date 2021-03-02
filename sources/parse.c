@@ -12,7 +12,7 @@
 
 #include "cub3d.h"
 
-int		parse(int args, char **av, t_game *game)
+bool	parse(int args, char **av, t_game *game)
 {
 	int		file_id;
 	char	*line;

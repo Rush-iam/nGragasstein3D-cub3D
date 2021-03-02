@@ -44,7 +44,7 @@ int		terminate(int return_value, char *message)
 		else if (return_value == ERROR_BMP)
 			ft_putendl_fd("Unable to save screenshot", 2);
 	}
-	exit(return_value);
+	exit(return_value); //
 }
 
 void	write_screenshot_and_exit(t_game *game)

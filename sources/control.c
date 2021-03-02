@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 20:55:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/26 17:55:10 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/02 16:31:24 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,12 @@
 
 void	player_control(t_game *game)
 {
+//	t_point	mouse_pos;
+//
+//	mlx_mouse_get_pos(game->win, &mouse_pos.x, &mouse_pos.y);
+//	mlx_mouse_move(game->win, game->img.size.x / 2, game->img.size.y / 2);
+//	game->key.mdir.x = mouse_pos.x - game->img.size.x / 2;
+//	game->p.angle += game->key.mdir.x / 1000.;
 	if (game->key.k[TURN_LEFT])
 		game->p.angle -= PL_SPEED / 2;
 	if (game->key.k[TURN_RIGHT])

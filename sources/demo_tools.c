@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 19:39:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/23 20:04:14 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/02 20:18:53 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	demo_fillrate(t_game *mlx, int step)
 		x = 0;
 		while (x < mlx->img.size.x)
 		{
-			pixel_put(&mlx->img, x, y, x * y + shift);
+			mlx->img.data[y * mlx->img.size.x + x] = x * y + shift;
 			x += step;
 		}
 		shift++;
@@ -51,9 +51,11 @@ void	demo_radar(t_game *mlx, int rays)
 	shift += 8;
 }
 
-void	demo_cursor(t_game *game, int color)
-{
-	draw_line(&game->img, game->key.mpos,
-		(t_point){game->key.mpos.x + game->key.mdir.x,
-			game->key.mpos.y + game->key.mdir.y}, color);
-}
+/*
+**void	demo_cursor(t_game *game, int color)
+**{
+**	draw_line(&game->img, game->key.mpos,
+**		(t_point){game->key.mpos.x + game->key.mdir.x,
+**			game->key.mpos.y + game->key.mdir.y}, color);
+**}
+*/

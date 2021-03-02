@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/01 23:54:22 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/02 22:25:14 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ int	main(int args, char *av[])
 	mlx_hook(game.win, EVENT_KEYRELEASE, 0, hook_key_release, &game.key);
 	mlx_hook(game.win, EVENT_BUTTONPRESS, 0, hook_mouse_press, &game.key);
 	mlx_hook(game.win, EVENT_BUTTONRELEASE, 0, hook_mouse_release, &game.key);
-	mlx_hook(game.win, EVENT_MOTIONNOTIFY, 0, hook_mouse_move, &game.key);
 	mlx_hook(game.win, EVENT_DESTROYNOTIFY, 0, terminate, NULL);
 	mlx_loop_hook(game.mlx, game_loop, &game);
 	mlx_loop(game.mlx);
@@ -122,25 +121,33 @@ int	game_loop(t_game *game)
 	static clock_t	tick;
 	char			*fps;
 
-	player_control(game);
-	img_ceilfloor_fill_rgb(&game->img, game->color_ceil, game->color_floor);
-	ray_cast(game);
-	draw_walls(game);
 //	for (int i = 0; i < 250; ++i)
-		draw_objects(game);
-	demo_cursor(game, 0xFF88FF);
+//	mlx_sync(MLX_SYNC_IMAGE_WRITABLE, game->img.ptr);
+//	player_control(game);
+	img_ceilfloor_fill_rgb(&game->img, game->color_ceil, game->color_floor);
+//	ray_cast(game);
+//	draw_walls(game);
+//	draw_objects(game);
+
+//	demo_cursor(game, 0xFF88FF);
+//	demo_fillrate(game, 1);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
-	draw_map(game);
+	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
+	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
+	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
+//	draw_map(game);
 
 //	fizzlefade(&game->img, 0xFF0000);
-//	demo_fillrate(game, 1);
 //	demo_radar(game, 360);
-//	ft_putnbr_fd(CLOCKS_PER_SEC / (clock() - start), 1);
+//	ft_putnbr_fd(CLOCKS_PER_SEC / (clock() - tick), 1);
 //	write(1, "\n", 1);
 	fps = ft_itoa(CLOCKS_PER_SEC / (clock() - tick));
 	tick = clock();
 	mlx_string_put(game->mlx, game->win, 0, 10, 0xFFFFFF, fps);
 	free(fps);
+//	mlx_do_sync(game->mlx);
+//	mlx_sync(MLX_SYNC_WIN_FLUSH_CMD, game->win);
+//	mlx_sync(MLX_SYNC_WIN_CMD_COMPLETED, game->win);
 
 //	write(1, "Player x", 9); ft_putnbr_fd((int)game->p.pos.x, 1);
 //	write(1, " y", 3); ft_putnbr_fd((int)game->p.pos.y, 1); write(1, "\n", 1);
