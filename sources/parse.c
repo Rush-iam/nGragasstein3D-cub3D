@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/28 18:27:20 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/01 23:13:28 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/03 21:50:45 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,24 +18,24 @@ bool	parse(int args, char **av, t_game *game)
 	char	*line;
 
 	if (args == 1)
-		terminate(ERROR_ARGS, "Please specify scene filename");
+		terminate(game, ERR_ARGS, "Please specify scene filename");
 	else if (args >= 4)
-		terminate(ERROR_ARGS, "Too many arguments");
+		terminate(game, ERR_ARGS, "Too many arguments");
 	av++;
 	if (ft_strlen(*av) < 5 || ft_memcmp(".cub", *av + ft_strlen(*av) - 4, 5))
-		terminate(ERROR_ARGS, "Wrong scene filename");
+		terminate(game, ERR_ARGS, "Wrong scene filename");
 	if ((file_id = open(*av, O_RDONLY)) == -1)
-		terminate(ERROR_ARGS, strerror(errno));
+		terminate(game, ERR_ARGS, strerror(errno));
 	parse_scene(file_id, &line, game);
 	parse_map(file_id, line, game);
 	if (close(file_id) == -1)
-		terminate(ERROR_PARSE, strerror(errno));
+		terminate(game, ERR_PARSE, strerror(errno));
 	if (args == 3)
 	{
 		if (ft_strncmp("--save", *++av, 7) == 0)
 			return (true);
 		else
-			terminate(ERROR_ARGS, "Invalid option");
+			terminate(game, ERR_ARGS, "Invalid option");
 	}
 	return (false);
 }
@@ -49,11 +49,11 @@ void	parse_scene(int file_id, char **line, t_game *game)
 	while ((status = get_next_line(file_id, line)) >= 0)
 	{
 		if (**line == 'R')
-			set_resolution(*line, &game->img.size);
+			set_resolution(*line, &game->img.size, game);
 		else if (**line == 'C')
-			set_colors(*line, &game->color_ceil);
+			set_colors(*line, &game->color_ceil, game);
 		else if (**line == 'F')
-			set_colors(*line, &game->color_floor);
+			set_colors(*line, &game->color_floor, game);
 		else if (**line == 'N' || **line == 'S' ||
 				**line == 'W' || **line == 'E')
 			set_textures(*line, game);
@@ -61,54 +61,51 @@ void	parse_scene(int file_id, char **line, t_game *game)
 			return ;
 		free(*line);
 		if (status == 0)
-			terminate(ERROR_PARSE, "There is no map in scene file");
+			terminate(game, ERR_PARSE, "There is no map in scene file");
 	}
 	if (status == -1)
-		terminate(ERROR_PARSE, "Something went wrong while reading scene file");
+		terminate(game, ERR_PARSE, "Can't load scene file");
 }
 
-void	set_resolution(const char *res_string, t_upoint *res)
+void	set_resolution(const char *res_string, t_upoint *res, t_game *game)
 {
 	if (res->x)
-		terminate(ERROR_PARSE, "Duplicated R(esolution) setting in scene file");
+		terminate(game, ERR_PARSE, "Duplicated Resolution setting");
 	res_string++;
-	res_string = atoi_limited(&res->x, res_string, SHRT_MAX);
+	res_string = atoi_limited(&res->x, res_string, UINT_MAX);
 	if (res_string == NULL)
-		terminate(ERROR_PARSE, "R(esolution) X setting is too large (>32767)");
-	res_string = atoi_limited(&res->y, res_string, SHRT_MAX);
+		terminate(game, ERR_PARSE, "Resolution X setting is wrong");
+	res_string = atoi_limited(&res->y, res_string, UINT_MAX);
 	if (res_string == NULL)
-		terminate(ERROR_PARSE, "R(esolution) Y setting is too large (>32767)");
+		terminate(game, ERR_PARSE, "Resolution Y setting is wrong");
 	if (*res_string != '\0' || res->x == 0 || res->y == 0)
-		terminate(ERROR_PARSE, "Wrong R(esolution) setting");
-	if (res->x * res->y > 512000000)
-		terminate(ERROR_PARSE, "R(esolution) X*Y should be less than 512 Mpix");
+		terminate(game, ERR_PARSE, "Wrong Resolution setting");
 }
 
-void	set_colors(const char *color_string, unsigned *target)
+void	set_colors(const char *color_string, unsigned *target, t_game *game)
 {
 	unsigned	r;
 	unsigned	g;
 	unsigned	b;
 
-	r = 0;
-	g = 0;
-	b = 0;
 	if (*target != (unsigned)-1)
-		terminate(ERROR_PARSE, "Duplicated F or C color setting in scene file");
+		terminate(game, ERR_PARSE, "Duplicated F or C color setting");
 	color_string++;
 	color_string = atoi_limited(&r, color_string, UCHAR_MAX);
 	if (color_string == NULL)
-		terminate(ERROR_PARSE, "F or C color Red is wrong (range: 0-255)");
+		terminate(game, ERR_PARSE, "F/C color Red is wrong (range: 0-255)");
 	if (*color_string++ != ',')
-		terminate(ERROR_PARSE, "F or C color format: 'F R,G,B' or 'C R,G,B'");
+		terminate(game, ERR_PARSE, "F/C color format: 'F R,G,B'/'C R,G,B'");
 	color_string = atoi_limited(&g, color_string, UCHAR_MAX);
 	if (color_string == NULL)
-		terminate(ERROR_PARSE, "F or C color Green is wrong (range: 0-255)");
+		terminate(game, ERR_PARSE, "F/C color Green is wrong (range: 0-255)");
 	if (*color_string++ != ',')
-		terminate(ERROR_PARSE, "F or C color format: 'F R,G,B' or 'C R,G,B'");
+		terminate(game, ERR_PARSE, "F/C color format: 'F R,G,B'/'C R,G,B'");
 	color_string = atoi_limited(&b, color_string, UCHAR_MAX);
 	if (color_string == NULL)
-		terminate(ERROR_PARSE, "F or C color Blue is wrong (range: 0-255)");
+		terminate(game, ERR_PARSE, "F/C color Blue is wrong (range: 0-255)");
+	if (*color_string != '\0')
+		terminate(game, ERR_PARSE, "F/C color line redundant symbols");
 	*target = (r << 16) | (g << 8) | b;
 }
 
@@ -131,10 +128,10 @@ void	set_textures(char *string, t_game *game)
 	while (*string == ' ')
 		string++;
 	if (game->texture[id].ptr != NULL)
-		terminate(ERROR_PARSE, "Duplicated texture setting in scene file");
+		terminate(game, ERR_PARSE, "Duplicated texture setting");
 	if (!(game->texture[id].ptr = mlx_xpm_file_to_image(game->mlx, string,
 		(int *)&game->texture[id].size.x, (int *)&game->texture[id].size.y)))
-		terminate(ERROR_PARSE, "Something went wrong while loading texture");
+		terminate(game, ERR_PARSE, "Can't load texture file");
 	game->texture[id].data = (unsigned *)mlx_get_data_addr(
 								game->texture[id].ptr, &null, &null, &null);
 	game->texture[id].aspect = game->texture[id].size.x /

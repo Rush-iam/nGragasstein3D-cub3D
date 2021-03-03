@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/02 22:09:14 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/03 21:48:59 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,16 @@
 # include "get_next_line.h"
 # include "x_events.h"
 
-# define WINDOW_TITLE	"cub3D by nGragas"
+# define WIN_TITLE	"cub3D by nGragas"
+# define MAX_WIN	(t_upoint){2560, 1440}
+# define MAX_SCR	(t_upoint){20000, 20000}
+# define MIN_RES_X	2
 
-# define ERROR_MLX		1
-# define ERROR_ARGS		2
-# define ERROR_PARSE	3
-# define ERROR_MEMORY	4
-# define ERROR_BMP		5
+# define ERR_MLX	1
+# define ERR_ARGS	2
+# define ERR_PARSE	3
+# define ERR_MEM	4
+# define ERR_BMP	5
 
 # define WALL_N	0
 # define WALL_S	1
@@ -47,11 +50,12 @@
 # define TURN_RIGHT		KEY_RIGHT
 
 # define PL_SPEED		0.05
-# define MAP_SCALE		64
+# define MAP_SCALE		32
 
 # define PI2			(2 * M_PI)
 # define GRAD_TO_RAD	(PI2 / 360)
 # define FOV			(60. * GRAD_TO_RAD)
+
 /*
 ** tan(FOV / 2) if FOV 60 == .57735
 */
@@ -138,15 +142,17 @@ typedef struct	s_game
 }				t_game;
 
 void			validate_scene		(t_game *game);
-void			initialize			(t_game *game, bool screenshot);
-void			initialize_objects	(t_game *game);
+void			initialize_game	(t_game *game, bool screenshot);
+void			initialize_game_objects	(t_game *game);
 
 int				game_loop		(t_game *game);
 
 bool			parse			(int args, char **av, t_game *game);
 void			parse_scene		(int file_id, char **line, t_game *game);
-void			set_resolution	(const char *res_string, t_upoint *res);
-void			set_colors		(const char *color_string, unsigned *target);
+void			set_resolution	(const char *res_string, t_upoint *res,
+															t_game *game);
+void			set_colors		(const char *color_string, unsigned *target,
+															t_game *game);
 void			set_textures	(char *string, t_game *game);
 
 void			parse_map			(int file_id, char *line, t_game *game);
@@ -154,10 +160,11 @@ void			set_map				(t_game *game, t_list *map);
 void			set_map_process		(t_game *game);
 void			set_map_check_cell	(t_game *game, char **map, t_upoint pt);
 
-int				hook_key_press		(int key_code, struct s_key *key);
+int				hook_key_press		(int key_code, t_game *game);
 int				hook_key_release	(int key_code, struct s_key *key);
 int				hook_mouse_press	(int btn, int x, int y, struct s_key *key);
 int				hook_mouse_release	(int btn, int x, int y, struct s_key *key);
+int				hook_exit			(t_game *game);
 
 void			player_control			(t_game *game);
 void			player_control_borders	(t_game *game);
@@ -198,9 +205,10 @@ void			draw_sprite_scaled	(t_img *img, t_object *obj, unsigned x,
 
 char			*atoi_limited	(unsigned *dst_int, const char *src_string,
 															unsigned limit);
-int				terminate					(int return_value, char *message);
+int				terminate		(t_game *game, int return_value, char *message);
+void			terminate_free	(t_game *game);
 void			write_screenshot_and_exit	(t_game *game);
-void			write_screenshot_and_exit_2	(t_img *img, int file_id);
+void			write_screenshot_data	(t_game *game, int file_id);
 
 void			demo_fillrate	(t_game *mlx, int step);
 void			demo_radar		(t_game *mlx, int rays);

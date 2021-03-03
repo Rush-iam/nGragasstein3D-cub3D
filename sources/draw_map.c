@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 18:52:51 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/01 16:01:27 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/03 19:15:40 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	draw_map_init(t_game *game)
 									game->map.size.y * MAP_SCALE};
 	if (!(game->map.img.ptr = mlx_new_image(game->mlx, game->map.img.size.x,
 														game->map.img.size.y)))
-		terminate(ERROR_MEMORY, "Memory allocation failed (draw map)");
+		terminate(game, ERR_MEM, "Memory allocation failed (draw map)");
 	game->map.img.data = (unsigned *)mlx_get_data_addr(game->map.img.ptr, &null,
 																&null, &null);
 }

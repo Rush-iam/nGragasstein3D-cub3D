@@ -6,12 +6,12 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/03/02 22:26:31 by ngragas          ###   ########.fr        #
+#    Updated: 2021/03/03 20:20:07 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = cub3D
-CFLAGS = -Wall -Wextra -Werror -MMD -g -Ofast
+CFLAGS = -Wall -Wextra -Werror -MMD -g #-Ofast -march=native
 SRC =	main.c			\
 		parse.c			\
 		parse_map.c		\
@@ -35,11 +35,11 @@ INC_DIR = includes/
 LIB = $(LIB_DIR)libft.a
 LIB_DIR = libft/
 
-#MLX = $(LIB_DIR)libmlx.a
-#MLX_DIR = minilibx_opengl/
+MLX = $(LIB_DIR)libmlx.a
+MLX_DIR = minilibx_opengl/
 
-MLX = $(LIB_DIR)libmlx.dylib
-MLX_DIR = minilibx_swift/
+#MLX = $(LIB_DIR)libmlx.dylib
+#MLX_DIR = minilibx_swift/
 
 all:
 	$(MAKE) $(NAME) -j8
@@ -47,7 +47,7 @@ bonus: all
 $(LIB): FORCE
 	$(MAKE) -C $(LIB_DIR)
 $(MLX): FORCE
-	$(MAKE) -C $(MLX_DIR) -j1
+	$(MAKE) -C $(MLX_DIR)
 $(NAME): $(LIB) $(MLX) $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $@ -lft -L$(LIB_DIR) \
 		-lmlx -framework OpenGL -framework AppKit \

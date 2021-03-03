@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 20:04:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/26 18:52:09 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/04 00:05:53 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ t_fpoint	ray_intersect_y(t_game *game, t_fpoint step)
 
 /*
 ** == ping-pong intersect detection (0.5% faster?)
-**void	ray_intersect_n(t_game *game, double cur_angle, unsigned ray)
+**void	ray_intersect(t_game *game, double cur_angle, unsigned ray)
 **{
 **	t_fpoint	x_axis;
 **	t_fpoint	y_axis;
@@ -122,31 +122,33 @@ t_fpoint	ray_intersect_y(t_game *game, t_fpoint step)
 **			 sin(game->p.angle) * (y_axis.y - game->p.pos.y + (y_step.y < 0));
 **	while (true)
 **	{
-**		while (dist.x < dist.y)
+**		if (dist.x < dist.y)
 **		{
 **			if ((unsigned)x_axis.y >= game->map.size.y ||
 **				(unsigned)x_axis.x >= game->map.size.x ||
 **				game->map.grid[(int)x_axis.y][(int)x_axis.x] == '1')
 **			{
 **				x_axis.x += (x_step.x < 0);
-**				game->column[ray] = (struct s_column){dist.x,
-**					COL_SCALE / dist.x, x_axis, x_axis.y - (int)x_axis.y,
+**				*game->column[ray] = (struct s_column){dist.x,
+**					game->img.size.x / COL_SCALE / dist.x,
+**					x_axis, x_axis.y - (int)x_axis.y,
 **					"EW"[x_axis.x >= game->p.pos.x]};
 **				return ;
 **			}
 **			x_axis = (t_fpoint){x_axis.x + x_step.x, x_axis.y + x_step.y};
 **			dist.x += dist_step.x;
 **		}
-**		while (dist.y < dist.x)
+**		else
 **		{
 **			if ((unsigned)y_axis.y >= game->map.size.y ||
 **				(unsigned)y_axis.x >= game->map.size.x ||
 **				game->map.grid[(int)y_axis.y][(int)y_axis.x] == '1')
 **			{
 **				y_axis.y += (y_step.y < 0);
-**				game->column[ray] = (struct s_column){dist.y,
-**					  COL_SCALE / dist.y, y_axis, y_axis.x - (int)y_axis.x,
-**					  "NS"[y_axis.y >= game->p.pos.y]};
+**				*game->column[ray] = (struct s_column){dist.y,
+**					game->img.size.x / COL_SCALE / dist.y,
+**					y_axis, y_axis.x - (int)y_axis.x,
+**					"NS"[y_axis.y >= game->p.pos.y]};
 **				return ;
 **			}
 **			y_axis = (t_fpoint){y_axis.x + y_step.x, y_axis.y + y_step.y};

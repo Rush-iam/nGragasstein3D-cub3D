@@ -6,19 +6,19 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 22:16:42 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/02 15:58:13 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/03 19:11:13 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-int	hook_key_press(int key_code, struct s_key *key)
+int	hook_key_press(int key_code, t_game *game)
 {
-	if (key_code >= (int)sizeof(key->k))
+	if (key_code >= (int)sizeof(game->key.k))
 		return (1);
 	if (key_code == KEY_ESCAPE)
-		terminate(EXIT_SUCCESS, NULL);
-	key->k[key_code] = true;
+		terminate(game, EXIT_SUCCESS, NULL);
+	game->key.k[key_code] = true;
 	return (0);
 }
 
@@ -48,4 +48,9 @@ int	hook_mouse_release(int btn, int x, int y, struct s_key *key)
 		return (1);
 	key->m[btn] = false;
 	return (0);
+}
+
+int	hook_exit(t_game *game)
+{
+	return (terminate(game, 0, NULL));
 }
