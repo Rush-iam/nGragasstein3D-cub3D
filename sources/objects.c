@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 16:34:37 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/01 15:54:16 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/04 23:43:53 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,16 +31,19 @@ void	draw_objects(t_game *game)
 		obj = (t_object *)cur_list->content;
 		diff = (t_fpoint){obj->pos.x - game->p.pos.x,
 						obj->pos.y - game->p.pos.y};
-		angle = atan2(diff.y, diff.x);
-		if (fabs(game->p.angle - angle - PI2) <= M_PI)
-			angle += PI2;
-		angle -= game->p.angle;
-		obj->distance = game->p.cossin.x * diff.x + game->p.cossin.y * diff.y;
-		if (fabs(angle) < FOV)
+		if ((obj->distance = game->p.cossin.x * diff.x +
+				game->p.cossin.y * diff.y) > 0.2)
 		{
-			obj->width = game->img.size.x / COL_SCALE /
-								hypot(diff.x, diff.y) * obj->sprite->aspect;
-			draw_sprite(game, obj, angle);
+			angle = atan2(diff.y, diff.x);
+			if (fabs(game->p.angle - angle - PI2) <= M_PI)
+				angle += PI2;
+			angle -= game->p.angle;
+			if (fabs(angle) < REAL_FOV)
+			{
+				obj->size.x = game->img.size.x / COL_SCALE / obj->distance;
+				obj->size.y = obj->size.x * obj->sprite->aspect;
+				draw_sprite(game, obj, angle);
+			}
 		}
 		cur_list = cur_list->next;
 	}
@@ -51,12 +54,16 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 	int				start_ray;
 	int				cur;
 	int				max_ray;
-	const double	scale_x = obj->width / obj->sprite->size.x;
+	const double	scale_x = (double)obj->size.x / obj->sprite->size.x;
+	double			cur_angle;
 
-	obj->height = game->img.size.x / COL_SCALE / obj->distance;
-	start_ray = (angle / FOV + 0.5) * game->img.size.x - obj->width / 2;
+	start_ray = (angle / REAL_FOV + .5) * game->img.size.x;
+	cur_angle = atan(tan(FOV / (game->img.size.x - 1)) *
+									(start_ray - game->img.size.x / 2.));
+	cur_angle = angle - (cur_angle - angle);
+	start_ray = (cur_angle / REAL_FOV + .5) * game->img.size.x - obj->size.x / 2;
 	cur = start_ray;
-	max_ray = cur + obj->width;
+	max_ray = cur + obj->size.x;
 	if (cur < 0)
 		cur = 0;
 	if (max_ray >= (int)game->img.size.x)
@@ -73,23 +80,23 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 void	draw_sprite_scaled(t_img *img, t_object *obj, unsigned x,
 																unsigned src_x)
 {
-	const double	step = (double)obj->sprite->size.y / obj->height;
+	const double	step = (double)obj->sprite->size.y / obj->size.y;
 	int				y;
 	double			src_y;
 	int				max_height;
 	int				src_pixel;
 
-	if (obj->height > img->size.y)
+	if (obj->size.y > img->size.y)
 	{
-		src_y = step * (obj->height - img->size.y) / 2;
+		src_y = step * (obj->size.y - img->size.y) / 2;
 		y = -1;
 		max_height = img->size.y;
 	}
 	else
 	{
 		src_y = 0;
-		y = -1 + (img->size.y - obj->height) / 2;
-		max_height = y + obj->height;
+		y = -1 + (img->size.y - obj->size.y) / 2;
+		max_height = y + obj->size.y;
 	}
 	while (++y < max_height)
 	{

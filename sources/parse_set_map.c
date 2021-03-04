@@ -54,7 +54,7 @@ void	set_map_process(t_game *game)
 				if ((obj = malloc(sizeof(t_object))) == NULL)
 					terminate(game, ERR_MEM, "Memory allocation failed (obj)");
 				*obj = (t_object){&game->texture[SPRITE],
-								(t_fpoint){pt.x + 0.5, pt.y + 0.5}, 0, 0, 0};
+					(t_fpoint){pt.x + 0.5, pt.y + 0.5}, (t_upoint){0, 0}, 0};
 				if ((obj_list = ft_lstnew(obj)) == NULL)
 					terminate(game, ERR_MEM, "Memory allocation failed (objl)");
 				ft_lstadd_front(&game->objects, obj_list);

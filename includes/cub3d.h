@@ -6,14 +6,14 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/04 15:57:36 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/04 23:43:20 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB3D_H
 # define CUB3D_H
 
-# include <time.h>
+# include <time.h> //
 # include <fcntl.h>
 # include <math.h>
 # include <stdbool.h>
@@ -49,18 +49,20 @@
 # define TURN_LEFT		KEY_LEFT
 # define TURN_RIGHT		KEY_RIGHT
 
-# define PL_SPEED		0.05
-# define MAP_SCALE		32
+# define PL_SPEED	0.05
+# define MAP_SCALE	32
 
-# define PI2			(2 * M_PI)
-# define GRAD_TO_RAD	(PI2 / 360)
-# define FOV			(60. * GRAD_TO_RAD)
+# define PI2		(2 * M_PI)
+# define FOV		(90 * PI2 / 360)
+# define REAL_FOV	1.3355
 
 /*
 ** tan(FOV / 2) if FOV 60 == .57735
+*  FOV 90 fixed == 1.3355 / 2
 */
-# define TAN_60_2		.57735
-# define COL_SCALE		(2 * TAN_60_2)
+//# define TAN_60_2	.57735
+# define TAN_60_2	tan(REAL_FOV / 2)
+# define COL_SCALE	(2 * TAN_60_2)
 
 typedef struct	s_point
 {
@@ -99,8 +101,7 @@ typedef struct	s_object
 {
 	t_img		*sprite;
 	t_fpoint	pos;
-	double		width;
-	unsigned	height;
+	t_upoint	size;
 	double		distance;
 }				t_object;
 

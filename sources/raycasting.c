@@ -6,22 +6,25 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 20:04:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/04 00:05:53 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/04 21:15:10 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
+#include <stdio.h> //
 void		ray_cast(t_game *game)
 {
 	unsigned		ray;
-	const double	start_angle = game->p.angle - FOV / 2;
 	double			cur_angle;
+	const double	step_plane = tan(FOV / (game->img.size.x - 1));
+	const double	ray_half = (game->img.size.x - 1.) / 2;
 
 	ray = 0;
+//	printf("%f\n", atan(step_plane * (0 - ray_half)));
 	while (ray < game->img.size.x)
 	{
-		cur_angle = start_angle + FOV * ray / (game->img.size.x - 1);
+		cur_angle = game->p.angle + atan(step_plane * (ray - ray_half));
 		if (cur_angle < 0)
 			cur_angle += PI2;
 		else if (cur_angle > PI2)
