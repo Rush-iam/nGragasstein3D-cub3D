@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/03 21:48:59 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/04 15:57:36 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,6 @@ typedef struct	s_game
 	t_list		*objects;
 }				t_game;
 
-void			validate_scene		(t_game *game);
 void			initialize_game	(t_game *game, bool screenshot);
 void			initialize_game_objects	(t_game *game);
 
@@ -149,13 +148,16 @@ int				game_loop		(t_game *game);
 
 bool			parse			(int args, char **av, t_game *game);
 void			parse_scene		(int file_id, char **line, t_game *game);
-void			set_resolution	(const char *res_string, t_upoint *res,
-															t_game *game);
-void			set_colors		(const char *color_string, unsigned *target,
-															t_game *game);
-void			set_textures	(char *string, t_game *game);
+void			parse_map		(int file_id, char *line, t_game *game);
+void			validate_settings(t_game *game);
 
-void			parse_map			(int file_id, char *line, t_game *game);
+void			set_resolution		(const char *res_string, t_upoint *res,
+															t_game *game);
+void			set_colors			(const char *color_string, unsigned *target,
+															t_game *game);
+void			set_textures		(char *string, t_game *game);
+void			set_textures_import(char *string, t_img *texture, t_game *game);
+
 void			set_map				(t_game *game, t_list *map);
 void			set_map_process		(t_game *game);
 void			set_map_check_cell	(t_game *game, char **map, t_upoint pt);

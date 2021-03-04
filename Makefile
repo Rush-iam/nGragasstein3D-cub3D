@@ -6,15 +6,16 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/03/03 20:20:07 by ngragas          ###   ########.fr        #
+#    Updated: 2021/03/04 15:45:43 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = cub3D
-CFLAGS = -Wall -Wextra -Werror -MMD -g #-Ofast -march=native
+CFLAGS = -Wall -Wextra -Werror -MMD -g -Ofast -march=native
 SRC =	main.c			\
 		parse.c			\
-		parse_map.c		\
+		parse_set.c		\
+		parse_set_map.c	\
 		hooks.c			\
 		control.c		\
 		raycasting.c	\
@@ -35,7 +36,7 @@ INC_DIR = includes/
 LIB = $(LIB_DIR)libft.a
 LIB_DIR = libft/
 
-MLX = $(LIB_DIR)libmlx.a
+MLX = $(MLX_DIR)libmlx.a
 MLX_DIR = minilibx_opengl/
 
 #MLX = $(LIB_DIR)libmlx.dylib
@@ -51,7 +52,7 @@ $(MLX): FORCE
 $(NAME): $(LIB) $(MLX) $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $@ -lft -L$(LIB_DIR) \
 		-lmlx -framework OpenGL -framework AppKit \
-		-L$(MLX_DIR) -I$(MLX_DIR)
+		-L$(MLX_DIR) -I$(MLX_DIR) -lz
 $(OBJ): | $(OBJ_DIR)
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)

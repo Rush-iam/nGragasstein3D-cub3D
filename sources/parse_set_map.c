@@ -1,45 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parse_map.c                                        :+:      :+:    :+:   */
+/*   parse_set_map.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/28 18:43:41 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/02 15:28:42 by ngragas          ###   ########.fr       */
+/*   Created: 2021/03/04 16:01:00 by ngragas           #+#    #+#             */
+/*   Updated: 2021/03/04 16:01:00 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-void	parse_map(int file_id, char *line, t_game *game)
-{
-	t_list		*map;
-	t_list		*line_lst;
-	int			status;
-	unsigned	line_len;
-
-	if ((map = ft_lstnew(line)) == NULL)
-		terminate(game, ERR_MEM, "Memory allocation failed (map first row)");
-	game->map.size = (t_upoint){ft_strlen(line), 1};
-	while ((status = get_next_line(file_id, &line)) >= 0 && *line != '\0')
-	{
-		if ((line_lst = ft_lstnew(line)) == NULL)
-			terminate(game, ERR_MEM, "Memory allocation failed (map rows)");
-		ft_lstadd_front(&map, line_lst);
-		if ((line_len = ft_strlen(line)) > game->map.size.x)
-			game->map.size.x = line_len;
-		game->map.size.y++;
-	}
-	if (status == -1)
-		terminate(game, ERR_PARSE, "Can't load scene file");
-	free(line);
-	if (status != 0)
-		terminate(game, ERR_PARSE, "Empty lines in map are not allowed");
-	if ((game->map.grid = malloc(sizeof(char *) * game->map.size.y)) == NULL)
-		terminate(game, ERR_MEM, "Memory allocation failed (map rows)");
-	set_map(game, map);
-}
 
 void	set_map(t_game *game, t_list *map)
 {
@@ -61,6 +32,8 @@ void	set_map(t_game *game, t_list *map)
 		free(line);
 	}
 	set_map_process(game);
+	if (game->p.pos.x == 0)
+		terminate(game, ERR_PARSE, "Map player character 'NSWE' not found");
 }
 
 void	set_map_process(t_game *game)

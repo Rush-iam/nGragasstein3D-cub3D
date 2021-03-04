@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/03 23:01:00 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/04 15:57:36 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ int	main(int args, char *av[])
 	if (!(game.mlx = mlx_init()))
 		terminate(&game, ERR_MLX, strerror(errno));
 	screenshot_only = parse(args, av, &game);
-	validate_scene(&game);
 	initialize_game(&game, screenshot_only);
 	draw_map_init(&game); //
 	if (screenshot_only == true)
@@ -37,34 +36,6 @@ int	main(int args, char *av[])
 	mlx_hook(game.win, EVENT_DESTROYNOTIFY, 0, hook_exit, &game);
 	mlx_loop_hook(game.mlx, game_loop, &game);
 	mlx_loop(game.mlx);
-}
-
-void	validate_scene(t_game *game)
-{
-	if (game->p.pos.x == 0)
-		terminate(game, ERR_PARSE, "Player pos character 'NSWE' not found");
-	if (game->color_floor == -1U)
-		terminate(game, ERR_PARSE, "Floor color not found. Format: F R,G,B");
-	if (game->color_ceil == -1U)
-		terminate(game, ERR_PARSE, "Ceil color not found. Format: C R,G,B");
-	if (game->img.size.x == 0 || game->img.size.y == 0)
-		terminate(game, ERR_PARSE,
-				  "Resolution doesn't set. Format: 'R WIDTH HEIGHT' (max 32767x32767)");
-	if (game->texture[WALL_N].ptr == NULL)
-		terminate(game, ERR_PARSE,
-				  "North wall texture doesn't set. Format: 'NO ./path.xpm'");
-	if (game->texture[WALL_S].ptr == NULL)
-		terminate(game, ERR_PARSE,
-				  "South wall texture doesn't set. Format: 'SO ./path.xpm'");
-	if (game->texture[WALL_W].ptr == NULL)
-		terminate(game, ERR_PARSE,
-				  "West wall texture doesn't set. Format: 'WE ./path.xpm'");
-	if (game->texture[WALL_E].ptr == NULL)
-		terminate(game, ERR_PARSE,
-				  "East wall texture doesn't set. Format: 'EA ./path.xpm'");
-	if (game->texture[SPRITE].ptr == NULL)
-		terminate(game, ERR_PARSE,
-				  "Sprite texture doesn't set. Format: 'S ./path.xpm'");
 }
 
 void	initialize_game(t_game *game, bool screenshot)

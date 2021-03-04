@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/28 18:27:20 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/03 21:50:45 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/04 16:02:29 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ bool	parse(int args, char **av, t_game *game)
 	if ((file_id = open(*av, O_RDONLY)) == -1)
 		terminate(game, ERR_ARGS, strerror(errno));
 	parse_scene(file_id, &line, game);
+	validate_settings(game);
 	parse_map(file_id, line, game);
 	if (close(file_id) == -1)
 		terminate(game, ERR_PARSE, strerror(errno));
@@ -67,73 +68,57 @@ void	parse_scene(int file_id, char **line, t_game *game)
 		terminate(game, ERR_PARSE, "Can't load scene file");
 }
 
-void	set_resolution(const char *res_string, t_upoint *res, t_game *game)
+void	parse_map(int file_id, char *line, t_game *game)
 {
-	if (res->x)
-		terminate(game, ERR_PARSE, "Duplicated Resolution setting");
-	res_string++;
-	res_string = atoi_limited(&res->x, res_string, UINT_MAX);
-	if (res_string == NULL)
-		terminate(game, ERR_PARSE, "Resolution X setting is wrong");
-	res_string = atoi_limited(&res->y, res_string, UINT_MAX);
-	if (res_string == NULL)
-		terminate(game, ERR_PARSE, "Resolution Y setting is wrong");
-	if (*res_string != '\0' || res->x == 0 || res->y == 0)
-		terminate(game, ERR_PARSE, "Wrong Resolution setting");
+	t_list		*map;
+	t_list		*line_lst;
+	int			status;
+	unsigned	line_len;
+
+	if ((map = ft_lstnew(line)) == NULL)
+		terminate(game, ERR_MEM, "Memory allocation failed (map first row)");
+	game->map.size = (t_upoint){ft_strlen(line), 1};
+	while ((status = get_next_line(file_id, &line)) >= 0 && *line != '\0')
+	{
+		if ((line_lst = ft_lstnew(line)) == NULL)
+			terminate(game, ERR_MEM, "Memory allocation failed (map rows)");
+		ft_lstadd_front(&map, line_lst);
+		if ((line_len = ft_strlen(line)) > game->map.size.x)
+			game->map.size.x = line_len;
+		game->map.size.y++;
+	}
+	if (status == -1)
+		terminate(game, ERR_PARSE, "Can't load scene file");
+	free(line);
+	if (status != 0)
+		terminate(game, ERR_PARSE, "Empty lines in map are not allowed");
+	if ((game->map.grid = malloc(sizeof(char *) * game->map.size.y)) == NULL)
+		terminate(game, ERR_MEM, "Memory allocation failed (map rows)");
+	set_map(game, map);
 }
 
-void	set_colors(const char *color_string, unsigned *target, t_game *game)
+void	validate_settings(t_game *game)
 {
-	unsigned	r;
-	unsigned	g;
-	unsigned	b;
-
-	if (*target != (unsigned)-1)
-		terminate(game, ERR_PARSE, "Duplicated F or C color setting");
-	color_string++;
-	color_string = atoi_limited(&r, color_string, UCHAR_MAX);
-	if (color_string == NULL)
-		terminate(game, ERR_PARSE, "F/C color Red is wrong (range: 0-255)");
-	if (*color_string++ != ',')
-		terminate(game, ERR_PARSE, "F/C color format: 'F R,G,B'/'C R,G,B'");
-	color_string = atoi_limited(&g, color_string, UCHAR_MAX);
-	if (color_string == NULL)
-		terminate(game, ERR_PARSE, "F/C color Green is wrong (range: 0-255)");
-	if (*color_string++ != ',')
-		terminate(game, ERR_PARSE, "F/C color format: 'F R,G,B'/'C R,G,B'");
-	color_string = atoi_limited(&b, color_string, UCHAR_MAX);
-	if (color_string == NULL)
-		terminate(game, ERR_PARSE, "F/C color Blue is wrong (range: 0-255)");
-	if (*color_string != '\0')
-		terminate(game, ERR_PARSE, "F/C color line redundant symbols");
-	*target = (r << 16) | (g << 8) | b;
-}
-
-void	set_textures(char *string, t_game *game)
-{
-	int	id;
-	int null;
-
-	if (string[0] == 'S' && string[1] == ' ')
-		id = SPRITE;
-	else if (string[0] == 'N' && string[1] == 'O')
-		id = WALL_N;
-	else if (string[0] == 'S' && string[1] == 'O')
-		id = WALL_S;
-	else if (string[0] == 'W' && string[1] == 'E')
-		id = WALL_W;
-	else if (string[0] == 'E' && string[1] == 'A')
-		id = WALL_E;
-	string += 2;
-	while (*string == ' ')
-		string++;
-	if (game->texture[id].ptr != NULL)
-		terminate(game, ERR_PARSE, "Duplicated texture setting");
-	if (!(game->texture[id].ptr = mlx_xpm_file_to_image(game->mlx, string,
-		(int *)&game->texture[id].size.x, (int *)&game->texture[id].size.y)))
-		terminate(game, ERR_PARSE, "Can't load texture file");
-	game->texture[id].data = (unsigned *)mlx_get_data_addr(
-								game->texture[id].ptr, &null, &null, &null);
-	game->texture[id].aspect = game->texture[id].size.x /
-								game->texture[id].size.y;
+	if (game->color_floor == -1U)
+		terminate(game, ERR_PARSE, "Floor color not found. Format: F R,G,B");
+	if (game->color_ceil == -1U)
+		terminate(game, ERR_PARSE, "Ceil color not found. Format: C R,G,B");
+	if (game->img.size.x == 0 || game->img.size.y == 0)
+		terminate(game, ERR_PARSE,
+		"Resolution doesn't set. Format: 'R WIDTH HEIGHT' (max 32767x32767)");
+	if (game->texture[WALL_N].ptr == NULL)
+		terminate(game, ERR_PARSE,
+				"North wall texture doesn't set. Format: 'NO ./path.xpm'");
+	if (game->texture[WALL_S].ptr == NULL)
+		terminate(game, ERR_PARSE,
+				"South wall texture doesn't set. Format: 'SO ./path.xpm'");
+	if (game->texture[WALL_W].ptr == NULL)
+		terminate(game, ERR_PARSE,
+				"West wall texture doesn't set. Format: 'WE ./path.xpm'");
+	if (game->texture[WALL_E].ptr == NULL)
+		terminate(game, ERR_PARSE,
+				"East wall texture doesn't set. Format: 'EA ./path.xpm'");
+	if (game->texture[SPRITE].ptr == NULL)
+		terminate(game, ERR_PARSE,
+				"Sprite texture doesn't set. Format: 'S ./path.xpm'");
 }
