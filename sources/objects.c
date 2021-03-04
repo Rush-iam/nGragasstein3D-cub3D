@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 16:34:37 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/04 23:43:53 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/04 23:50:25 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,7 @@ void	draw_objects(t_game *game)
 				angle += PI2;
 			angle -= game->p.angle;
 			if (fabs(angle) < REAL_FOV)
-			{
-				obj->size.x = game->img.size.x / COL_SCALE / obj->distance;
-				obj->size.y = obj->size.x * obj->sprite->aspect;
 				draw_sprite(game, obj, angle);
-			}
 		}
 		cur_list = cur_list->next;
 	}
@@ -51,17 +47,18 @@ void	draw_objects(t_game *game)
 
 void	draw_sprite(t_game *game, t_object *obj, double angle)
 {
-	int				start_ray;
-	int				cur;
-	int				max_ray;
-	const double	scale_x = (double)obj->size.x / obj->sprite->size.x;
-	double			cur_angle;
+	int		start_ray;
+	int		cur;
+	int		max_ray;
+	double	cur_angle;
 
+	obj->size.x = game->img.size.x / COL_SCALE / obj->distance;
+	obj->size.y = obj->size.x * obj->sprite->aspect;
 	start_ray = (angle / REAL_FOV + .5) * game->img.size.x;
 	cur_angle = atan(tan(FOV / (game->img.size.x - 1)) *
 									(start_ray - game->img.size.x / 2.));
-	cur_angle = angle - (cur_angle - angle);
-	start_ray = (cur_angle / REAL_FOV + .5) * game->img.size.x - obj->size.x / 2;
+	start_ray = ((angle - (cur_angle - angle)) / REAL_FOV + .5) *
+			game->img.size.x - obj->size.x / 2;
 	cur = start_ray;
 	max_ray = cur + obj->size.x;
 	if (cur < 0)
@@ -71,8 +68,8 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 	while (cur < max_ray)
 	{
 		if (obj->distance < game->column[cur]->distance)
-			draw_sprite_scaled(
-					&game->img, obj, cur, (cur - start_ray) / scale_x);
+			draw_sprite_scaled(&game->img, obj, cur,
+			(cur - start_ray) / ((double)obj->size.x / obj->sprite->size.x));
 		cur++;
 	}
 }
