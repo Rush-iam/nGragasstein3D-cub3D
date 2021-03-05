@@ -6,30 +6,26 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 20:04:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/04 21:15:10 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/05 15:47:51 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-#include <stdio.h> //
 void		ray_cast(t_game *game)
 {
-	unsigned		ray;
-	double			cur_angle;
-	const double	step_plane = tan(FOV / (game->img.size.x - 1));
-	const double	ray_half = (game->img.size.x - 1.) / 2;
+	unsigned	ray;
+	double		angle;
 
 	ray = 0;
-//	printf("%f\n", atan(step_plane * (0 - ray_half)));
 	while (ray < game->img.size.x)
 	{
-		cur_angle = game->p.angle + atan(step_plane * (ray - ray_half));
-		if (cur_angle < 0)
-			cur_angle += PI2;
-		else if (cur_angle > PI2)
-			cur_angle -= PI2;
-		ray_intersect(game, cur_angle, ray);
+		angle = game->p.angle + atan(game->col_step * (ray - game->col_center));
+		if (angle < 0)
+			angle += PI2;
+		else if (angle > PI2)
+			angle -= PI2;
+		ray_intersect(game, angle, ray);
 		ray++;
 	}
 }
@@ -52,11 +48,11 @@ void		ray_intersect(t_game *game, double cur_angle, unsigned ray)
 			game->p.cossin.y * (y1.y - game->p.pos.y);
 	if (distance.x < distance.y)
 		*game->column[ray] = (struct s_column)
-			{distance.x, game->img.size.x / COL_SCALE / distance.x, x1,
+			{distance.x, game->col_scale / distance.x, x1,
 				x1.y - (int)x1.y, (x1.x < game->p.pos.x) ? 'E' : 'W'};
 	else
 		*game->column[ray] = (struct s_column)
-			{distance.y, game->img.size.x / COL_SCALE / distance.y, y1,
+			{distance.y, game->col_scale / distance.y, y1,
 				y1.x - (int)y1.x, (y1.y < game->p.pos.y) ? 'N' : 'S'};
 }
 

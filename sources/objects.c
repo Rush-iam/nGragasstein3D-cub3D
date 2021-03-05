@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 16:34:37 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/04 23:50:25 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/05 17:09:03 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,13 @@ void	draw_objects(t_game *game)
 		diff = (t_fpoint){obj->pos.x - game->p.pos.x,
 						obj->pos.y - game->p.pos.y};
 		if ((obj->distance = game->p.cossin.x * diff.x +
-				game->p.cossin.y * diff.y) > 0.2)
+				game->p.cossin.y * diff.y) > 0.01)
 		{
 			angle = atan2(diff.y, diff.x);
 			if (fabs(game->p.angle - angle - PI2) <= M_PI)
 				angle += PI2;
 			angle -= game->p.angle;
-			if (fabs(angle) < REAL_FOV)
+			if (fabs(angle) < game->fov)
 				draw_sprite(game, obj, angle);
 		}
 		cur_list = cur_list->next;
@@ -47,30 +47,25 @@ void	draw_objects(t_game *game)
 
 void	draw_sprite(t_game *game, t_object *obj, double angle)
 {
-	int		start_ray;
-	int		cur;
-	int		max_ray;
-	double	cur_angle;
+	int	start_x;
+	int	cur_x;
+	int	max_x;
 
-	obj->size.x = game->img.size.x / COL_SCALE / obj->distance;
+	obj->size.x = game->col_scale / obj->distance;
 	obj->size.y = obj->size.x * obj->sprite->aspect;
-	start_ray = (angle / REAL_FOV + .5) * game->img.size.x;
-	cur_angle = atan(tan(FOV / (game->img.size.x - 1)) *
-									(start_ray - game->img.size.x / 2.));
-	start_ray = ((angle - (cur_angle - angle)) / REAL_FOV + .5) *
-			game->img.size.x - obj->size.x / 2;
-	cur = start_ray;
-	max_ray = cur + obj->size.x;
-	if (cur < 0)
-		cur = 0;
-	if (max_ray >= (int)game->img.size.x)
-		max_ray = (int)game->img.size.x;
-	while (cur < max_ray)
+	start_x = game->col_center + tan(angle) / game->col_step - obj->size.x / 2;
+	cur_x = start_x;
+	max_x = cur_x + obj->size.x;
+	if (cur_x < 0)
+		cur_x = 0;
+	if (max_x >= (int)game->img.size.x)
+		max_x = (int)game->img.size.x;
+	while (cur_x < max_x)
 	{
-		if (obj->distance < game->column[cur]->distance)
-			draw_sprite_scaled(&game->img, obj, cur,
-			(cur - start_ray) / ((double)obj->size.x / obj->sprite->size.x));
-		cur++;
+		if (obj->distance < game->column[cur_x]->distance)
+			draw_sprite_scaled(&game->img, obj, cur_x,
+			(cur_x - start_x) / ((double)obj->size.x / obj->sprite->size.x));
+		cur_x++;
 	}
 }
 

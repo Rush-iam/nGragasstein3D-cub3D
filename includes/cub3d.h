@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/04 23:43:20 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/05 18:16:03 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define CUB3D_H
 
 # include <time.h> //
+# include <stdio.h>
 # include <fcntl.h>
 # include <math.h>
 # include <stdbool.h>
@@ -49,20 +50,13 @@
 # define TURN_LEFT		KEY_LEFT
 # define TURN_RIGHT		KEY_RIGHT
 
+# define FOV_MORE	KEY_NUMPLUS
+# define FOV_LESS	KEY_NUMMINUS
+
 # define PL_SPEED	0.05
 # define MAP_SCALE	32
 
-# define PI2		(2 * M_PI)
-# define FOV		(90 * PI2 / 360)
-# define REAL_FOV	1.3355
-
-/*
-** tan(FOV / 2) if FOV 60 == .57735
-*  FOV 90 fixed == 1.3355 / 2
-*/
-//# define TAN_60_2	.57735
-# define TAN_60_2	tan(REAL_FOV / 2)
-# define COL_SCALE	(2 * TAN_60_2)
+# define PI2	(2 * M_PI)
 
 typedef struct	s_point
 {
@@ -128,6 +122,10 @@ typedef struct	s_game
 		t_upoint	size;
 		char		**grid;
 	}			map;
+	float		fov;
+	float		col_center;
+	double		col_step;
+	double		col_scale;
 	struct		s_column
 	{
 		double		distance;
@@ -142,12 +140,13 @@ typedef struct	s_game
 	t_list		*objects;
 }				t_game;
 
-void			initialize_game	(t_game *game, bool screenshot);
-void			initialize_game_objects	(t_game *game);
+void			initialize_game		(t_game *game, bool screenshot);
+void			initialize_game_2	(t_game *game);
+void			set_fov				(t_game *game, double aspect);
 
 int				game_loop		(t_game *game);
 
-bool			parse			(int args, char **av, t_game *game);
+void			parse(int args, char **av, t_game *game, bool *screenshot_only);
 void			parse_scene		(int file_id, char **line, t_game *game);
 void			parse_map		(int file_id, char *line, t_game *game);
 void			validate_settings(t_game *game);
@@ -198,7 +197,7 @@ void			draw_map_objects(t_game *game);
 void			draw_walls		(t_game *game);
 void			draw_wall_scaled(t_game *game, t_img *src, unsigned x,
 						double fade);
-void			draw_wall_solid	(t_game *game, unsigned ray, double fade);
+void			draw_wall_solid	(t_game *game, unsigned x, double fade);
 
 void			draw_objects		(t_game *game);
 int				objects_sort		(t_object *obj1, t_object *obj2);

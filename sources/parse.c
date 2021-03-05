@@ -6,13 +6,13 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/28 18:27:20 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/04 16:02:29 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/05 17:06:46 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-bool	parse(int args, char **av, t_game *game)
+void	parse(int args, char **av, t_game *game, bool *screenshot_only)
 {
 	int		file_id;
 	char	*line;
@@ -31,14 +31,14 @@ bool	parse(int args, char **av, t_game *game)
 	parse_map(file_id, line, game);
 	if (close(file_id) == -1)
 		terminate(game, ERR_PARSE, strerror(errno));
+	*screenshot_only = false;
 	if (args == 3)
 	{
-		if (ft_strncmp("--save", *++av, 7) == 0)
-			return (true);
+		if (ft_strncmp("--save", *(av + 1), 7) == 0)
+			*screenshot_only = true;
 		else
 			terminate(game, ERR_ARGS, "Invalid option");
 	}
-	return (false);
 }
 
 void	parse_scene(int file_id, char **line, t_game *game)

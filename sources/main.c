@@ -6,12 +6,11 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/04 15:57:36 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/05 18:09:46 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-#include "x_events.h"
 
 int	main(int args, char *av[])
 {
@@ -22,7 +21,7 @@ int	main(int args, char *av[])
 	game = (t_game){0};
 	if (!(game.mlx = mlx_init()))
 		terminate(&game, ERR_MLX, strerror(errno));
-	screenshot_only = parse(args, av, &game);
+	parse(args, av, &game, &screenshot_only);
 	initialize_game(&game, screenshot_only);
 	draw_map_init(&game); //
 	if (screenshot_only == true)
@@ -49,6 +48,7 @@ void	initialize_game(t_game *game, bool screenshot)
 		game->img.size.x = max_res.x;
 	if (game->img.size.y > max_res.y)
 		game->img.size.y = max_res.y;
+	game->img.aspect = (double)game->img.size.x / game->img.size.y;
 	if (screenshot == false)
 		if (!(game->win = mlx_new_window(
 				game->mlx, game->img.size.x, game->img.size.y, WIN_TITLE)))
@@ -63,15 +63,16 @@ void	initialize_game(t_game *game, bool screenshot)
 	while (n < (int)game->img.size.x)
 		if ((game->column[n++] = ft_calloc(1, sizeof(struct s_column))) == NULL)
 			terminate(game, ERR_MEM, "Memory allocation failed (column)");
-	initialize_game_objects(game);
+	initialize_game_2(game);
 }
 
-void	initialize_game_objects(t_game *game)
+void	initialize_game_2(t_game *game)
 {
 	t_list		*cur_list;
 	t_object	*obj;
 
 	__sincos(game->p.angle, &game->p.cossin.y, &game->p.cossin.x);
+	set_fov(game, game->img.aspect);
 	cur_list = game->objects;
 	while (cur_list)
 	{
@@ -80,6 +81,16 @@ void	initialize_game_objects(t_game *game)
 						game->p.cossin.y * (obj->pos.y - game->p.pos.y);
 		cur_list = cur_list->next;
 	}
+}
+
+void	set_fov(t_game *game, double aspect)
+{
+	game->fov = M_PI_2 + ((aspect >= 1.77) - (aspect < 1.77)) *
+								sqrt(fabs(M_PI_4 * (aspect - 1.77) / 2));
+	game->col_step = tan(game->fov / (game->img.size.x - 1));
+	game->col_center = game->img.size.x / 2.;
+	game->col_scale = 1 / game->col_step;
+	printf("Real FOV: %.0f\n", 114 * atan(game->col_step * game->col_center));
 }
 
 int	game_loop(t_game *game)

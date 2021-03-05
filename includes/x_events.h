@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 19:20:05 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/05 23:33:52 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/05 18:20:15 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,8 @@ enum	e_keyboard
 	KEY_SPACE,
 	KEY_TILDA = 50,
 	KEY_ESCAPE = 53,
+	KEY_NUMPLUS = 69,
+	KEY_NUMMINUS = 78,
 	KEY_LEFT = 123,
 	KEY_RIGHT,
 	KEY_DOWN,

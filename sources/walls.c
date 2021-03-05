@@ -60,11 +60,11 @@ void	draw_wall_scaled(t_game *game, t_img *src, unsigned x, double fade)
 	}
 }
 
-void	draw_wall_solid(t_game *game, unsigned ray, double fade)
+void	draw_wall_solid(t_game *game, unsigned x, double fade)
 {
 	draw_line(&game->img,
-		(t_point){ray, game->img.size.y / 2 - game->column[ray]->height / 2},
-		(t_point){ray, game->img.size.y / 2 + game->column[ray]->height / 2},
+		(t_point){x, (game->img.size.y - game->column[x]->height) / 2},
+		(t_point){x, (game->img.size.y + game->column[x]->height) / 2},
 		((int)(0x60 * fade) << 16) + ((int)(0x80 * fade) << 8) +
 		(int)(0x80 * fade));
 }
