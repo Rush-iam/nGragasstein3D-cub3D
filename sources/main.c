@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/05 18:09:46 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/05 19:07:55 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,9 @@ void	initialize_game_2(t_game *game)
 	t_object	*obj;
 
 	__sincos(game->p.angle, &game->p.cossin.y, &game->p.cossin.x);
-	set_fov(game, game->img.aspect);
+	game->fov = ((game->img.aspect >= 1.77) - (game->img.aspect < 1.77)) *
+					sqrt(fabs(M_PI_4 * (game->img.aspect - 1.77) / 2)) + M_PI_2;
+	set_fov(game, game->fov);
 	cur_list = game->objects;
 	while (cur_list)
 	{
@@ -83,14 +85,14 @@ void	initialize_game_2(t_game *game)
 	}
 }
 
-void	set_fov(t_game *game, double aspect)
+void	set_fov(t_game *game, double fov)
 {
-	game->fov = M_PI_2 + ((aspect >= 1.77) - (aspect < 1.77)) *
-								sqrt(fabs(M_PI_4 * (aspect - 1.77) / 2));
-	game->col_step = tan(game->fov / (game->img.size.x - 1));
+	game->col_step = tan(fov / (game->img.size.x - 1));
 	game->col_center = game->img.size.x / 2.;
 	game->col_scale = 1 / game->col_step;
 	printf("Real FOV: %.0f\n", 114 * atan(game->col_step * game->col_center));
+	if (fov < PI2)
+		game->fov = fov;
 }
 
 int	game_loop(t_game *game)

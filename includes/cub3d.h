@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/05 18:16:03 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/05 18:21:52 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@
 # define TURN_LEFT		KEY_LEFT
 # define TURN_RIGHT		KEY_RIGHT
 
-# define FOV_MORE	KEY_NUMPLUS
-# define FOV_LESS	KEY_NUMMINUS
+# define FOV_WIDE	KEY_NUMMINUS
+# define FOV_TELE	KEY_NUMPLUS
 
 # define PL_SPEED	0.05
 # define MAP_SCALE	32

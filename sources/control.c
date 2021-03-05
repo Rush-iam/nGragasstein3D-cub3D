@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 20:55:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/05 18:55:05 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/05 19:04:15 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,16 +36,10 @@ void	player_control(t_game *game)
 	if (game->key.k[MOVE_RIGHT])
 		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.cossin.y,
 								game->p.pos.y + PL_SPEED * game->p.cossin.x};
-	if (game->key.k[FOV_MORE])
-	{
-		game->img.aspect *= 1.03;
-		set_fov(game, game->img.aspect);
-	}
-	else if (game->key.k[FOV_LESS])
-	{
-		game->img.aspect /= 1.03;
-		set_fov(game, game->img.aspect);
-	}
+	if (game->key.k[FOV_WIDE])
+		set_fov(game, game->fov * 1.03);
+	else if (game->key.k[FOV_TELE])
+		set_fov(game, game->fov / 1.03);
 	player_control_borders(game);
 	__sincos(game->p.angle, &game->p.cossin.y, &game->p.cossin.x);
 }
