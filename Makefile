@@ -6,7 +6,7 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/03/06 18:41:04 by ngragas          ###   ########.fr        #
+#    Updated: 2021/03/06 18:42:00 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -76,7 +76,7 @@ $(OBJ_DIR)%.o: $(SRC_DIR)%.c Makefile
 -include $(DEP)
 
 switch_clean:
-	$(RM) $(SWITCH_CLEAN)
+	@$(RM) $(SWITCH_CLEAN)
 clean:
 	$(RM) $(OBJ)
 	$(RM) $(DEP)
