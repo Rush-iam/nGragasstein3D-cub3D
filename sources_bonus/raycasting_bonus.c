@@ -40,7 +40,7 @@ void		ray_intersect(t_game *game, double cur_angle, unsigned ray)
 	x1 = (cur_angle < M_PI_2 || cur_angle > 3 * M_PI_2) ?
 		 ray_intersect_x(game, (t_fpoint){1, tan_cur_angle}) :
 		 ray_intersect_x(game, (t_fpoint){-1, -tan_cur_angle});
-	y1 = (cur_angle < M_PI) ?
+	y1 = (cur_angle <= M_PI) ?
 		 ray_intersect_y(game, (t_fpoint){1 / tan_cur_angle, 1}) :
 		 ray_intersect_y(game, (t_fpoint){-1 / tan_cur_angle, -1});
 	distance.x = game->p.cossin.x * (x1.x - game->p.pos.x) +

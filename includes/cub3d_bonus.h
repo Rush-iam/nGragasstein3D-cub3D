@@ -6,14 +6,14 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 17:29:00 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/06 23:36:49 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB3D_BONUS_H
 # define CUB3D_BONUS_H
 
-# include <time.h> //
+# include <time.h>
 # include <stdio.h>
 # include <fcntl.h>
 # include <math.h>
@@ -50,12 +50,18 @@
 # define TURN_LEFT		KEY_LEFT
 # define TURN_RIGHT		KEY_RIGHT
 
+# define MAP_TOGGLE		KEY_M
+
 # define FOV_WIDE	KEY_NUMMINUS
 # define FOV_TELE	KEY_NUMPLUS
 # define FOV_RESET	KEY_NUMASTERISK
+# define FOV_ZOOMSPEED	1.03
 
-# define PL_SPEED	0.05
-# define MAP_SCALE	32
+# define PL_SPEED		0.05
+# define MOUSE_SPEED	2000.
+# define MAP_SCALE		32
+
+# define BUMP_RADIUS		0.2
 
 # define PI2	(2 * M_PI)
 
@@ -115,6 +121,7 @@ typedef struct	s_game
 	{
 		bool		k[280];
 		bool		m[10];
+		t_point		mpos;
 		t_point		mdir;
 	}			key;
 	struct		s_map
@@ -122,8 +129,10 @@ typedef struct	s_game
 		t_img		img;
 		t_upoint	size;
 		char		**grid;
+		bool		show;
 	}			map;
 	float		fov;
+	t_upoint	win_center;
 	float		col_center;
 	double		col_step;
 	double		col_scale;
@@ -170,7 +179,10 @@ int				hook_mouse_release	(int btn, int x, int y, struct s_key *key);
 int				hook_exit			(t_game *game);
 
 void			player_control			(t_game *game);
-void			player_control_borders	(t_game *game);
+void			player_control_move		(t_game *game);
+void			player_control_toggler	(t_game *game, int key_code);
+void			player_control_extra	(t_game *game);
+void			player_control_borders	(t_game *g);
 
 void			ray_cast		(t_game *game);
 void			ray_intersect	(t_game *game, double cur_angle, unsigned ray);

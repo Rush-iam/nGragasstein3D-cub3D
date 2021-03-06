@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 17:52:14 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/06 22:33:29 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ typedef struct	s_game
 		char		**grid;
 	}			map;
 	float		fov;
-	float		col_center;
+	float	col_center;
 	double		col_step;
 	double		col_scale;
 	struct		s_column
@@ -140,7 +140,7 @@ void			set_map_process		(t_game *game);
 void			set_map_check_cell	(t_game *game, char **map, t_upoint pt);
 
 void			player_control			(t_game *game);
-void			player_control_borders	(t_game *game);
+void			player_control_borders	(t_game *g);
 int				hook_key_press		(int key_code, t_game *game);
 int				hook_key_release	(int key_code, t_game *game);
 int				hook_exit			(t_game *game);

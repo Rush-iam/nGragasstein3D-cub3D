@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 20:04:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 17:48:11 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/06 22:38:52 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void		ray_intersect(t_game *game, double cur_angle, unsigned ray)
 	x1 = (cur_angle < M_PI_2 || cur_angle > 3 * M_PI_2) ?
 		ray_intersect_x(game, (t_fpoint){1, tan_cur_angle}) :
 		ray_intersect_x(game, (t_fpoint){-1, -tan_cur_angle});
-	y1 = (cur_angle < M_PI) ?
+	y1 = (cur_angle <= M_PI) ?
 		ray_intersect_y(game, (t_fpoint){1 / tan_cur_angle, 1}) :
 		ray_intersect_y(game, (t_fpoint){-1 / tan_cur_angle, -1});
 	distance.x = game->p.cossin.x * (x1.x - game->p.pos.x) +

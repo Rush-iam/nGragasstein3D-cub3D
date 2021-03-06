@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:13 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 17:33:13 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/06 21:25:26 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ void	draw_map_init(t_game *game)
 {
 	int	null;
 
+	game->map.show = true;
 	game->map.img.size = (t_upoint){game->map.size.x * MAP_SCALE,
 									game->map.size.y * MAP_SCALE};
 	if (!(game->map.img.ptr = mlx_new_image(game->mlx, game->map.img.size.x,
@@ -29,6 +30,8 @@ void	draw_map(t_game *game)
 {
 	t_point	pt;
 
+	if (game->map.show == false)
+		return ;
 	img_clear_rgb(&game->map.img, 0xAA000000);
 	pt.y = 0;
 	while (pt.y < (int)game->map.img.size.y)

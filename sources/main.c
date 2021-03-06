@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 17:48:11 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/06 22:39:55 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ void	set_fov(t_game *game, double fov, bool reset)
 		fov = ((game->img.aspect >= 1.77) - (game->img.aspect < 1.77)) *
 					sqrt(fabs(M_PI_4 * (game->img.aspect - 1.77) / 2)) + M_PI_2;
 	game->col_step = tan(fov / (game->img.size.x - 1));
-	game->col_center = game->img.size.x / 2.;
+	game->col_center = (float)game->img.size.x / 2;
 	game->col_scale = 1 / game->col_step;
 	printf("Real FOV: %.0f\n", 114 * atan(game->col_step * game->col_center));
 	if (reset == true || (M_PI_4 / 4 < fov && fov < PI2))

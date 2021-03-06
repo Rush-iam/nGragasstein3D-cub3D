@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 17:33:07 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/06 22:25:26 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@ int	main(int args, char *av[])
 		terminate(&game, ERR_MLX, strerror(errno));
 	parse(args, av, &game, &screenshot_only);
 	initialize_game(&game, screenshot_only);
-	draw_map_init(&game); //
+	draw_map_init(&game);
 	if (screenshot_only == true)
 		write_screenshot_and_exit(&game);
 	mlx_do_key_autorepeatoff(game.mlx);
-//	mlx_mouse_hide();
+	mlx_mouse_hide();
 	mlx_hook(game.win, EVENT_KEYPRESS, 0, hook_key_press, &game);
 	mlx_hook(game.win, EVENT_KEYRELEASE, 0, hook_key_release, &game.key);
 	mlx_hook(game.win, EVENT_BUTTONPRESS, 0, hook_mouse_press, &game.key);
@@ -72,6 +72,8 @@ void	initialize_game_2(t_game *game)
 	t_object	*obj;
 
 	__sincos(game->p.angle, &game->p.cossin.y, &game->p.cossin.x);
+	game->win_center = (t_upoint){game->img.size.x / 2, game->img.size.y / 2};
+	mlx_mouse_move(game->win, game->win_center.x, game->win_center.y);
 	set_fov(game, 0, true);
 	cur_list = game->objects;
 	while (cur_list)
@@ -89,7 +91,7 @@ void	set_fov(t_game *game, double fov, bool reset)
 		fov = ((game->img.aspect >= 1.77) - (game->img.aspect < 1.77)) *
 					sqrt(fabs(M_PI_4 * (game->img.aspect - 1.77) / 2)) + M_PI_2;
 	game->col_step = tan(fov / (game->img.size.x - 1));
-	game->col_center = game->img.size.x / 2.;
+	game->col_center = (float)game->img.size.x / 2;
 	game->col_scale = 1 / game->col_step;
 	printf("Real FOV: %.0f\n", 114 * atan(game->col_step * game->col_center));
 	if (reset == true || (M_PI_4 / 4 < fov && fov < PI2))
@@ -115,18 +117,11 @@ int	game_loop(t_game *game)
 
 //	fizzlefade(&game->img, 0xFF0000);
 //	demo_radar(game, 360);
-//	ft_putnbr_fd(CLOCKS_PER_SEC / (clock() - tick), 1);
-//	write(1, "\n", 1);
+//	printf("FPS: %lu\n", CLOCKS_PER_SEC / (clock() - tick));
 	fps = ft_itoa(CLOCKS_PER_SEC / (clock() - tick));
 	tick = clock();
 	mlx_string_put(game->mlx, game->win, 0, 10, 0xFFFFFF, fps);
 	free(fps);
 
-//	write(1, "Player x", 9); ft_putnbr_fd((int)game->p.pos.x, 1);
-//	write(1, " y", 3); ft_putnbr_fd((int)game->p.pos.y, 1); write(1, "\n", 1);
-//	write(1, "Column 0 height ", 16); ft_putnbr_fd(game->column[0].height, 1);
-//	write(1, " cell x", 7); ft_putnbr_fd((int)game->column[0].cell.x, 1);
-//	write(1, " y", 2); ft_putnbr_fd((int)game->column[0].cell.y, 1);
-//	write(1, " dir=", 5); write(1, &(game->column[0].dir), 1); write(1, "\n", 1);
 	return (0);
 }

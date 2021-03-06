@@ -6,13 +6,13 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/03/06 18:42:00 by ngragas          ###   ########.fr        #
+#    Updated: 2021/03/06 23:26:38 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = cub3D
-CFLAGS = -Wall -Wextra -Werror -MMD -g -Ofast -march=native
-SRC :=			main			\
+NAME 	= 	cub3D
+CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g -Ofast -march=native
+SRC    :=		main			\
 				control			\
 				objects			\
 				parse			\
@@ -32,6 +32,12 @@ SRC_DIR := sources/
 INC_DIR = includes/
 OBJ_DIR = objects/
 SRC_BONUS_DIR = sources_bonus/
+
+# DELETE ME
+#	SRC_DIR := $(SRC_BONUS_DIR)
+#	SRC += $(SRC_BONUS)
+#	SRC := $(addsuffix _bonus, $(SRC))
+# DELETE ME
 
 ifeq ($(filter bonus, $(MAKECMDGOALS)), bonus)
 	SWITCH_CLEAN := $(addsuffix .o, $(SRC))
