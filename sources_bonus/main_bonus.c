@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   main_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 17:48:11 by ngragas          ###   ########.fr       */
+/*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
+/*   Updated: 2021/03/06 17:33:07 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "cub3d_bonus.h"
 
-int		main(int args, char *av[])
+int	main(int args, char *av[])
 {
 	t_game	game;
 	bool	screenshot_only;
@@ -23,11 +23,15 @@ int		main(int args, char *av[])
 		terminate(&game, ERR_MLX, strerror(errno));
 	parse(args, av, &game, &screenshot_only);
 	initialize_game(&game, screenshot_only);
+	draw_map_init(&game); //
 	if (screenshot_only == true)
 		write_screenshot_and_exit(&game);
 	mlx_do_key_autorepeatoff(game.mlx);
+//	mlx_mouse_hide();
 	mlx_hook(game.win, EVENT_KEYPRESS, 0, hook_key_press, &game);
-	mlx_hook(game.win, EVENT_KEYRELEASE, 0, hook_key_release, &game);
+	mlx_hook(game.win, EVENT_KEYRELEASE, 0, hook_key_release, &game.key);
+	mlx_hook(game.win, EVENT_BUTTONPRESS, 0, hook_mouse_press, &game.key);
+	mlx_hook(game.win, EVENT_BUTTONRELEASE, 0, hook_mouse_release, &game.key);
 	mlx_hook(game.win, EVENT_DESTROYNOTIFY, 0, hook_exit, &game);
 	mlx_loop_hook(game.mlx, game_loop, &game);
 	mlx_loop(game.mlx);
@@ -92,13 +96,37 @@ void	set_fov(t_game *game, double fov, bool reset)
 		game->fov = fov;
 }
 
-int		game_loop(t_game *game)
+int	game_loop(t_game *game)
 {
+	static clock_t	tick;
+	char			*fps;
+
 	player_control(game);
-	ray_cast(game);
+//	for (int i = 0; i < 500; ++i)
+		ray_cast(game);
 	img_ceilfloor_fill_rgb(&game->img, game->color_ceil, game->color_floor);
 	draw_walls(game);
 	draw_objects(game);
+
+//	demo_cursor(game, 0xFF88FF);
+//	demo_fillrate(game, 1);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
+	draw_map(game);
+
+//	fizzlefade(&game->img, 0xFF0000);
+//	demo_radar(game, 360);
+//	ft_putnbr_fd(CLOCKS_PER_SEC / (clock() - tick), 1);
+//	write(1, "\n", 1);
+	fps = ft_itoa(CLOCKS_PER_SEC / (clock() - tick));
+	tick = clock();
+	mlx_string_put(game->mlx, game->win, 0, 10, 0xFFFFFF, fps);
+	free(fps);
+
+//	write(1, "Player x", 9); ft_putnbr_fd((int)game->p.pos.x, 1);
+//	write(1, " y", 3); ft_putnbr_fd((int)game->p.pos.y, 1); write(1, "\n", 1);
+//	write(1, "Column 0 height ", 16); ft_putnbr_fd(game->column[0].height, 1);
+//	write(1, " cell x", 7); ft_putnbr_fd((int)game->column[0].cell.x, 1);
+//	write(1, " y", 2); ft_putnbr_fd((int)game->column[0].cell.y, 1);
+//	write(1, " dir=", 5); write(1, &(game->column[0].dir), 1); write(1, "\n", 1);
 	return (0);
 }

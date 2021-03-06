@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   draw_figures.c                                     :+:      :+:    :+:   */
+/*   draw_figures_bonus.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/05 19:33:42 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/27 00:12:05 by ngragas          ###   ########.fr       */
+/*   Created: 2021/03/06 17:32:09 by ngragas           #+#    #+#             */
+/*   Updated: 2021/03/06 17:32:09 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "cub3d_bonus.h"
 
 void	pixel_put(t_img *img, unsigned x, unsigned y, int color)
 {

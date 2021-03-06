@@ -10,7 +10,6 @@ CFLAGS+=-O2
 
 # add to match string put with X11 in size and position
 CFLAGS+= -DSTRINGPUTX11
-CFLAGS+= -D GL_SILENCE_DEPRECATION
 
 all: $(NOM)
 

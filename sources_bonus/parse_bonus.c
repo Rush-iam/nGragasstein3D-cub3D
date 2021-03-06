@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parse.c                                            :+:      :+:    :+:   */
+/*   parse_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/28 18:27:20 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/05 20:33:46 by ngragas          ###   ########.fr       */
+/*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
+/*   Updated: 2021/03/06 17:32:59 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "cub3d_bonus.h"
 
 void	parse(int args, char **av, t_game *game, bool *screenshot_only)
 {

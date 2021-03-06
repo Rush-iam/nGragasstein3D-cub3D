@@ -23,7 +23,7 @@
 **  BUFFER_SIZE - how many bytes to read from input in one call
 */
 
-# define MAX_FDS 260
+# define MAX_FDS 32
 # define BIG_BUF 262144
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 65536

@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   utils_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/06 16:20:11 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/05 16:57:11 by ngragas          ###   ########.fr       */
+/*   Created: 2021/03/06 17:32:41 by ngragas           #+#    #+#             */
+/*   Updated: 2021/03/06 17:32:41 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "cub3d_bonus.h"
 
 char	*atoi_limited(unsigned *dst_int, const char *src_string, unsigned limit)
 {
@@ -52,6 +52,8 @@ int		terminate(t_game *game, int return_value, char *message)
 			ft_putendl_fd("Unable to save screenshot", 2);
 	}
 	terminate_free(game);
+	if (game->map.img.ptr)
+		mlx_destroy_image(game->mlx, game->map.img.ptr); //
 	if (game->img.ptr)
 		mlx_destroy_image(game->mlx, game->img.ptr);
 	if (game->win)

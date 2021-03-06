@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   hooks.c                                            :+:      :+:    :+:   */
+/*   hooks_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/05 22:16:42 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/05 18:19:41 by ngragas          ###   ########.fr       */
+/*   Created: 2021/03/06 17:33:10 by ngragas           #+#    #+#             */
+/*   Updated: 2021/03/06 17:33:10 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "cub3d_bonus.h"
 
 int	hook_key_press(int key_code, t_game *game)
 {
@@ -18,6 +18,7 @@ int	hook_key_press(int key_code, t_game *game)
 		return (1);
 	if (key_code == KEY_ESCAPE)
 		terminate(game, EXIT_SUCCESS, NULL);
+//	printf("Key pressed: %d\n", key_code);
 	game->key.k[key_code] = true;
 	return (0);
 }
