@@ -6,7 +6,7 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/03/06 17:54:30 by ngragas          ###   ########.fr        #
+#    Updated: 2021/03/06 18:41:04 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,7 @@ SRC_BONUS :=	demo_tools		\
 				draw_map		\
 				hooks			\
 
-SRC_DIR = sources/
+SRC_DIR := sources/
 INC_DIR = includes/
 OBJ_DIR = objects/
 SRC_BONUS_DIR = sources_bonus/
@@ -44,8 +44,8 @@ else
 	SWITCH_CLEAN += $(addsuffix _bonus.d, $(SRC) $(SRC_BONUS))
 endif
 SWITCH_CLEAN := $(addprefix $(OBJ_DIR), $(SWITCH_CLEAN))
-SRC := $(addsuffix .c, $(SRC))
 
+SRC := $(addsuffix .c, $(SRC))
 OBJ = $(addprefix $(OBJ_DIR), $(SRC:.c=.o))
 DEP = $(OBJ:.o=.d)
 
@@ -76,7 +76,7 @@ $(OBJ_DIR)%.o: $(SRC_DIR)%.c Makefile
 -include $(DEP)
 
 switch_clean:
-	@$(RM) $(SWITCH_CLEAN)
+	$(RM) $(SWITCH_CLEAN)
 clean:
 	$(RM) $(OBJ)
 	$(RM) $(DEP)
