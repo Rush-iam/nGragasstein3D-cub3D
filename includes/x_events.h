@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 19:20:05 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/05 18:20:15 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/07 15:04:40 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ enum	e_x11events
 	EVENT_BUTTONPRESS,
 	EVENT_BUTTONRELEASE,
 	EVENT_MOTIONNOTIFY,
-	EVENT_DESTROYNOTIFY = 17
+	EVENT_DESTROYNOTIFY = 17,
 };
 
 enum	e_mouse

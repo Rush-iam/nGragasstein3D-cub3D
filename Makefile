@@ -6,12 +6,12 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/03/06 23:26:38 by ngragas          ###   ########.fr        #
+#    Updated: 2021/03/07 17:28:17 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME 	= 	cub3D
-CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g -Ofast -march=native
+CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g #-Ofast -march=native
 SRC    :=		main			\
 				control			\
 				objects			\

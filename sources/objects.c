@@ -31,8 +31,8 @@ void	draw_objects(t_game *game)
 		obj = (t_object *)cur_list->content;
 		diff = (t_fpoint){obj->pos.x - game->p.pos.x,
 						obj->pos.y - game->p.pos.y};
-		if ((obj->distance = game->p.cossin.x * diff.x +
-				game->p.cossin.y * diff.y) > 0.01)
+		if ((obj->distance = game->p.vector.x * diff.x +
+							 game->p.vector.y * diff.y) > 0.01)
 		{
 			angle = atan2(diff.y, diff.x);
 			if (fabs(game->p.angle - angle - PI2) <= M_PI)

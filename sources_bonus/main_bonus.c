@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 22:25:26 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/07 15:27:54 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void	initialize_game_2(t_game *game)
 	t_list		*cur_list;
 	t_object	*obj;
 
-	__sincos(game->p.angle, &game->p.cossin.y, &game->p.cossin.x);
+	__sincos(game->p.angle, &game->p.vector.y, &game->p.vector.x);
 	game->win_center = (t_upoint){game->img.size.x / 2, game->img.size.y / 2};
 	mlx_mouse_move(game->win, game->win_center.x, game->win_center.y);
 	set_fov(game, 0, true);
@@ -79,8 +79,8 @@ void	initialize_game_2(t_game *game)
 	while (cur_list)
 	{
 		obj = (t_object *)cur_list->content;
-		obj->distance = game->p.cossin.x * (obj->pos.x - game->p.pos.x) +
-						game->p.cossin.y * (obj->pos.y - game->p.pos.y);
+		obj->distance = game->p.vector.x * (obj->pos.x - game->p.pos.x) +
+						game->p.vector.y * (obj->pos.y - game->p.pos.y);
 		cur_list = cur_list->next;
 	}
 }

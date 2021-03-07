@@ -93,7 +93,7 @@ typedef struct	s_game
 	{
 		t_fpoint	pos;
 		double		angle;
-		t_fpoint	cossin;
+		t_fpoint	vector;
 	}			p;
 	bool		key[280];
 	struct		s_map
@@ -102,7 +102,7 @@ typedef struct	s_game
 		char		**grid;
 	}			map;
 	float		fov;
-	float	col_center;
+	float		col_center;
 	double		col_step;
 	double		col_scale;
 	struct		s_column

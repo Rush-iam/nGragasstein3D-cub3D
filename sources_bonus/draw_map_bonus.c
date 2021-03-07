@@ -43,7 +43,7 @@ void	draw_map(t_game *game)
 					(t_point){pt.x + MAP_SCALE, pt.y}, 0x113322);
 			draw_line(&game->map.img, pt,
 					(t_point){pt.x, pt.y + MAP_SCALE}, 0x113322);
-			if (game->map.grid[pt.y / MAP_SCALE][pt.x / MAP_SCALE] == '1')
+			if (ft_isdigit(game->map.grid[pt.y / MAP_SCALE][pt.x / MAP_SCALE]))
 				draw_square(&game->map.img, (t_point){pt.x + MAP_SCALE / 2,
 								pt.y + MAP_SCALE / 2}, MAP_SCALE - 4, 0x33AA99);
 			pt.x += MAP_SCALE;

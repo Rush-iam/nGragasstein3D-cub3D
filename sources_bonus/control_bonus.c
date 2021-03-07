@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 23:46:08 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/07 17:55:36 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	player_control(t_game *game)
 	player_control_move(game);
 	player_control_extra(game);
 	player_control_borders(game);
-	__sincos(game->p.angle, &game->p.cossin.y, &game->p.cossin.x);
+	__sincos(game->p.angle, &game->p.vector.y, &game->p.vector.x);
 }
 
 void	player_control_move(t_game *game)
@@ -36,17 +36,17 @@ void	player_control_move(t_game *game)
 	if (game->p.angle < 0)
 		game->p.angle += PI2;
 	if (game->key.k[MOVE_FORWARD])
-		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.cossin.x,
-								 game->p.pos.y + PL_SPEED * game->p.cossin.y};
+		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.vector.x,
+								 game->p.pos.y + PL_SPEED * game->p.vector.y};
 	if (game->key.k[MOVE_BACK])
-		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.cossin.x,
-								 game->p.pos.y - PL_SPEED * game->p.cossin.y};
+		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vector.x,
+								 game->p.pos.y - PL_SPEED * game->p.vector.y};
 	if (game->key.k[MOVE_LEFT])
-		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.cossin.y,
-								 game->p.pos.y - PL_SPEED * game->p.cossin.x};
+		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.vector.y,
+								 game->p.pos.y - PL_SPEED * game->p.vector.x};
 	if (game->key.k[MOVE_RIGHT])
-		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.cossin.y,
-								 game->p.pos.y + PL_SPEED * game->p.cossin.x};
+		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vector.y,
+								 game->p.pos.y + PL_SPEED * game->p.vector.x};
 }
 
 void	player_control_toggler(t_game *game, int key_code)
@@ -67,32 +67,47 @@ void	player_control_extra(t_game *game)
 
 void	player_control_borders(t_game *g)
 {
-	if (g->p.pos.x < BUMP_RADIUS)
-		g->p.pos.x = BUMP_RADIUS;
-	if (g->p.pos.y < BUMP_RADIUS)
-		g->p.pos.y = BUMP_RADIUS;
-	if (g->p.pos.x + BUMP_RADIUS >= g->map.size.x)
-		g->p.pos.x = g->map.size.x - BUMP_RADIUS;
-	if (g->p.pos.y + BUMP_RADIUS >= g->map.size.y)
-		g->p.pos.y = g->map.size.y - BUMP_RADIUS;
-	if (g->map.grid[(int)(g->p.pos.y - BUMP_RADIUS)][(int)g->p.pos.x] == '1')
-		g->p.pos.y = (int)(g->p.pos.y - BUMP_RADIUS) + 1 + BUMP_RADIUS;
-	if (g->map.grid[(int)(g->p.pos.y + BUMP_RADIUS)][(int)g->p.pos.x] == '1')
-		g->p.pos.y = (int)(g->p.pos.y + BUMP_RADIUS) - BUMP_RADIUS;
-	if (g->map.grid[(int)g->p.pos.y][(int)(g->p.pos.x - BUMP_RADIUS)] == '1')
-		g->p.pos.x = (int)(g->p.pos.x - BUMP_RADIUS) + 1 + BUMP_RADIUS;
-	if (g->map.grid[(int)g->p.pos.y][(int)(g->p.pos.x + BUMP_RADIUS)] == '1')
-		g->p.pos.x = (int)(g->p.pos.x + BUMP_RADIUS) - BUMP_RADIUS;
+	const t_point	plus = {g->p.pos.x + PL_RADIUS, g->p.pos.y + PL_RADIUS};
+	const t_point	minus = {g->p.pos.x - PL_RADIUS, g->p.pos.y - PL_RADIUS};
 
-//	if (g->map.grid[(int)(g->p.pos.y - BUMP_RADIUS)][(int)(g->p.pos.x - BUMP_RADIUS)] == '1')
-//	{
-//		g->p.pos.y = (int)(g->p.pos.y - BUMP_RADIUS) + 1 + BUMP_RADIUS;
-//		g->p.pos.x = (int)(g->p.pos.x - BUMP_RADIUS) + 1 + BUMP_RADIUS;
-//	}
-//	if (g->map.grid[(int)(g->p.pos.y + BUMP_RADIUS)][(int)g->p.pos.x] == '1')
-//		g->p.pos.y = (int)(g->p.pos.y + BUMP_RADIUS) - BUMP_RADIUS;
-//	if (g->map.grid[(int)g->p.pos.y][(int)(g->p.pos.x - BUMP_RADIUS)] == '1')
-//		g->p.pos.x = (int)(g->p.pos.x - BUMP_RADIUS) + 1 + BUMP_RADIUS;
-//	if (g->map.grid[(int)g->p.pos.y][(int)(g->p.pos.x + BUMP_RADIUS)] == '1')
-//		g->p.pos.x = (int)(g->p.pos.x + BUMP_RADIUS) - BUMP_RADIUS;
+	if (g->p.pos.x < PL_RADIUS)
+		g->p.pos.x = PL_RADIUS + MAP_CELL_FIX;
+	if (g->p.pos.y < PL_RADIUS)
+		g->p.pos.y = PL_RADIUS + MAP_CELL_FIX;
+	if (g->p.pos.x + PL_RADIUS >= g->map.size.x)
+		g->p.pos.x = g->map.size.x - PL_RADIUS - MAP_CELL_FIX;
+	if (g->p.pos.y + PL_RADIUS >= g->map.size.y)
+		g->p.pos.y = g->map.size.y - PL_RADIUS - MAP_CELL_FIX;
+	if (ft_isdigit(g->map.grid[(int)g->p.pos.y][minus.x]))
+		g->p.pos.x = minus.x + 1 + PL_RADIUS + MAP_CELL_FIX;
+	if (ft_isdigit(g->map.grid[(int)g->p.pos.y][plus.x]))
+		g->p.pos.x = plus.x - PL_RADIUS - MAP_CELL_FIX;
+	if (ft_isdigit(g->map.grid[minus.y][(int)g->p.pos.x]))
+		g->p.pos.y = minus.y + 1 + PL_RADIUS + MAP_CELL_FIX;
+	if (ft_isdigit(g->map.grid[plus.y][(int)g->p.pos.x]))
+		g->p.pos.y = plus.y - PL_RADIUS - MAP_CELL_FIX;
+	player_control_borders_diag(g);
+}
+
+void	player_control_borders_diag(t_game *g)
+{
+	const t_point	plus = {g->p.pos.x + PL_RADIUS, g->p.pos.y + PL_RADIUS};
+	const t_point	minus = {g->p.pos.x - PL_RADIUS, g->p.pos.y - PL_RADIUS};
+
+	if (ft_isdigit(g->map.grid[minus.y][minus.x]))
+		(g->p.pos.x - (int)g->p.pos.x > g->p.pos.y - (int)g->p.pos.y) ?
+		(g->p.pos.x = minus.x + 1 + PL_RADIUS) :
+		(g->p.pos.y = minus.y + 1 + PL_RADIUS);
+	if (ft_isdigit(g->map.grid[plus.y][plus.x]))
+		(g->p.pos.x - (int)g->p.pos.x < g->p.pos.y - (int)g->p.pos.y) ?
+		(g->p.pos.x = plus.x - PL_RADIUS) :
+		(g->p.pos.y = plus.y - PL_RADIUS);
+	if (ft_isdigit(g->map.grid[minus.y][plus.x]))
+		(1. - (g->p.pos.x - (int)g->p.pos.x) > g->p.pos.y - (int)g->p.pos.y) ?
+		(g->p.pos.x = plus.x - PL_RADIUS) :
+		(g->p.pos.y = minus.y + 1 + PL_RADIUS);
+	if (ft_isdigit(g->map.grid[plus.y][minus.x]))
+		(g->p.pos.x - (int)g->p.pos.x > 1. - (g->p.pos.y - (int)g->p.pos.y)) ?
+		(g->p.pos.x = minus.x + 1 + PL_RADIUS) :
+		(g->p.pos.y = plus.y - PL_RADIUS);
 }

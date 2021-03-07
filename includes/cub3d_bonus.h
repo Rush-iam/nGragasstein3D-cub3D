@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 23:36:49 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/07 20:47:03 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,17 +31,13 @@
 # define MAX_SCR	(t_upoint){20000, 20000}
 # define MIN_RES_X	2
 
+# define PI2	(2 * M_PI)
+
 # define ERR_MLX	1
 # define ERR_ARGS	2
 # define ERR_PARSE	3
 # define ERR_MEM	4
 # define ERR_BMP	5
-
-# define WALL_N	0
-# define WALL_S	1
-# define WALL_W	2
-# define WALL_E	3
-# define SPRITE 4
 
 # define MOVE_FORWARD	KEY_W
 # define MOVE_BACK		KEY_S
@@ -52,18 +48,16 @@
 
 # define MAP_TOGGLE		KEY_M
 
-# define FOV_WIDE	KEY_NUMMINUS
-# define FOV_TELE	KEY_NUMPLUS
-# define FOV_RESET	KEY_NUMASTERISK
+# define FOV_WIDE		KEY_NUMMINUS
+# define FOV_TELE		KEY_NUMPLUS
+# define FOV_RESET		KEY_NUMASTERISK
 # define FOV_ZOOMSPEED	1.03
 
-# define PL_SPEED		0.05
+# define PL_SPEED		0.07
+# define PL_RADIUS		0.3
+# define MAP_CELL_FIX	0.0000001
 # define MOUSE_SPEED	2000.
-# define MAP_SCALE		32
-
-# define BUMP_RADIUS		0.2
-
-# define PI2	(2 * M_PI)
+# define MAP_SCALE		16
 
 typedef struct	s_point
 {
@@ -91,19 +85,53 @@ typedef struct	s_img
 	double		aspect;
 }				t_img;
 
-//typedef struct	s_sprite
-//{
-//	t_img		img;
-//	bool		animated;
-//	unsigned	frames;
-//}				t_sprite;
+typedef struct	s_sprite
+{
+	t_img		img;
+	unsigned	frames;
+}				t_sprite;
+
+# define CHAR_DECOR		"/"
+# define CHAR_PICKUP	"HhAaK"
+# define CHAR_ENEMY		"nswe"
+# define CHAR_SOLID		"/nswe"
+# define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP CHAR_ENEMY
+# define CHAR_ALLOWED	" .0123456789NSWE" CHAR_OBJECTS
 
 typedef struct	s_object
 {
-	t_img		*sprite;
+	t_sprite	*sprite;
 	t_fpoint	pos;
+	double		angle;
 	t_upoint	size;
 	double		distance;
+	bool		solid;
+	enum		e_objtype
+	{
+		T_DECOR = 0,
+		T_PICKUP_HEALTH_LARGE,
+		T_PICKUP_HEALTH_MED,
+		T_PICKUP_AMMO_MED,
+		T_PICKUP_AMMO_SMALL,
+		T_PICKUP_KEY,
+		T_ENEMY
+	}			type;
+	struct		s_enemy
+	{
+		short	health;
+		short	frame;
+		time_t	tick_nextframe;
+		time_t	tick_state_start;
+		time_t	tick_state_end;
+		enum	e_objstate
+		{
+			S_WAIT = 0,
+			S_ATTACK,
+			S_GETHIT,
+			S_SEARCH,
+			S_DEAD
+		}		state;
+	}			*e;
 }				t_object;
 
 typedef struct	s_game
@@ -115,7 +143,7 @@ typedef struct	s_game
 	{
 		t_fpoint	pos;
 		double		angle;
-		t_fpoint	cossin;
+		t_fpoint	vector;
 	}			p;
 	struct		s_key
 	{
@@ -146,7 +174,8 @@ typedef struct	s_game
 	}			**column;
 	unsigned	color_ceil;
 	unsigned	color_floor;
-	t_img		texture[5];
+	t_img		texture[4];
+	t_sprite	sprite[7];
 	t_list		*objects;
 }				t_game;
 
@@ -183,6 +212,7 @@ void			player_control_move		(t_game *game);
 void			player_control_toggler	(t_game *game, int key_code);
 void			player_control_extra	(t_game *game);
 void			player_control_borders	(t_game *g);
+void			player_control_borders_diag(t_game *g);
 
 void			ray_cast		(t_game *game);
 void			ray_intersect	(t_game *game, double cur_angle, unsigned ray);

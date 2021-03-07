@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:35 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 17:32:35 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/07 17:54:08 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,17 @@ void	draw_walls(t_game *game)
 	unsigned	ray;
 	double		fade;
 	unsigned	texture_id;
-	const char	*textures = "NSWE";
 
 	ray = 0;
 	while (ray < game->img.size.x)
 	{
-		fade = 4. / game->column[ray]->distance;
+		fade = 8. / game->column[ray]->distance;
 		if (fade > 1)
 			fade = 1;
-		texture_id = ft_strchr(textures, game->column[ray]->dir) - textures;
+		texture_id = game->map.grid[(int)game->column[ray]->cell.y]
+									[(int)game->column[ray]->cell.x] - '0';
+		if (game->column[ray]->dir == 'W' || game->column[ray]->dir == 'E')
+			fade /= 2;
 		draw_wall_scaled(game, &game->texture[texture_id], ray, fade);
 		ray++;
 	}

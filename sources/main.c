@@ -67,14 +67,14 @@ void	initialize_game_2(t_game *game)
 	t_list		*cur_list;
 	t_object	*obj;
 
-	__sincos(game->p.angle, &game->p.cossin.y, &game->p.cossin.x);
+	__sincos(game->p.angle, &game->p.vector.y, &game->p.vector.x);
 	set_fov(game, 0, true);
 	cur_list = game->objects;
 	while (cur_list)
 	{
 		obj = (t_object *)cur_list->content;
-		obj->distance = game->p.cossin.x * (obj->pos.x - game->p.pos.x) +
-						game->p.cossin.y * (obj->pos.y - game->p.pos.y);
+		obj->distance = game->p.vector.x * (obj->pos.x - game->p.pos.x) +
+						game->p.vector.y * (obj->pos.y - game->p.pos.y);
 		cur_list = cur_list->next;
 	}
 }

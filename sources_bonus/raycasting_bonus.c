@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:45 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 17:32:45 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/07 17:55:36 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,10 @@ void		ray_cast(t_game *game)
 		else if (angle > PI2)
 			angle -= PI2;
 		ray_intersect(game, angle, ray);
+		if (game->column[ray]->dir == 'N')
+			game->column[ray]->cell.y -= MAP_CELL_FIX;
+		if (game->column[ray]->dir == 'W')
+			game->column[ray]->cell.x -= MAP_CELL_FIX;
 		ray++;
 	}
 }
@@ -43,10 +47,10 @@ void		ray_intersect(t_game *game, double cur_angle, unsigned ray)
 	y1 = (cur_angle <= M_PI) ?
 		 ray_intersect_y(game, (t_fpoint){1 / tan_cur_angle, 1}) :
 		 ray_intersect_y(game, (t_fpoint){-1 / tan_cur_angle, -1});
-	distance.x = game->p.cossin.x * (x1.x - game->p.pos.x) +
-				 game->p.cossin.y * (x1.y - game->p.pos.y);
-	distance.y = game->p.cossin.x * (y1.x - game->p.pos.x) +
-				 game->p.cossin.y * (y1.y - game->p.pos.y);
+	distance.x = game->p.vector.x * (x1.x - game->p.pos.x) +
+				 game->p.vector.y * (x1.y - game->p.pos.y);
+	distance.y = game->p.vector.x * (y1.x - game->p.pos.x) +
+				 game->p.vector.y * (y1.y - game->p.pos.y);
 	if (distance.x < distance.y)
 		*game->column[ray] = (struct s_column)
 				{distance.x, game->col_scale / distance.x, x1,
@@ -71,7 +75,7 @@ t_fpoint	ray_intersect_x(t_game *game, t_fpoint step)
 		check.y = game->p.pos.y + step.y * (game->p.pos.x - (int)game->p.pos.x);
 	while ((unsigned)check.y < game->map.size.y &&
 			(unsigned)check.x < game->map.size.x &&
-			game->map.grid[(unsigned)check.y][(unsigned)check.x] != '1')
+			!ft_isdigit(game->map.grid[(unsigned)check.y][(unsigned)check.x]))
 		check = (t_fpoint){check.x + step.x, check.y + step.y};
 	check.x += (step.x < 0);
 	return (check);
@@ -89,7 +93,7 @@ t_fpoint	ray_intersect_y(t_game *game, t_fpoint step)
 		check.x = game->p.pos.x + step.x * (game->p.pos.y - (int)game->p.pos.y);
 	while ((unsigned)check.y < game->map.size.y &&
 			(unsigned)check.x < game->map.size.x &&
-			game->map.grid[(unsigned)check.y][(unsigned)check.x] != '1')
+			!ft_isdigit(game->map.grid[(unsigned)check.y][(unsigned)check.x]))
 		check = (t_fpoint){check.x + step.x, check.y + step.y};
 	check.y += (step.y < 0);
 	return (check);

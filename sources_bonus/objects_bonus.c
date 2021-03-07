@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:03 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 22:28:13 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/07 17:49:46 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ void	draw_objects(t_game *game)
 		obj = (t_object *)cur_list->content;
 		diff = (t_fpoint){obj->pos.x - game->p.pos.x,
 						obj->pos.y - game->p.pos.y};
-		if ((obj->distance = game->p.cossin.x * diff.x +
-				game->p.cossin.y * diff.y) > 0.01)
+		if ((obj->distance = game->p.vector.x * diff.x +
+							 game->p.vector.y * diff.y) > 0.01)
 		{
 			angle = atan2(diff.y, diff.x);
 			if (fabs(game->p.angle - angle - PI2) <= M_PI)
@@ -52,7 +52,7 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 	int	max_x;
 
 	obj->size.x = game->col_scale / obj->distance;
-	obj->size.y = obj->size.x * obj->sprite->aspect;
+	obj->size.y = obj->size.x * obj->sprite->img.aspect;
 	start_x = game->col_center + tan(angle) / game->col_step - obj->size.x / 2;
 	cur_x = start_x;
 	max_x = cur_x + obj->size.x;
@@ -63,8 +63,8 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 	while (cur_x < max_x)
 	{
 		if (obj->distance < game->column[cur_x]->distance)
-			draw_sprite_scaled(&game->img, obj, cur_x,
-			(cur_x - start_x) / ((double)obj->size.x / obj->sprite->size.x));
+			draw_sprite_scaled(&game->img, obj, cur_x, (cur_x - start_x) /
+				((double)obj->size.x / obj->sprite->img.size.x));
 		cur_x++;
 	}
 }
@@ -72,7 +72,7 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 void	draw_sprite_scaled(t_img *img, t_object *obj, unsigned x,
 																unsigned src_x)
 {
-	const double	step = (double)obj->sprite->size.y / obj->size.y;
+	const double	step = (double)obj->sprite->img.size.y / obj->size.y;
 	int				y;
 	double			src_y;
 	int				max_height;
@@ -92,8 +92,8 @@ void	draw_sprite_scaled(t_img *img, t_object *obj, unsigned x,
 	}
 	while (++y < max_height)
 	{
-		if (((src_pixel = obj->sprite->data[(unsigned)src_y *
-						obj->sprite->size.x + src_x]) & 0xFF000000) == 0)
+		if (((src_pixel = obj->sprite->img.data[(unsigned)src_y *
+						obj->sprite->img.size.x + src_x]) & 0xFF000000) == 0)
 			img->data[y * img->size.x + x] = src_pixel;
 		src_y += step;
 	}

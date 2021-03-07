@@ -1,0 +1,43 @@
+R 2400 1200
+W0 ./resources/wall_0.xpm
+W1 ./resources/wall_1.xpm
+W2 ./resources/wall_2.xpm
+W3 ./resources/wall_9.xpm
+
+S0 ./resources/sprite_3.xpm
+S1 ./resources/sprite.xpm
+S2 ./resources/wall_0.xpm
+S3 ./resources/wall_1.xpm
+S4 ./resources/wall_2.xpm
+S5 ./resources/sprite_3.xpm
+S6 ./resources/sprite_3.xpm
+
+C 30,20,10
+F 80,60,30
+
+     00000
+     0...0
+     0...0
+     0...0
+     0...0
+     0...0
+     0...0
+     0...0
+     0...0
+     0...0
+     0...0
+     0...0
+0000000.0000000
+0....0...0....0
+0.............0
+0....0...0....0
+0....0...0....0
+000000...000000
+0....0...3....0
+0.E...........0
+0....2...1....0
+000000...000000
+0..A..........0
+0....h.H....w.0
+0.a...........0
+000000000000000

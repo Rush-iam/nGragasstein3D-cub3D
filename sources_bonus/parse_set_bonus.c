@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:55 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 17:32:55 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/07 17:49:46 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,27 +56,30 @@ void	set_colors(const char *color_string, unsigned *target, t_game *game)
 
 void	set_textures(char *string, t_game *game)
 {
-	int	id;
+	const unsigned	id = string[1] - '0';
 
-	id = -1;
-	if (string[0] == 'S' && string[1] == ' ')
-		id = SPRITE;
-	else if (string[0] == 'N' && string[1] == 'O')
-		id = WALL_N;
-	else if (string[0] == 'S' && string[1] == 'O')
-		id = WALL_S;
-	else if (string[0] == 'W' && string[1] == 'E')
-		id = WALL_W;
-	else if (string[0] == 'E' && string[1] == 'A')
-		id = WALL_E;
-	else
-		terminate(game, ERR_PARSE, "Wrong texture setting. Valid: NO/SO/WE/EA");
-	if (game->texture[id].ptr != NULL)
-		terminate(game, ERR_PARSE, "Duplicated texture setting");
-	string += 2;
-	while (*string == ' ')
-		string++;
-	set_textures_import(string, &game->texture[id], game);
+	if (*string == 'W')
+	{
+		if (id >= sizeof(game->texture) / sizeof(*game->texture))
+			terminate(game, ERR_PARSE, "Texture ID out of array range");
+		if (game->texture[id].ptr != NULL)
+			terminate(game, ERR_PARSE, "Duplicated texture setting");
+		string += 2;
+		while (*string == ' ')
+			string++;
+		set_textures_import(string, &game->texture[id], game);
+	}
+	else if (*string == 'S')
+	{
+		if (id >= sizeof(game->sprite) / sizeof(*game->sprite))
+			terminate(game, ERR_PARSE, "Sprite ID out of array range");
+		if (game->sprite[id].img.ptr != NULL)
+			terminate(game, ERR_PARSE, "Duplicated sprite setting");
+		string += 2;
+		while (*string == ' ')
+			string++;
+		set_textures_import(string, &game->sprite[id].img, game);
+	}
 }
 
 void	set_textures_import(char *string, t_img *texture, t_game *game)

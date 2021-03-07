@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 17:32:59 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/07 17:40:02 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,7 @@ void	parse_scene(int file_id, char **line, t_game *game)
 			set_colors(*line, &game->color_ceil, game);
 		else if (**line == 'F')
 			set_colors(*line, &game->color_floor, game);
-		else if (**line == 'N' || **line == 'S' ||
-				**line == 'W' || **line == 'E')
+		else if (**line == 'W' || **line == 'S')
 			set_textures(*line, game);
 		else if (**line != '\0')
 			return ;
@@ -98,6 +97,8 @@ void	parse_map(int file_id, char *line, t_list *map, t_game *game)
 
 void	validate_settings(t_game *game)
 {
+	unsigned	i;
+
 	if (game->color_floor == -1U)
 		terminate(game, ERR_PARSE, "Floor color not found. Format: F R,G,B");
 	if (game->color_ceil == -1U)
@@ -105,19 +106,12 @@ void	validate_settings(t_game *game)
 	if (game->img.size.x == 0 || game->img.size.y == 0)
 		terminate(game, ERR_PARSE,
 		"Resolution doesn't set. Format: 'R WIDTH HEIGHT' (max 32767x32767)");
-	if (game->texture[WALL_N].ptr == NULL)
-		terminate(game, ERR_PARSE,
-				"North wall texture doesn't set. Format: 'NO ./path.xpm'");
-	if (game->texture[WALL_S].ptr == NULL)
-		terminate(game, ERR_PARSE,
-				"South wall texture doesn't set. Format: 'SO ./path.xpm'");
-	if (game->texture[WALL_W].ptr == NULL)
-		terminate(game, ERR_PARSE,
-				"West wall texture doesn't set. Format: 'WE ./path.xpm'");
-	if (game->texture[WALL_E].ptr == NULL)
-		terminate(game, ERR_PARSE,
-				"East wall texture doesn't set. Format: 'EA ./path.xpm'");
-	if (game->texture[SPRITE].ptr == NULL)
-		terminate(game, ERR_PARSE,
-				"Sprite texture doesn't set. Format: 'S ./path.xpm'");
+	i = 0;
+	while (i < sizeof(game->texture) / sizeof(*game->texture))
+		if (game->texture[i++].ptr == NULL)
+			terminate(game, ERR_PARSE, "Missing wall texture");
+	i = 0;
+	while (i < sizeof(game->sprite) / sizeof(*game->sprite))
+		if (game->sprite[i++].img.ptr == NULL)
+			terminate(game, ERR_PARSE, "Missing sprite");
 }
