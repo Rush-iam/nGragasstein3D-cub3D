@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/08 23:36:38 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/08 23:50:54 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,10 @@
 # define TURN_LEFT		KEY_LEFT
 # define TURN_RIGHT		KEY_RIGHT
 
-# define MAP_TOGGLE		KEY_M
+# define MAP_TOGGLE			KEY_M
+# define MAP_COLOR_DECOR	0x808080
+# define MAP_COLOR_ENEMY	0xFF7A40
+# define MAP_COLOR_PICKUP	0x7AFF40
 
 # define FOV_WIDE		KEY_NUMMINUS
 # define FOV_TELE		KEY_NUMPLUS

@@ -81,13 +81,20 @@ void	draw_map_objects(t_game *game)
 {
 	t_list		*cur_list;
 	t_object	*obj;
+	unsigned	color;
 
 	cur_list = game->objects;
 	while (cur_list)
 	{
 		obj = (t_object *)cur_list->content;
+		if (obj->type == T_DECOR)
+			color = MAP_COLOR_DECOR;
+		else if (obj->type == T_ENEMY)
+			color = MAP_COLOR_ENEMY;
+		else
+			color = MAP_COLOR_PICKUP;
 		draw_square(&game->map.img, (t_point){
-				obj->pos.x * MAP_SCALE, obj->pos.y * MAP_SCALE}, 2, 0xFF7A40);
+				obj->pos.x * MAP_SCALE, obj->pos.y * MAP_SCALE}, 2, color);
 		cur_list = cur_list->next;
 	}
 }
