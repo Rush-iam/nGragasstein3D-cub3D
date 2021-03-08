@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:09 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 17:32:09 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/08 15:46:39 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,20 @@ void	pixel_put(t_img *img, unsigned x, unsigned y, int color)
 
 int		pixel_fade(int color, double fade)
 {
+//	int	r;
+//	int g;
+//	int b;
+//
+//	r = (int)((color & MASK_R) / 1.3 - (int)((MASK_R - (color & MASK_R)) * fade/4)) & MASK_R;
+//	if (r > (color & MASK_R))
+//		r = 0;
+//	g = (int)((color & MASK_G) / 1.3 - (int)((MASK_G - (color & MASK_G)) * fade/4)) & MASK_G;
+//	if (g > (color & MASK_G))
+//		g = 0;
+//	b = (int)((color & MASK_B) / 1.3 - (int)((MASK_B - (color & MASK_B)) * fade/4)) & MASK_B;
+//	if (b > (color & MASK_B))
+//		b = 0;
+//	return (r | g | b);
 	return (((int)((color & 0xFF0000) * fade) & 0xFF0000) +
 			((int)((color & 0xFF00) * fade) & 0xFF00) +
 			(int)((color & 0xFF) * fade));

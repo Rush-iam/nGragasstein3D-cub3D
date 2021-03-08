@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:49 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/07 20:23:59 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/08 18:06:22 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,32 @@ void	set_map(t_game *game, t_list *map)
 		terminate(game, ERR_PARSE, "Map player character 'NSWE' not found");
 }
 
+void	set_map_process(t_game *game)
+{
+	t_upoint	pt;
+	const char	obj_chars[] = CHAR_OBJECTS;
+	char		*chr;
+
+	pt.y = 0;
+	while (pt.y < game->map.size.y)
+	{
+		pt.x = 0;
+		while (pt.x < game->map.size.x)
+		{
+			set_map_check_cell(game, game->map.grid, pt);
+			if ((chr = ft_strchr(obj_chars, game->map.grid[pt.y][pt.x])))
+			{
+				if (*chr == 'n' || *chr == 's' || *chr == 'w' || *chr == 'e')
+					set_map_object_add(game, *chr, sizeof(obj_chars) - 4, pt);
+				else
+					set_map_object_add(game, *chr, chr - obj_chars, pt);
+			}
+			pt.x++;
+		}
+		pt.y++;
+	}
+}
+
 void	set_map_object_add(t_game *game, char chr, unsigned type, t_upoint pt)
 {
 	t_list		*obj_list;
@@ -59,32 +85,6 @@ void	set_map_object_add(t_game *game, char chr, unsigned type, t_upoint pt)
 	if ((obj_list = ft_lstnew(obj)) == NULL)
 		terminate(game, ERR_MEM, "Memory allocation failed (obj_list)");
 	ft_lstadd_front(&game->objects, obj_list);
-}
-
-void	set_map_process(t_game *game)
-{
-	t_upoint	pt;
-	const char	*obj_chars = CHAR_OBJECTS;
-	char		*chr;
-
-	pt.y = 0;
-	while (pt.y < game->map.size.y)
-	{
-		pt.x = 0;
-		while (pt.x < game->map.size.x)
-		{
-			set_map_check_cell(game, game->map.grid, pt);
-			if ((chr = ft_strchr(obj_chars, game->map.grid[pt.y][pt.x])))
-			{
-				if (*chr == 'n' || *chr == 's' || *chr == 'w' || *chr == 'e')
-					set_map_object_add(game, *chr, sizeof(obj_chars) - 3, pt);
-				else
-					set_map_object_add(game, *chr, chr - obj_chars, pt);
-			}
-			pt.x++;
-		}
-		pt.y++;
-	}
 }
 
 void	set_map_check_cell(t_game *game, char **map, t_upoint pt)

@@ -41,7 +41,7 @@ void		ray_intersect(t_game *game, double cur_angle, unsigned ray)
 	t_fpoint		distance;
 	const double	tan_cur_angle = tan(cur_angle);
 
-	x1 = (cur_angle < M_PI_2 || cur_angle > 3 * M_PI_2) ?
+	x1 = (cur_angle <= M_PI_2 || cur_angle > 3 * M_PI_2) ?
 		 ray_intersect_x(game, (t_fpoint){1, tan_cur_angle}) :
 		 ray_intersect_x(game, (t_fpoint){-1, -tan_cur_angle});
 	y1 = (cur_angle <= M_PI) ?

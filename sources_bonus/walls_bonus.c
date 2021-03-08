@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:35 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/07 17:54:08 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/08 16:51:18 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	draw_walls(t_game *game)
 		texture_id = game->map.grid[(int)game->column[ray]->cell.y]
 									[(int)game->column[ray]->cell.x] - '0';
 		if (game->column[ray]->dir == 'W' || game->column[ray]->dir == 'E')
-			fade /= 2;
+			fade /= 1.5;
 		draw_wall_scaled(game, &game->texture[texture_id], ray, fade);
 		ray++;
 	}

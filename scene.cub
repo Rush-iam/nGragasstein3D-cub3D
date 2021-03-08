@@ -1,10 +1,10 @@
 R 2400 1200
 NO ./resources/wall_0.xpm
-SO ./resources/wall_1.xpm
-WE ./resources/wall_2.xpm
-EA ./resources/wall_9.xpm
+SO ./resources/wall_3.xpm
+WE ./resources/wall_6.xpm
+EA ./resources/wall_10.xpm
 
-S ./resources/sprite_3.xpm
+S ./resources/sprite_2.xpm
 C 30  ,  20,10
 F 80,60,30
 
@@ -13,7 +13,7 @@ F 80,60,30
         1011022222222222222222221
         1011022222222222222222221
         1011022222222222222222221
-        1011E22222222222222222221
+        1011N22222222222222222221
         1011022222222222222222221
         1011022222222222222222221
         1001022222222222222222221

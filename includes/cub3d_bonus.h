@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/07 20:47:03 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/08 18:00:07 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,10 @@
 # define MAX_WIN	(t_upoint){2560, 1440}
 # define MAX_SCR	(t_upoint){20000, 20000}
 # define MIN_RES_X	2
+
+# define MASK_R 0xFF0000
+# define MASK_G 0xFF00
+# define MASK_B 0xFF
 
 # define PI2	(2 * M_PI)
 
@@ -57,7 +61,7 @@
 # define PL_RADIUS		0.3
 # define MAP_CELL_FIX	0.0000001
 # define MOUSE_SPEED	2000.
-# define MAP_SCALE		16
+# define MAP_SCALE		8
 
 typedef struct	s_point
 {
@@ -91,8 +95,8 @@ typedef struct	s_sprite
 	unsigned	frames;
 }				t_sprite;
 
-# define CHAR_DECOR		"/"
-# define CHAR_PICKUP	"HhAaK"
+# define CHAR_DECOR		"*#-_`"
+# define CHAR_PICKUP	"Hha"
 # define CHAR_ENEMY		"nswe"
 # define CHAR_SOLID		"/nswe"
 # define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP CHAR_ENEMY
@@ -111,9 +115,7 @@ typedef struct	s_object
 		T_DECOR = 0,
 		T_PICKUP_HEALTH_LARGE,
 		T_PICKUP_HEALTH_MED,
-		T_PICKUP_AMMO_MED,
-		T_PICKUP_AMMO_SMALL,
-		T_PICKUP_KEY,
+		T_PICKUP_AMMO,
 		T_ENEMY
 	}			type;
 	struct		s_enemy
@@ -174,8 +176,8 @@ typedef struct	s_game
 	}			**column;
 	unsigned	color_ceil;
 	unsigned	color_floor;
-	t_img		texture[4];
-	t_sprite	sprite[7];
+	t_img		texture[10];
+	t_sprite	sprite[10];
 	t_list		*objects;
 }				t_game;
 
@@ -199,6 +201,8 @@ void			set_textures_import(char *string, t_img *texture, t_game *game);
 
 void			set_map				(t_game *game, t_list *map);
 void			set_map_process		(t_game *game);
+void			set_map_object_add(t_game *game, char chr, unsigned type,
+											t_upoint pt);
 void			set_map_check_cell	(t_game *game, char **map, t_upoint pt);
 
 int				hook_key_press		(int key_code, t_game *game);
@@ -228,6 +232,7 @@ void			fizzlefade				(t_img *img, int color);
 
 void			pixel_put	(t_img *img, unsigned x, unsigned y, int color);
 int				pixel_fade	(int color, double fade);
+int				pixel_shadow_fade(int color, double fade);
 void			draw_line	(t_img *img, t_point p1, t_point p2, int color);
 void			draw_square	(t_img *img, t_point center, int size, int color);
 void			draw_4pts	(t_img *img, t_point *pts, int color);
