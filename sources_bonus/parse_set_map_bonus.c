@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:49 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/08 18:06:22 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/08 22:02:43 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	set_map_process(t_game *game)
 			if ((chr = ft_strchr(obj_chars, game->map.grid[pt.y][pt.x])))
 			{
 				if (*chr == 'n' || *chr == 's' || *chr == 'w' || *chr == 'e')
-					set_map_object_add(game, *chr, sizeof(obj_chars) - 4, pt);
+					set_map_object_add(game, *chr, sizeof(obj_chars) - 5, pt);
 				else
 					set_map_object_add(game, *chr, chr - obj_chars, pt);
 			}
@@ -72,9 +72,8 @@ void	set_map_object_add(t_game *game, char chr, unsigned type, t_upoint pt)
 		terminate(game, ERR_MEM, "Memory allocation failed (object)");
 	obj->pos = (t_fpoint){pt.x + 0.5, pt.y + 0.5};
 	obj->sprite = &game->sprite[type];
-	obj->type = type;
-	if (ft_strchr(CHAR_SOLID, chr))
-		obj->solid = true;
+	if (type > sizeof(CHAR_DECOR) - 2)
+		obj->type = type - (sizeof(CHAR_DECOR) - 2);
 	if (obj->type == T_ENEMY)
 	{
 		obj->angle = M_PI_2 * (ft_strchr(dirs, chr) - dirs);

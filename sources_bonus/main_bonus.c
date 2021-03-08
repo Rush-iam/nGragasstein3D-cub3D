@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/07 15:27:54 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/08 23:14:21 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,10 @@ void	initialize_game_2(t_game *game)
 	game->win_center = (t_upoint){game->img.size.x / 2, game->img.size.y / 2};
 	mlx_mouse_move(game->win, game->win_center.x, game->win_center.y);
 	set_fov(game, 0, true);
+	game->p.health = 100;
+	game->p.ammo = 8;
+	game->p.weapon_cur = WEAPON_PISTOL;
+	game->p.weapons = WEAPON_KNIFE | WEAPON_PISTOL;
 	cur_list = game->objects;
 	while (cur_list)
 	{
@@ -108,7 +112,7 @@ int	game_loop(t_game *game)
 		ray_cast(game);
 	img_ceilfloor_fill_rgb(&game->img, game->color_ceil, game->color_floor);
 	draw_walls(game);
-	draw_objects(game);
+	objects(game);
 
 //	demo_cursor(game, 0xFF88FF);
 //	demo_fillrate(game, 1);

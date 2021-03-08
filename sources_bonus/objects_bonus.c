@@ -6,18 +6,13 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:03 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/07 17:49:46 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/08 23:34:29 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
 
-int		objects_sort(t_object *obj1, t_object *obj2)
-{
-	return (obj1->distance < obj2->distance);
-}
-
-void	draw_objects(t_game *game)
+void	objects(t_game *game)
 {
 	t_list		*cur_list;
 	t_object	*obj;
@@ -29,10 +24,8 @@ void	draw_objects(t_game *game)
 	while (cur_list)
 	{
 		obj = (t_object *)cur_list->content;
-		diff = (t_fpoint){obj->pos.x - game->p.pos.x,
-						obj->pos.y - game->p.pos.y};
-		if ((obj->distance = game->p.vector.x * diff.x +
-							 game->p.vector.y * diff.y) > 0.01)
+		diff = (t_fpoint){obj->pos.x - game->p.pos.x, obj->pos.y - game->p.pos.y};
+		if ((obj->distance = game->p.vector.x * diff.x + game->p.vector.y * diff.y) > 0.1)
 		{
 			angle = atan2(diff.y, diff.x);
 			if (fabs(game->p.angle - angle - PI2) <= M_PI)
@@ -41,60 +34,62 @@ void	draw_objects(t_game *game)
 			if (fabs(angle) < game->fov + M_PI_4)
 				draw_sprite(game, obj, angle);
 		}
-		cur_list = cur_list->next;
+		if ((obj->distance_real = hypot(diff.x, diff.y)) < 0.5)
+			cur_list = object_pickup(game, cur_list, obj->type);
+		else
+			cur_list = cur_list->next;
 	}
 }
 
-void	draw_sprite(t_game *game, t_object *obj, double angle)
+int		objects_sort(t_object *obj1, t_object *obj2)
 {
-	int	start_x;
-	int	cur_x;
-	int	max_x;
-
-	obj->size.x = game->col_scale / obj->distance;
-	obj->size.y = obj->size.x * obj->sprite->img.aspect;
-	start_x = game->col_center + tan(angle) / game->col_step - obj->size.x / 2;
-	cur_x = start_x;
-	max_x = cur_x + obj->size.x;
-	if (cur_x < 0)
-		cur_x = 0;
-	if (max_x >= (int)game->img.size.x)
-		max_x = (int)game->img.size.x;
-	while (cur_x < max_x)
-	{
-		if (obj->distance < game->column[cur_x]->distance)
-			draw_sprite_scaled(&game->img, obj, cur_x, (cur_x - start_x) /
-				((double)obj->size.x / obj->sprite->img.size.x));
-		cur_x++;
-	}
+	return (obj1->distance < obj2->distance);
 }
 
-void	draw_sprite_scaled(t_img *img, t_object *obj, unsigned x,
-																unsigned src_x)
+t_list	*object_pickup(t_game *game, t_list *cur_list, enum e_objtype type)
 {
-	const double	step = (double)obj->sprite->img.size.y / obj->size.y;
-	int				y;
-	double			src_y;
-	int				max_height;
-	int				src_pixel;
+	const t_list	*next = cur_list->next;
 
-	if (obj->size.y > img->size.y)
+	if (type == T_DECOR || type == T_ENEMY)
+		return ((t_list *)next);
+	if (type == T_AMMO && game->p.ammo >= 99)
+		return ((t_list *)next);
+	if ((type == T_HEALTH_M || type == T_HEALTH_L) && game->p.health >= 100)
+		return ((t_list *)next);
+	object_pickup_add(game, type);
+	if (game->p.ammo > 99)
+		game->p.ammo = 99;
+	else if (game->p.health > 100 && (type == T_HEALTH_L || type == T_HEALTH_M))
+		game->p.health = 100;
+	printf("UP type: %u. Health = %hd; Ammo = %hd; Score = %hd\n", type,
+		   game->p.health, game->p.ammo, game->p.score);
+	ft_lstremove(&game->objects, cur_list);
+	return ((t_list *)next);
+}
+
+void	object_pickup_add(t_game *game, enum e_objtype type)
+{
+	if (type == T_HEALTH_L)
+		game->p.health += VAL_HEALTH_L;
+	else if (type == T_HEALTH_M)
+		game->p.health += VAL_HEALTH_M;
+	else if (type == T_HEALTH_XL)
+		game->p.health = VAL_HEALTH_XL;
+	else if (type == T_AMMO)
+		game->p.ammo += VAL_AMMO_M;
+	else if (type == T_AMMO_ENEMY)
+		game->p.ammo += VAL_AMMO_S;
+	else if (type == T_RIFLE)
 	{
-		src_y = step * (obj->size.y - img->size.y) / 2;
-		y = -1;
-		max_height = img->size.y;
+		game->p.ammo += VAL_AMMO_M;
+		game->p.weapons |= WEAPON_RIFLE;
 	}
-	else
-	{
-		src_y = 0;
-		y = -1 + (img->size.y - obj->size.y) / 2;
-		max_height = y + obj->size.y;
-	}
-	while (++y < max_height)
-	{
-		if (((src_pixel = obj->sprite->img.data[(unsigned)src_y *
-						obj->sprite->img.size.x + src_x]) & 0xFF000000) == 0)
-			img->data[y * img->size.x + x] = src_pixel;
-		src_y += step;
-	}
+	else if (type == T_BONUS_XL)
+		game->p.score += VAL_SCORE_XL;
+	else if (type == T_BONUS_L)
+		game->p.score += VAL_SCORE_L;
+	else if (type == T_BONUS_M)
+		game->p.score += VAL_SCORE_M;
+	else if (type == T_BONUS_S)
+		game->p.score += VAL_SCORE_S;
 }

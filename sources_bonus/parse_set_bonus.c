@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:55 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/07 17:49:46 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/08 19:15:43 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,29 +56,27 @@ void	set_colors(const char *color_string, unsigned *target, t_game *game)
 
 void	set_textures(char *string, t_game *game)
 {
-	const unsigned	id = string[1] - '0';
+	unsigned	id;
 
 	if (*string == 'W')
 	{
+		if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
+			terminate(game, ERR_PARSE, "Wall ID is wrong");
 		if (id >= sizeof(game->texture) / sizeof(*game->texture))
 			terminate(game, ERR_PARSE, "Texture ID out of array range");
 		if (game->texture[id].ptr != NULL)
 			terminate(game, ERR_PARSE, "Duplicated texture setting");
-		string += 2;
-		while (*string == ' ')
-			string++;
 		set_textures_import(string, &game->texture[id], game);
 	}
 	else if (*string == 'S')
 	{
+		if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
+			terminate(game, ERR_PARSE, "Sprite ID is wrong");
 		if (id >= sizeof(game->sprite) / sizeof(*game->sprite))
 			terminate(game, ERR_PARSE, "Sprite ID out of array range");
-		if (game->sprite[id].img.ptr != NULL)
+		if (game->sprite[id].ptr != NULL)
 			terminate(game, ERR_PARSE, "Duplicated sprite setting");
-		string += 2;
-		while (*string == ' ')
-			string++;
-		set_textures_import(string, &game->sprite[id].img, game);
+		set_textures_import(string, &game->sprite[id], game);
 	}
 }
 

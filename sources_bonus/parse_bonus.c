@@ -112,6 +112,6 @@ void	validate_settings(t_game *game)
 			terminate(game, ERR_PARSE, "Missing wall texture");
 	i = 0;
 	while (i < sizeof(game->sprite) / sizeof(*game->sprite))
-		if (game->sprite[i++].img.ptr == NULL)
+		if (game->sprite[i++].ptr == NULL)
 			terminate(game, ERR_PARSE, "Missing sprite");
 }

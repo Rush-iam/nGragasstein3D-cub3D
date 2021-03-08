@@ -6,7 +6,7 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/03/08 18:03:08 by ngragas          ###   ########.fr        #
+#    Updated: 2021/03/08 23:30:50 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,9 @@ SRC_BONUS :=	demo_tools		\
 				draw_figures	\
 				draw_fills		\
 				draw_map		\
+				draw_sprite		\
 				hooks			\
+				terminate
 
 SRC_DIR := sources/
 INC_DIR = includes/

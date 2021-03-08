@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:41 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 22:23:52 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/08 23:28:56 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,60 +36,6 @@ char	*atoi_limited(unsigned *dst_int, const char *src_string, unsigned limit)
 	return ((char *)src_string);
 }
 
-int		terminate(t_game *game, int return_value, char *message)
-{
-	if (return_value)
-	{
-		ft_putendl_fd("Error", 2);
-		ft_putendl_fd(message, 2);
-		if (return_value == ERR_MLX)
-			ft_putendl_fd("MLX/X11 crashed", 2);
-		else if (return_value == ERR_PARSE)
-			ft_putendl_fd("Plese fix scene file", 2);
-		else if (return_value == ERR_ARGS)
-			ft_putendl_fd("Usage: ./cub3D scene_name.cub [--save]", 2);
-		else if (return_value == ERR_BMP)
-			ft_putendl_fd("Unable to save screenshot", 2);
-	}
-	terminate_free(game);
-	if (game->map.img.ptr)
-		mlx_destroy_image(game->mlx, game->map.img.ptr); //
-	if (game->img.ptr)
-		mlx_destroy_image(game->mlx, game->img.ptr);
-	if (game->win)
-		mlx_destroy_window(game->mlx, game->win);
-	free(game->mlx);
-	exit(return_value);
-}
-
-void	terminate_free(t_game *game)
-{
-	unsigned	i;
-
-	ft_lstclear(&game->objects, free);
-	if (game->column)
-	{
-		i = 0;
-		while (i < game->img.size.x)
-			free(game->column[i++]);
-		free(game->column);
-	}
-	if (game->map.grid)
-	{
-		i = 0;
-		while (i < game->map.size.y)
-			free(game->map.grid[i++]);
-		free(game->map.grid);
-	}
-	i = 0;
-	while (i < sizeof(game->texture) / sizeof(t_img))
-	{
-		if (game->texture[i].ptr)
-			mlx_destroy_image(game->mlx, game->texture[i].ptr);
-		i++;
-	}
-}
-
 void	write_screenshot_and_exit(t_game *game)
 {
 	int				file_id;
@@ -99,7 +45,7 @@ void	write_screenshot_and_exit(t_game *game)
 	img_ceilfloor_fill_rgb(&game->img, game->color_ceil, game->color_floor);
 	ray_cast(game);
 	draw_walls(game);
-	draw_objects(game);
+	objects(game);
 	if ((file_id = open("shot.bmp", O_WRONLY | O_CREAT | O_TRUNC)) == -1)
 		terminate(game, ERR_BMP, strerror(errno));
 	ft_memcpy(header, "BM", 2);

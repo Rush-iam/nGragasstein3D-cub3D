@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/08 18:00:07 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/08 23:36:38 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@
 # define FOV_RESET		KEY_NUMASTERISK
 # define FOV_ZOOMSPEED	1.03
 
-# define PL_SPEED		0.07
+# define PL_SPEED		0.1
 # define PL_RADIUS		0.3
 # define MAP_CELL_FIX	0.0000001
 # define MOUSE_SPEED	2000.
@@ -89,34 +89,55 @@ typedef struct	s_img
 	double		aspect;
 }				t_img;
 
-typedef struct	s_sprite
+typedef struct	s_spriteset
 {
 	t_img		img;
 	unsigned	frames;
-}				t_sprite;
+}				t_spriteset;
 
-# define CHAR_DECOR		"*#-_`"
-# define CHAR_PICKUP	"Hha"
+# define CHAR_DECOR		"^*$:;,@%#&|{}_<`"
+# define CHAR_PICKUP	"+HhAaZzXx"
 # define CHAR_ENEMY		"nswe"
-# define CHAR_SOLID		"/nswe"
+# define CHAR_SOLID		"$:;,@%#&|"
 # define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP CHAR_ENEMY
 # define CHAR_ALLOWED	" .0123456789NSWE" CHAR_OBJECTS
 
+# define VAL_HEALTH_XL	200
+# define VAL_HEALTH_L	25
+# define VAL_HEALTH_M	10
+# define VAL_AMMO_M		8
+# define VAL_AMMO_S		4
+# define VAL_SCORE_XL	5000
+# define VAL_SCORE_L	1000
+# define VAL_SCORE_M	500
+# define VAL_SCORE_S	100
+# define VAL_SCORE_KILL	100
+# define WEAPON_KNIFE	0b001
+# define WEAPON_PISTOL	0b010
+# define WEAPON_RIFLE	0b100
+
 typedef struct	s_object
 {
-	t_sprite	*sprite;
+	t_img		*sprite;
 	t_fpoint	pos;
 	double		angle;
 	t_upoint	size;
 	double		distance;
-	bool		solid;
+	double		distance_real;
 	enum		e_objtype
 	{
 		T_DECOR = 0,
-		T_PICKUP_HEALTH_LARGE,
-		T_PICKUP_HEALTH_MED,
-		T_PICKUP_AMMO,
-		T_ENEMY
+		T_HEALTH_XL,
+		T_HEALTH_L,
+		T_HEALTH_M,
+		T_RIFLE,
+		T_AMMO,
+		T_BONUS_XL,
+		T_BONUS_L,
+		T_BONUS_M,
+		T_BONUS_S,
+		T_ENEMY,
+		T_AMMO_ENEMY
 	}			type;
 	struct		s_enemy
 	{
@@ -146,6 +167,11 @@ typedef struct	s_game
 		t_fpoint	pos;
 		double		angle;
 		t_fpoint	vector;
+		short		health;
+		short		ammo;
+		short		score;
+		short		weapon_cur;
+		short		weapons;
 	}			p;
 	struct		s_key
 	{
@@ -177,7 +203,7 @@ typedef struct	s_game
 	unsigned	color_ceil;
 	unsigned	color_floor;
 	t_img		texture[10];
-	t_sprite	sprite[10];
+	t_img		sprite[sizeof(CHAR_OBJECTS) - 4];
 	t_list		*objects;
 }				t_game;
 
@@ -247,18 +273,23 @@ void			draw_wall_scaled(t_game *game, t_img *src, unsigned x,
 						double fade);
 void			draw_wall_solid	(t_game *game, unsigned x, double fade);
 
-void			draw_objects		(t_game *game);
+void			objects				(t_game *game);
 int				objects_sort		(t_object *obj1, t_object *obj2);
+t_list			*object_pickup(t_game *game, t_list *cur_list,
+												enum e_objtype type);
+void			object_pickup_add(t_game *game, enum e_objtype type);
 void			draw_sprite			(t_game *game, t_object *obj, double angle);
 void			draw_sprite_scaled	(t_img *img, t_object *obj, unsigned x,
 																unsigned src_x);
 
 char			*atoi_limited	(unsigned *dst_int, const char *src_string,
 															unsigned limit);
-int				terminate		(t_game *game, int return_value, char *message);
-void			terminate_free	(t_game *game);
 void			write_screenshot_and_exit	(t_game *game);
 void			write_screenshot_data	(t_game *game, int file_id);
+
+int				terminate		(t_game *game, int return_value, char *message);
+void			terminate_free	(t_game *game);
+void			terminate_free_object(void *object);
 
 void			demo_fillrate	(t_game *mlx, int step);
 void			demo_radar		(t_game *mlx, int rays);
