@@ -16,26 +16,27 @@ S2 ./resources/sprites/lamp_stand.png
 S3 ./resources/sprites/plant_green.png
 S4 ./resources/sprites/plant_dry.png
 S5 ./resources/sprites/vase.png
-S6 ./resources/sprites/barrel_brown.png
-S7 ./resources/sprites/barrel_green.png
-S8 ./resources/sprites/table.png
-S9 ./resources/sprites/table_chairs.png
-S10 ./resources/sprites/statue.png
-S11 ./resources/sprites/skeleton.png
-S12 ./resources/sprites/bones.png
-S13 ./resources/sprites/puddle.png
-S14 ./resources/sprites/pot.png
-S15 ./resources/sprites/guard_dead.png
-S16 ./resources/sprites/health_xl.png
-S17 ./resources/sprites/health_l.png
-S18 ./resources/sprites/health_m.png
-S19 ./resources/sprites/gun_rifle.png
-S20 ./resources/sprites/ammo.png
-S21 ./resources/sprites/bonus_xl.png
-S22 ./resources/sprites/bonus_l.png
-S23 ./resources/sprites/bonus_m.png
-S24 ./resources/sprites/bonus_s.png
-S25 ./resources/sprite_2.xpm
+S6 ./resources/sprites/flag.png
+S7 ./resources/sprites/barrel_brown.png
+S8 ./resources/sprites/barrel_green.png
+S9 ./resources/sprites/table.png
+S10 ./resources/sprites/table_chairs.png
+S11 ./resources/sprites/statue.png
+S12 ./resources/sprites/skeleton.png
+S13 ./resources/sprites/bones.png
+S14 ./resources/sprites/puddle.png
+S15 ./resources/sprites/pot.png
+S16 ./resources/sprites/guard_dead.png
+S17 ./resources/sprites/health_xl.png
+S18 ./resources/sprites/health_l.png
+S19 ./resources/sprites/health_m.png
+S20 ./resources/sprites/gun_rifle.png
+S21 ./resources/sprites/ammo.png
+S22 ./resources/sprites/bonus_xl.png
+S23 ./resources/sprites/bonus_l.png
+S24 ./resources/sprites/bonus_m.png
+S25 ./resources/sprites/bonus_s.png
+S26 ./resources/sprite_2.xpm
 
 C 56,56,56
 F 112,112,112
@@ -50,7 +51,7 @@ F 112,112,112
      6.xX:.:X..6 6...6      3.............3
      8.$...x.$s866...666    3334333.3334333
      6..e......6...n...6         3...3
-     6....&.s......^...6         3.s.3
+     6!...&.s......^...6         3.s.3
      6.........6.....n.6         5.^.5
 666668z$e....$.866696666         3...3
 6.H@66zz......n6                 3...3

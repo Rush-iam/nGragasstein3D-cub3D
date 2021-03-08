@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/08 23:50:54 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/08 23:54:07 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,6 @@
 # define MAX_WIN	(t_upoint){2560, 1440}
 # define MAX_SCR	(t_upoint){20000, 20000}
 # define MIN_RES_X	2
-
-# define MASK_R 0xFF0000
-# define MASK_G 0xFF00
-# define MASK_B 0xFF
 
 # define PI2	(2 * M_PI)
 
@@ -98,10 +94,10 @@ typedef struct	s_spriteset
 	unsigned	frames;
 }				t_spriteset;
 
-# define CHAR_DECOR		"^*$:;,@%#&|{}_<`"
+# define CHAR_DECOR		"^*$:;,!@%#&|{}_<`"
 # define CHAR_PICKUP	"+HhAaZzXx"
 # define CHAR_ENEMY		"nswe"
-# define CHAR_SOLID		"$:;,@%#&|"
+# define CHAR_SOLID		"$:;,!@%#&|"
 # define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP CHAR_ENEMY
 # define CHAR_ALLOWED	" .0123456789NSWE" CHAR_OBJECTS
 
