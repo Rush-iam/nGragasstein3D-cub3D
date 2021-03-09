@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:03 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/08 23:34:29 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/09 22:32:55 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ t_list	*object_pickup(t_game *game, t_list *cur_list, enum e_objtype type)
 		game->p.health = 100;
 	printf("UP type: %u. Health = %hd; Ammo = %hd; Score = %hd\n", type,
 		   game->p.health, game->p.ammo, game->p.score);
+	game->effect = (struct s_effect){30, 15, EF_FLASH, COLOR_YELLOW, .2};
 	ft_lstremove(&game->objects, cur_list);
 	return ((t_list *)next);
 }

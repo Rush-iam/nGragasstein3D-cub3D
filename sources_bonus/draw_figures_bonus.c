@@ -21,8 +21,8 @@ void	pixel_put(t_img *img, unsigned x, unsigned y, int color)
 
 int		pixel_fade(int color, double fade)
 {
-	return (((int)((color & 0xFF0000) * fade) & 0xFF0000) +
-			((int)((color & 0xFF00) * fade) & 0xFF00) +
+	return (((int)((color & 0xFF0000) * fade) & 0xFF0000) |
+			((int)((color & 0xFF00) * fade) & 0xFF00) |
 			(int)((color & 0xFF) * fade));
 }
 

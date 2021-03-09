@@ -6,12 +6,12 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/03/08 23:30:50 by ngragas          ###   ########.fr        #
+#    Updated: 2021/03/09 20:37:22 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME 	= 	cub3D
-CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g -Ofast -march=native
+CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g #-Ofast -march=native
 SRC    :=		main			\
 				control			\
 				objects			\
@@ -34,12 +34,6 @@ SRC_DIR := sources/
 INC_DIR = includes/
 OBJ_DIR = objects/
 SRC_BONUS_DIR = sources_bonus/
-
-# DELETE ME
-#	SRC_DIR := $(SRC_BONUS_DIR)
-#	SRC += $(SRC_BONUS)
-#	SRC := $(addsuffix _bonus, $(SRC))
-# DELETE ME
 
 ifeq ($(filter bonus, $(MAKECMDGOALS)), bonus)
 	SWITCH_CLEAN := $(addsuffix .o, $(SRC))

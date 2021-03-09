@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/08 23:14:21 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/09 22:32:04 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,12 @@ void	initialize_game(t_game *game, bool screenshot)
 			game->mlx, game->img.size.x, game->img.size.y)))
 		terminate(game, ERR_MLX, strerror(errno));
 	game->img.data = (unsigned *)mlx_get_data_addr(game->img.ptr, &n, &n, &n);
+	if (!(game->effect_img.ptr = mlx_new_image(
+			game->mlx, game->img.size.x, game->img.size.y)))
+		terminate(game, ERR_MLX, strerror(errno));
+	game->effect_img.data = (unsigned *)mlx_get_data_addr(game->effect_img.ptr,
+																	&n, &n, &n);
+	game->effect_img.size = game->img.size;
 	if (!(game->column = malloc(sizeof(struct s_column *) * game->img.size.x)))
 		terminate(game, ERR_MEM, "Memory allocation failed (ray columns)");
 	n = 0;
@@ -102,28 +108,58 @@ void	set_fov(t_game *game, double fov, bool reset)
 		game->fov = fov;
 }
 
+void	effect_flash(t_game *game, unsigned color, float power)
+{
+	img_clear_rgb(&game->effect_img, color | ((int)(255 - 255. * power) << 24));
+	mlx_put_image_to_window(game->mlx, game->win, game->effect_img.ptr, 0, 0);
+}
+
+void	draw_effect(t_game *game, struct s_effect *ef)
+{
+	float	power;
+
+	if (ef->frame_cur < ef->frames)
+	{
+		ef->frame_cur += game->tick_diff;
+		if (ef->frame_cur >= ef->frames)
+			ef->frame_cur = ef->frames - 1;
+		power = (float)ef->frame_cur / (ef->frames / 2.);
+		if (power > 1)
+			power = 2 - power;
+		if (ef->type == EF_FLASH)
+			effect_flash(game, game->effect.color, power * ef->max_power);
+	}
+}
+
 int	game_loop(t_game *game)
 {
-	static clock_t	tick;
-	char			*fps;
+	static clock_t			clock_cur;
+	static struct timespec	time;
+	static unsigned			tick_prev;
+	char					*fps;
 
+	clock_gettime(CLOCK_MONOTONIC, &time);
+	tick_prev = game->tick;
+	game->tick = 60 * time.tv_sec + 60 * time.tv_nsec / NANSECS_PER_SEC;
+	game->tick_diff = game->tick - tick_prev;
+	printf("tick: %u\n", game->tick);
 	player_control(game);
 //	for (int i = 0; i < 500; ++i)
 		ray_cast(game);
-	img_ceilfloor_fill_rgb(&game->img, game->color_ceil, game->color_floor);
+	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
 	draw_walls(game);
 	objects(game);
+	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
+	draw_effect(game, &game->effect);
+	draw_map(game);
 
 //	demo_cursor(game, 0xFF88FF);
 //	demo_fillrate(game, 1);
-	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
-	draw_map(game);
-
 //	fizzlefade(&game->img, 0xFF0000);
 //	demo_radar(game, 360);
 //	printf("FPS: %lu\n", CLOCKS_PER_SEC / (clock() - tick));
-	fps = ft_itoa(CLOCKS_PER_SEC / (clock() - tick));
-	tick = clock();
+	fps = ft_itoa(CLOCKS_PER_SEC / (clock() - clock_cur));
+	clock_cur = clock();
 	mlx_string_put(game->mlx, game->win, 0, 10, 0xFFFFFF, fps);
 	free(fps);
 

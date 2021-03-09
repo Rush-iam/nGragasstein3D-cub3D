@@ -42,7 +42,7 @@ void	write_screenshot_and_exit(t_game *game)
 	char			header[26];
 	const unsigned	filesize = 26 + 3 * game->img.size.x * game->img.size.y;
 
-	img_ceilfloor_fill_rgb(&game->img, game->color_ceil, game->color_floor);
+	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
 	ray_cast(game);
 	draw_walls(game);
 	objects(game);

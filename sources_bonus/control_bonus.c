@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/08 20:01:10 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/09 18:36:45 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,18 @@
 
 void	player_control(t_game *game)
 {
+	player_control_rotate(game);
 	player_control_move(game);
 	player_control_extra(game);
 	player_control_borders(game);
-	__sincos(game->p.angle, &game->p.vector.y, &game->p.vector.x);
 }
 
-void	player_control_move(t_game *game)
+void	player_control_rotate(t_game *game)
 {
 	mlx_mouse_get_pos(game->win, &game->key.mpos.x, &game->key.mpos.y);
 	mlx_mouse_move(game->win, game->win_center.x, game->win_center.y);
 	game->key.mdir.x = game->key.mdir.x / 2 + game->key.mpos.x -
-															game->win_center.x;
+					   game->win_center.x;
 	game->p.angle += game->key.mdir.x / MOUSE_SPEED;
 	if (game->key.k[TURN_LEFT])
 		game->p.angle -= PL_SPEED / 3;
@@ -33,20 +33,29 @@ void	player_control_move(t_game *game)
 		game->p.angle += PL_SPEED / 3;
 	if (game->p.angle > PI2)
 		game->p.angle -= PI2;
-	if (game->p.angle < 0)
+	else if (game->p.angle < 0)
 		game->p.angle += PI2;
+	__sincos(game->p.angle, &game->p.vector.y, &game->p.vector.x);
+}
+
+void	player_control_move(t_game *game)
+{
 	if (game->key.k[MOVE_FORWARD])
-		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.vector.x,
-								 game->p.pos.y + PL_SPEED * game->p.vector.y};
+		game->p.pos = (t_fpoint){
+		game->p.pos.x + (game->key.k[RUN] + 1) * PL_SPEED * game->p.vector.x,
+		game->p.pos.y + (game->key.k[RUN] + 1) * PL_SPEED * game->p.vector.y};
 	if (game->key.k[MOVE_BACK])
-		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vector.x,
-								 game->p.pos.y - PL_SPEED * game->p.vector.y};
+		game->p.pos = (t_fpoint){
+	game->p.pos.x - (game->key.k[RUN] + 1) * PL_SPEED / 1.5 * game->p.vector.x,
+	game->p.pos.y - (game->key.k[RUN] + 1) * PL_SPEED / 1.5 * game->p.vector.y};
 	if (game->key.k[MOVE_LEFT])
-		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.vector.y,
-								 game->p.pos.y - PL_SPEED * game->p.vector.x};
+		game->p.pos = (t_fpoint){
+		game->p.pos.x + (game->key.k[RUN] + 1) * PL_SPEED * game->p.vector.y,
+		game->p.pos.y - (game->key.k[RUN] + 1) * PL_SPEED * game->p.vector.x};
 	if (game->key.k[MOVE_RIGHT])
-		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vector.y,
-								 game->p.pos.y + PL_SPEED * game->p.vector.x};
+		game->p.pos = (t_fpoint){
+		game->p.pos.x - (game->key.k[RUN] + 1) * PL_SPEED * game->p.vector.y,
+		game->p.pos.y + (game->key.k[RUN] + 1) * PL_SPEED * game->p.vector.x};
 }
 
 void	player_control_toggler(t_game *game, int key_code)
@@ -64,6 +73,7 @@ void	player_control_extra(t_game *game)
 	if (game->key.k[FOV_RESET])
 		set_fov(game, 0, true);
 }
+
 
 void	player_control_borders(t_game *g)
 {

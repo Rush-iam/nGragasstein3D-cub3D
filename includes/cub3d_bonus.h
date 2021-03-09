@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/08 23:54:07 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/09 22:29:29 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,13 @@
 # include "get_next_line.h"
 # include "x_events.h"
 
-# define WIN_TITLE	"cub3D bonus by nGragas"
+# define WIN_TITLE	"nGragasstein 3D"
 # define MAX_WIN	(t_upoint){2560, 1440}
 # define MAX_SCR	(t_upoint){20000, 20000}
 # define MIN_RES_X	2
 
 # define PI2	(2 * M_PI)
+# define NANSECS_PER_SEC	1000000000
 
 # define ERR_MLX	1
 # define ERR_ARGS	2
@@ -45,18 +46,24 @@
 # define MOVE_RIGHT		KEY_D
 # define TURN_LEFT		KEY_LEFT
 # define TURN_RIGHT		KEY_RIGHT
+# define RUN			KEY_SHIFT_LEFT
+
+# define COLOR_YELLOW	0xFFFF00
+# define COLOR_GREEN	0x7AFF40
+# define COLOR_ORANGE	0xFF7A40
+# define COLOR_GREY		0x808080
 
 # define MAP_TOGGLE			KEY_M
-# define MAP_COLOR_DECOR	0x808080
-# define MAP_COLOR_ENEMY	0xFF7A40
-# define MAP_COLOR_PICKUP	0x7AFF40
+# define MAP_COLOR_DECOR	COLOR_GREY
+# define MAP_COLOR_ENEMY	COLOR_ORANGE
+# define MAP_COLOR_PICKUP	COLOR_GREEN
 
 # define FOV_WIDE		KEY_NUMMINUS
 # define FOV_TELE		KEY_NUMPLUS
 # define FOV_RESET		KEY_NUMASTERISK
 # define FOV_ZOOMSPEED	1.03
 
-# define PL_SPEED		0.1
+# define PL_SPEED		0.08
 # define PL_RADIUS		0.3
 # define MAP_CELL_FIX	0.0000001
 # define MOUSE_SPEED	2000.
@@ -161,6 +168,8 @@ typedef struct	s_game
 	void		*mlx;
 	void		*win;
 	t_img		img;
+	unsigned	tick;
+	unsigned	tick_diff;
 	struct		s_player
 	{
 		t_fpoint	pos;
@@ -204,6 +213,18 @@ typedef struct	s_game
 	t_img		texture[10];
 	t_img		sprite[sizeof(CHAR_OBJECTS) - 4];
 	t_list		*objects;
+	struct		s_effect
+	{
+		unsigned	frames;
+		unsigned	frame_cur;
+		enum	e_effect
+		{
+			EF_FLASH = 0
+		}		type;
+		unsigned	color;
+		float		max_power;
+	}			effect;
+	t_img		effect_img;
 }				t_game;
 
 void			initialize_game		(t_game *game, bool screenshot);
@@ -237,6 +258,7 @@ int				hook_mouse_release	(int btn, int x, int y, struct s_key *key);
 int				hook_exit			(t_game *game);
 
 void			player_control			(t_game *game);
+void			player_control_rotate	(t_game *game);
 void			player_control_move		(t_game *game);
 void			player_control_toggler	(t_game *game, int key_code);
 void			player_control_extra	(t_game *game);
@@ -249,11 +271,11 @@ t_fpoint		ray_intersect_x	(t_game *game, t_fpoint step);
 t_fpoint		ray_intersect_y	(t_game *game, t_fpoint step);
 
 void			img_clear				(t_img *img);
-void			img_clear_rgb			(t_img *img, int color);
-void			img_ceilfloor_fill		(t_img *img, unsigned char ceil,
+void			img_clear_rgb			(t_img *img, unsigned color);
+void			img_ceilfloor			(t_img *img, unsigned char ceil,
 										unsigned char floor);
-void			img_ceilfloor_fill_rgb	(t_img *img, int ceil, int floor);
-void			fizzlefade				(t_img *img, int color);
+void			img_ceilfloor_rgb	(t_img *img, unsigned ceil, unsigned floor);
+void			fizzlefade				(t_img *img, unsigned color);
 
 void			pixel_put	(t_img *img, unsigned x, unsigned y, int color);
 int				pixel_fade	(int color, double fade);

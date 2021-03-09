@@ -17,7 +17,7 @@ void	img_clear(t_img *img)
 	ft_bzero(img->data, 4 * img->size.x * img->size.y);
 }
 
-void	img_clear_rgb(t_img *img, int color)
+void	img_clear_rgb(t_img *img, unsigned color)
 {
 	const int	img_size = img->size.x * img->size.y;
 	int			i;
@@ -27,7 +27,7 @@ void	img_clear_rgb(t_img *img, int color)
 		img->data[i++] = color;
 }
 
-void	img_ceilfloor_fill(t_img *img, unsigned char ceil, unsigned char floor)
+void	img_ceilfloor(t_img *img, unsigned char ceil, unsigned char floor)
 {
 	const int	half_screen = img->size.x * img->size.y / 2;
 	const int	half_screen_bytes = half_screen * 4;
@@ -36,7 +36,7 @@ void	img_ceilfloor_fill(t_img *img, unsigned char ceil, unsigned char floor)
 	ft_memset(img->data + half_screen, floor, half_screen_bytes);
 }
 
-void	img_ceilfloor_fill_rgb(t_img *img, int ceil, int floor)
+void	img_ceilfloor_rgb(t_img *img, unsigned ceil, unsigned floor)
 {
 	const int	full_screen = img->size.x * img->size.y;
 	const int	half_screen = full_screen / 2;
@@ -49,7 +49,7 @@ void	img_ceilfloor_fill_rgb(t_img *img, int ceil, int floor)
 		img->data[i++] = floor;
 }
 
-void	fizzlefade(t_img *img, int color)
+void	fizzlefade(t_img *img, unsigned color)
 {
 	static unsigned	rndval = 1;
 	static int		frames;
