@@ -27,9 +27,9 @@ void		ray_cast(t_game *game)
 			angle -= PI2;
 		ray_intersect(game, angle, ray);
 		if (game->column[ray]->dir == 'N')
-			game->column[ray]->cell.y -= MAP_CELL_FIX;
+			game->column[ray]->cell.y -= FLOAT_FIX;
 		if (game->column[ray]->dir == 'W')
-			game->column[ray]->cell.x -= MAP_CELL_FIX;
+			game->column[ray]->cell.x -= FLOAT_FIX;
 		ray++;
 	}
 }

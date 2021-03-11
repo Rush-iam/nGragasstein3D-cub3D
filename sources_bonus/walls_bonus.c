@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:35 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/08 16:51:18 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/11 16:27:10 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,25 +15,25 @@
 void	draw_walls(t_game *game)
 {
 	unsigned	ray;
-	double		fade;
+	float		fade;
 	unsigned	texture_id;
 
 	ray = 0;
 	while (ray < game->img.size.x)
 	{
-		fade = 8. / game->column[ray]->distance;
+		fade = 8.f / game->column[ray]->distance;
 		if (fade > 1)
 			fade = 1;
+		if (game->column[ray]->dir == 'W' || game->column[ray]->dir == 'E')
+			fade /= 2;
 		texture_id = game->map.grid[(int)game->column[ray]->cell.y]
 									[(int)game->column[ray]->cell.x] - '0';
-		if (game->column[ray]->dir == 'W' || game->column[ray]->dir == 'E')
-			fade /= 1.5;
 		draw_wall_scaled(game, &game->texture[texture_id], ray, fade);
 		ray++;
 	}
 }
 
-void	draw_wall_scaled(t_game *game, t_img *src, unsigned x, double fade)
+void	draw_wall_scaled(t_game *game, t_img *src, unsigned x, float fade)
 {
 	const double	step = (double)src->size.y / game->column[x]->height;
 	const unsigned	src_x = game->column[x]->texture_pos * src->size.x;
@@ -62,7 +62,7 @@ void	draw_wall_scaled(t_game *game, t_img *src, unsigned x, double fade)
 	}
 }
 
-void	draw_wall_solid(t_game *game, unsigned x, double fade)
+void	draw_wall_solid(t_game *game, unsigned x, float fade)
 {
 	draw_line(&game->img,
 		(t_point){x, (game->img.size.y - game->column[x]->height) / 2},

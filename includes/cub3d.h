@@ -42,16 +42,16 @@
 # define WALL_E	3
 # define SPRITE 4
 
-# define MOVE_FORWARD	KEY_W
-# define MOVE_BACK		KEY_S
-# define MOVE_LEFT		KEY_A
-# define MOVE_RIGHT		KEY_D
-# define TURN_LEFT		KEY_LEFT
-# define TURN_RIGHT		KEY_RIGHT
+# define K_MOVE_FORWARD	KEY_W
+# define K_MOVE_BACK	KEY_S
+# define K_MOVE_LEFT	KEY_A
+# define K_MOVE_RIGHT	KEY_D
+# define K_TURN_LEFT	KEY_LEFT
+# define K_TURN_RIGHT	KEY_RIGHT
 
-# define FOV_WIDE	KEY_NUMMINUS
-# define FOV_TELE	KEY_NUMPLUS
-# define FOV_RESET	KEY_NUMASTERISK
+# define K_FOV_WIDE		KEY_NUMMINUS
+# define K_FOV_TELE		KEY_NUMPLUS
+# define K_FOV_RESET	KEY_NUMASTERISK
 
 # define PL_SPEED	0.05
 # define PI2		(2 * M_PI)
@@ -154,7 +154,7 @@ void			img_ceilfloor_fill_rgb	(t_img *img, int ceil, int floor);
 void			draw_walls				(t_game *game);
 void			draw_wall_scaled		(t_game *game, t_img *src, unsigned x);
 
-void			draw_objects		(t_game *game);
+void			draw_objects		(t_game *g);
 int				objects_sort		(t_object *obj1, t_object *obj2);
 void			draw_sprite			(t_game *game, t_object *obj, double angle);
 void			draw_sprite_scaled	(t_img *img, t_object *obj, unsigned x,

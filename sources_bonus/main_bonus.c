@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/09 22:32:04 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/11 23:48:54 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 
 int	main(int args, char *av[])
 {
-	t_game	game;
-	bool	screenshot_only;
+	t_game					game;
+	bool					screenshot_only;
+	static struct timespec	time;
 
 	errno = 0;
 	game = (t_game){0};
@@ -34,6 +35,8 @@ int	main(int args, char *av[])
 	mlx_hook(game.win, EVENT_BUTTONRELEASE, 0, hook_mouse_release, &game.key);
 	mlx_hook(game.win, EVENT_DESTROYNOTIFY, 0, hook_exit, &game);
 	mlx_loop_hook(game.mlx, game_loop, &game);
+	clock_gettime(CLOCK_MONOTONIC, &time);
+	game.tick = 60 * time.tv_sec + 60 * time.tv_nsec / NANSECS_PER_SEC;
 	mlx_loop(game.mlx);
 }
 
@@ -83,7 +86,8 @@ void	initialize_game_2(t_game *game)
 	set_fov(game, 0, true);
 	game->p.health = 100;
 	game->p.ammo = 8;
-	game->p.weapon_cur = WEAPON_PISTOL;
+	player_set_weapon(game, W_PISTOL);
+	game->p.weapon_cur = W_PISTOL;
 	game->p.weapons = WEAPON_KNIFE | WEAPON_PISTOL;
 	cur_list = game->objects;
 	while (cur_list)
@@ -95,40 +99,38 @@ void	initialize_game_2(t_game *game)
 	}
 }
 
-void	set_fov(t_game *game, double fov, bool reset)
+void	weapon_shoot(t_game *game)
 {
-	if (reset)
-		fov = ((game->img.aspect >= 1.77) - (game->img.aspect < 1.77)) *
-					sqrt(fabs(M_PI_4 * (game->img.aspect - 1.77) / 2)) + M_PI_2;
-	game->col_step = tan(fov / (game->img.size.x - 1));
-	game->col_center = (float)game->img.size.x / 2;
-	game->col_scale = 1 / game->col_step;
-	printf("Real FOV: %.0f\n", 114 * atan(game->col_step * game->col_center));
-	if (reset == true || (M_PI_4 / 4 < fov && fov < PI2))
-		game->fov = fov;
+	(void)game;
 }
 
-void	effect_flash(t_game *game, unsigned color, float power)
+void	weapon(t_game *game, struct s_weapon *weapon)
 {
-	img_clear_rgb(&game->effect_img, color | ((int)(255 - 255. * power) << 24));
-	mlx_put_image_to_window(game->mlx, game->win, game->effect_img.ptr, 0, 0);
-}
-
-void	draw_effect(t_game *game, struct s_effect *ef)
-{
-	float	power;
-
-	if (ef->frame_cur < ef->frames)
+	if (weapon->tick > 0)
 	{
-		ef->frame_cur += game->tick_diff;
-		if (ef->frame_cur >= ef->frames)
-			ef->frame_cur = ef->frames - 1;
-		power = (float)ef->frame_cur / (ef->frames / 2.);
-		if (power > 1)
-			power = 2 - power;
-		if (ef->type == EF_FLASH)
-			effect_flash(game, game->effect.color, power * ef->max_power);
+		if (++weapon->tick >= weapon->ticks)
+		{
+			weapon->tick = 0;
+			weapon->frame = 0;
+		}
+		weapon->frame = weapon->frames * weapon->tick / weapon->ticks;
+		if (weapon->frame == 2 && game->p.weapon_shot == false)
+		{
+			weapon_shoot(game);
+			game->p.weapon_shot = true;
+		}
+		else if (weapon->frame == 3)
+			game->p.weapon_shot = false;
+		if (game->p.weapon_cur == W_RIFLE && weapon->frame == 3)
+			weapon->lock = false;
 	}
+}
+
+void	draw_weapon(t_game *game, struct s_weapon *weapon)
+{
+	mlx_put_image_to_window(game->mlx, game->win, game->p.weapon_img
+				[game->p.weapon_cur][weapon->animation[weapon->frame]].ptr,
+							game->p.weapon_pos.x, game->p.weapon_pos.y);
 }
 
 int	game_loop(t_game *game)
@@ -136,32 +138,38 @@ int	game_loop(t_game *game)
 	static clock_t			clock_cur;
 	static struct timespec	time;
 	static unsigned			tick_prev;
-	char					*fps;
+	int						fps;
 
 	clock_gettime(CLOCK_MONOTONIC, &time);
 	tick_prev = game->tick;
 	game->tick = 60 * time.tv_sec + 60 * time.tv_nsec / NANSECS_PER_SEC;
 	game->tick_diff = game->tick - tick_prev;
-	printf("tick: %u\n", game->tick);
-	player_control(game);
+	if (game->effect.frame_cur < game->effect.frames)
+		game->effect.frame_cur += game->tick_diff;
+	while (game->tick_diff > 0)
+	{
+		player_control(game);
+		objects(game);
+		weapon(game, &game->p.weapon);
+		game->tick_diff--;
+	}
 //	for (int i = 0; i < 500; ++i)
 		ray_cast(game);
 	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
 	draw_walls(game);
-	objects(game);
+	draw_objects(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
 	draw_effect(game, &game->effect);
+	draw_weapon(game, &game->p.weapon);
 	draw_map(game);
 
 //	demo_cursor(game, 0xFF88FF);
 //	demo_fillrate(game, 1);
 //	fizzlefade(&game->img, 0xFF0000);
 //	demo_radar(game, 360);
-//	printf("FPS: %lu\n", CLOCKS_PER_SEC / (clock() - tick));
-	fps = ft_itoa(CLOCKS_PER_SEC / (clock() - clock_cur));
+	fps = CLOCKS_PER_SEC / (clock() - clock_cur);
 	clock_cur = clock();
-	mlx_string_put(game->mlx, game->win, 0, 10, 0xFFFFFF, fps);
-	free(fps);
-
+	mlx_string_put(game->mlx, game->win, 0, 10, COLOR_WHITE,
+		(char []){'0' + fps/100, '0' + fps / 10 % 10, '0' + fps % 10, '\0'});
 	return (0);
 }

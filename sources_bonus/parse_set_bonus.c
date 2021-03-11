@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:55 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/08 19:15:43 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/11 20:22:53 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,35 @@ void	set_colors(const char *color_string, unsigned *target, t_game *game)
 	if (*color_string != '\0')
 		terminate(game, ERR_PARSE, "F/C color line redundant symbols");
 	*target = (r << 16) | (g << 8) | b;
+}
+
+void	set_weapons(char *string, t_game *game)
+{
+	int			n;
+	unsigned	id;
+	int			i;
+	t_img		*texture;
+	char		*path;
+
+	if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
+		terminate(game, ERR_PARSE, "Weapon ID is wrong (Gx)");
+	if (id >= sizeof(game->p.weapon_img) / sizeof(*game->p.weapon_img))
+		terminate(game, ERR_PARSE, "Weapon ID out of array range");
+	if (game->p.weapon_img[id][0].ptr != NULL)
+		terminate(game, ERR_PARSE, "Duplicated weapon setting");
+	i = 0;
+	while (i < 4)
+	{
+		texture = &game->p.weapon_img[id][i];
+		path = ft_strjoin(string, (char []){'0' + i, '.', 'p', 'n', 'g', '\0'});
+		if (!(texture->ptr = mlx_png_file_to_image(game->mlx, path,
+												   (int *)&texture->size.x, (int *)&texture->size.y)))
+			terminate(game, ERR_PARSE, "Can't load weapon texture file");
+		texture->data = (unsigned *)mlx_get_data_addr(texture->ptr, &n, &n, &n);
+		texture->aspect = texture->size.x / texture->size.y;
+		free(path);
+		i++;
+	}
 }
 
 void	set_textures(char *string, t_game *game)

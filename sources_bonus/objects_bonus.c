@@ -6,38 +6,55 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:03 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/09 22:32:55 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/11 17:41:56 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
 
-void	objects(t_game *game)
+void	objects(t_game *g)
+{
+	t_list		*cur_list;
+	t_object	*obj;
+	t_fpoint	diff;
+
+	cur_list = g->objects;
+	while (cur_list)
+	{
+		obj = (t_object *)cur_list->content;
+		diff = (t_fpoint){obj->pos.x - g->p.pos.x, obj->pos.y - g->p.pos.y};
+		obj->distance_real = hypot(diff.x, diff.y);
+		if (obj->distance_real < 0.5)
+			cur_list = object_pickup(g, cur_list, obj->type);
+		else
+			cur_list = cur_list->next;
+	}
+}
+
+void	draw_objects(t_game *g)
 {
 	t_list		*cur_list;
 	t_object	*obj;
 	double		angle;
 	t_fpoint	diff;
 
-	ft_lstsort(&game->objects, objects_sort);
-	cur_list = game->objects;
+	ft_lstsort(&g->objects, objects_sort);
+	cur_list = g->objects;
 	while (cur_list)
 	{
 		obj = (t_object *)cur_list->content;
-		diff = (t_fpoint){obj->pos.x - game->p.pos.x, obj->pos.y - game->p.pos.y};
-		if ((obj->distance = game->p.vector.x * diff.x + game->p.vector.y * diff.y) > 0.1)
+		diff = (t_fpoint){obj->pos.x - g->p.pos.x, obj->pos.y - g->p.pos.y};
+		obj->distance = g->p.vector.x * diff.x + g->p.vector.y * diff.y;
+		if (obj->distance > 0.1)
 		{
 			angle = atan2(diff.y, diff.x);
-			if (fabs(game->p.angle - angle - PI2) <= M_PI)
+			if (fabs(g->p.angle - angle - PI2) <= M_PI)
 				angle += PI2;
-			angle -= game->p.angle;
-			if (fabs(angle) < game->fov + M_PI_4)
-				draw_sprite(game, obj, angle);
+			angle -= g->p.angle;
+			if (fabs(angle) < g->fov + M_PI_4)
+				draw_sprite(g, obj, angle);
 		}
-		if ((obj->distance_real = hypot(diff.x, diff.y)) < 0.5)
-			cur_list = object_pickup(game, cur_list, obj->type);
-		else
-			cur_list = cur_list->next;
+		cur_list = cur_list->next;
 	}
 }
 

@@ -6,12 +6,12 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/03/09 20:37:22 by ngragas          ###   ########.fr        #
+#    Updated: 2021/03/11 21:47:00 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME 	= 	cub3D
-CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g #-Ofast -march=native
+CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g -Ofast -march=native
 SRC    :=		main			\
 				control			\
 				objects			\
@@ -23,6 +23,7 @@ SRC    :=		main			\
 				walls
 
 SRC_BONUS :=	demo_tools		\
+				draw_effects	\
 				draw_figures	\
 				draw_fills		\
 				draw_map		\

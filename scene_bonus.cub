@@ -10,6 +10,10 @@ W7 ./resources/walls/wall_7.png
 W8 ./resources/walls/wall_8.png
 W9 ./resources/walls/wall_9.png
 
+G0 ./resources/weapons/knife_
+G1 ./resources/weapons/pistol_
+G2 ./resources/weapons/rifle_
+
 S0 ./resources/sprites/lamp.png
 S1 ./resources/sprites/chandelier.png
 S2 ./resources/sprites/lamp_stand.png

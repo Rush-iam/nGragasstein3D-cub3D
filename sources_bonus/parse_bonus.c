@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/07 17:40:02 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/11 20:22:53 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,8 @@ void	parse_scene(int file_id, char **line, t_game *game)
 			set_colors(*line, &game->color_floor, game);
 		else if (**line == 'W' || **line == 'S')
 			set_textures(*line, game);
+		else if (**line == 'G')
+			set_weapons(*line, game);
 		else if (**line != '\0')
 			return ;
 		free(*line);
@@ -114,4 +116,8 @@ void	validate_settings(t_game *game)
 	while (i < sizeof(game->sprite) / sizeof(*game->sprite))
 		if (game->sprite[i++].ptr == NULL)
 			terminate(game, ERR_PARSE, "Missing sprite");
+	i = 0;
+	while (i < sizeof(game->p.weapon_img) / sizeof(*game->p.weapon_img))
+		if (game->p.weapon_img[i++][0].ptr == NULL)
+			terminate(game, ERR_PARSE, "Missing weapon texture");
 }

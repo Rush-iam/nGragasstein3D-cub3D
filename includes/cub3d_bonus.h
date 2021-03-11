@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/09 22:29:29 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/11 23:51:54 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,32 +40,43 @@
 # define ERR_MEM	4
 # define ERR_BMP	5
 
-# define MOVE_FORWARD	KEY_W
-# define MOVE_BACK		KEY_S
-# define MOVE_LEFT		KEY_A
-# define MOVE_RIGHT		KEY_D
-# define TURN_LEFT		KEY_LEFT
-# define TURN_RIGHT		KEY_RIGHT
-# define RUN			KEY_SHIFT_LEFT
+# define K_MOVE_FORWARD	KEY_W
+# define K_MOVE_BACK	KEY_S
+# define K_MOVE_LEFT	KEY_A
+# define K_MOVE_RIGHT	KEY_D
+# define K_TURN_LEFT	KEY_LEFT
+# define K_TURN_RIGHT	KEY_RIGHT
+# define K_RUN			KEY_SHIFT_LEFT
 
+# define COLOR_WHITE	0xFFFFFF
 # define COLOR_YELLOW	0xFFFF00
 # define COLOR_GREEN	0x7AFF40
 # define COLOR_ORANGE	0xFF7A40
 # define COLOR_GREY		0x808080
 
-# define MAP_TOGGLE			KEY_M
+# define K_KNIFE	KEY_1
+# define K_PISTOL	KEY_2
+# define K_RIFLE	KEY_3
+# define M_SHOOT	MOUSE_LEFT
+
+# define ANIM_TICKS		5
+# define ANIM_KNIFE		(char []){0, 1, 2, 3, 2, 1}
+# define ANIM_PISTOL	(char []){0, 1, 2, 3, 1}
+# define ANIM_RIFLE		(char []){0, 1, 2, 1, 3}
+
+# define K_MAP_TOGGLE		KEY_M
 # define MAP_COLOR_DECOR	COLOR_GREY
 # define MAP_COLOR_ENEMY	COLOR_ORANGE
 # define MAP_COLOR_PICKUP	COLOR_GREEN
 
-# define FOV_WIDE		KEY_NUMMINUS
-# define FOV_TELE		KEY_NUMPLUS
-# define FOV_RESET		KEY_NUMASTERISK
+# define K_FOV_WIDE		KEY_NUMMINUS
+# define K_FOV_TELE		KEY_NUMPLUS
+# define K_FOV_RESET	KEY_NUMASTERISK
 # define FOV_ZOOMSPEED	1.03
 
 # define PL_SPEED		0.08
 # define PL_RADIUS		0.3
-# define MAP_CELL_FIX	0.0000001
+# define FLOAT_FIX		0.0000001
 # define MOUSE_SPEED	2000.
 # define MAP_SCALE		8
 
@@ -95,11 +106,7 @@ typedef struct	s_img
 	double		aspect;
 }				t_img;
 
-typedef struct	s_spriteset
-{
-	t_img		img;
-	unsigned	frames;
-}				t_spriteset;
+# define SHOT_FRAME_ID	2
 
 # define CHAR_DECOR		"^*$:;,!@%#&|{}_<`"
 # define CHAR_PICKUP	"+HhAaZzXx"
@@ -178,8 +185,25 @@ typedef struct	s_game
 		short		health;
 		short		ammo;
 		short		score;
-		short		weapon_cur;
 		short		weapons;
+		enum	e_weapon
+		{
+			W_KNIFE = 0,
+			W_PISTOL,
+			W_RIFLE
+		}		weapon_cur;
+		struct	s_weapon
+		{
+			unsigned char	animation[5];
+			unsigned		frame;
+			unsigned		frames;
+			unsigned		tick;
+			unsigned		ticks;
+			bool			lock;
+		}		weapon;
+		bool		weapon_shot;
+		t_img		weapon_img[3][4];
+		t_upoint	weapon_pos;
 	}			p;
 	struct		s_key
 	{
@@ -242,6 +266,7 @@ void			set_resolution		(const char *res_string, t_upoint *res,
 															t_game *game);
 void			set_colors			(const char *color_string, unsigned *target,
 															t_game *game);
+void			set_weapons			(char *string, t_game *game);
 void			set_textures		(char *string, t_game *game);
 void			set_textures_import(char *string, t_img *texture, t_game *game);
 
@@ -260,10 +285,12 @@ int				hook_exit			(t_game *game);
 void			player_control			(t_game *game);
 void			player_control_rotate	(t_game *game);
 void			player_control_move		(t_game *game);
+void			set_fov					(t_game *game, double fov, bool reset);
 void			player_control_toggler	(t_game *game, int key_code);
 void			player_control_extra	(t_game *game);
 void			player_control_borders	(t_game *g);
 void			player_control_borders_diag(t_game *g);
+void			player_set_weapon(t_game *game, enum e_weapon weapon);
 
 void			ray_cast		(t_game *game);
 void			ray_intersect	(t_game *game, double cur_angle, unsigned ray);
@@ -278,8 +305,7 @@ void			img_ceilfloor_rgb	(t_img *img, unsigned ceil, unsigned floor);
 void			fizzlefade				(t_img *img, unsigned color);
 
 void			pixel_put	(t_img *img, unsigned x, unsigned y, int color);
-int				pixel_fade	(int color, double fade);
-int				pixel_shadow_fade(int color, double fade);
+int				pixel_fade	(int color, float fade);
 void			draw_line	(t_img *img, t_point p1, t_point p2, int color);
 void			draw_square	(t_img *img, t_point center, int size, int color);
 void			draw_4pts	(t_img *img, t_point *pts, int color);
@@ -291,17 +317,22 @@ void			draw_map_objects(t_game *game);
 
 void			draw_walls		(t_game *game);
 void			draw_wall_scaled(t_game *game, t_img *src, unsigned x,
-						double fade);
-void			draw_wall_solid	(t_game *game, unsigned x, double fade);
+						float fade);
+void			draw_wall_solid	(t_game *game, unsigned x, float fade);
 
-void			objects				(t_game *game);
+void			objects				(t_game *g);
+void			draw_objects		(t_game *g);
 int				objects_sort		(t_object *obj1, t_object *obj2);
-t_list			*object_pickup(t_game *game, t_list *cur_list,
+t_list			*object_pickup		(t_game *game, t_list *cur_list,
 												enum e_objtype type);
 void			object_pickup_add(t_game *game, enum e_objtype type);
 void			draw_sprite			(t_game *game, t_object *obj, double angle);
 void			draw_sprite_scaled	(t_img *img, t_object *obj, unsigned x,
 																unsigned src_x);
+
+void			draw_effect(t_game *game, struct s_effect *ef);
+void			effect_flash(t_game *game, unsigned color, float power);
+
 
 char			*atoi_limited	(unsigned *dst_int, const char *src_string,
 															unsigned limit);

@@ -14,27 +14,27 @@
 
 void	player_control(t_game *game)
 {
-	if (game->key[TURN_LEFT])
+	if (game->key[K_TURN_LEFT])
 		game->p.angle -= PL_SPEED / 2;
-	if (game->key[TURN_RIGHT])
+	if (game->key[K_TURN_RIGHT])
 		game->p.angle += PL_SPEED / 2;
-	if (game->key[MOVE_FORWARD])
+	if (game->key[K_MOVE_FORWARD])
 		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.vector.x,
 								game->p.pos.y + PL_SPEED * game->p.vector.y};
-	if (game->key[MOVE_BACK])
+	if (game->key[K_MOVE_BACK])
 		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vector.x,
 								game->p.pos.y - PL_SPEED * game->p.vector.y};
-	if (game->key[MOVE_LEFT])
+	if (game->key[K_MOVE_LEFT])
 		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.vector.y,
 								game->p.pos.y - PL_SPEED * game->p.vector.x};
-	if (game->key[MOVE_RIGHT])
+	if (game->key[K_MOVE_RIGHT])
 		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vector.y,
 								game->p.pos.y + PL_SPEED * game->p.vector.x};
-	if (game->key[FOV_WIDE])
+	if (game->key[K_FOV_WIDE])
 		set_fov(game, game->fov * 1.03, false);
-	if (game->key[FOV_TELE])
+	if (game->key[K_FOV_TELE])
 		set_fov(game, game->fov / 1.03, false);
-	if (game->key[FOV_RESET])
+	if (game->key[K_FOV_RESET])
 		set_fov(game, 0, true);
 	player_control_borders(game);
 	__sincos(game->p.angle, &game->p.vector.y, &game->p.vector.x);
