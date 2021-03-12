@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 23:33:45 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/08 23:33:45 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/12 23:13:28 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,12 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 	while (cur_x < max_x)
 	{
 		if (obj->distance < game->column[cur_x]->distance)
+		{
+			if (obj->type == T_ENEMY && cur_x == (int)game->win_center.x)
+				obj->e->targeted = true;
 			draw_sprite_scaled(&game->img, obj, cur_x, (cur_x - start_x) /
-													   ((double)obj->size.x / obj->sprite->size.x));
+								((double)obj->size.x / obj->sprite->size.x));
+		}
 		cur_x++;
 	}
 }

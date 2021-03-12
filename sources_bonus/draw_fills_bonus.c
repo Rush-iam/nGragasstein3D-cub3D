@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 17:32:18 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/12 15:31:09 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,15 +27,6 @@ void	img_clear_rgb(t_img *img, unsigned color)
 		img->data[i++] = color;
 }
 
-void	img_ceilfloor(t_img *img, unsigned char ceil, unsigned char floor)
-{
-	const int	half_screen = img->size.x * img->size.y / 2;
-	const int	half_screen_bytes = half_screen * 4;
-
-	ft_memset(img->data, ceil, half_screen_bytes);
-	ft_memset(img->data + half_screen, floor, half_screen_bytes);
-}
-
 void	img_ceilfloor_rgb(t_img *img, unsigned ceil, unsigned floor)
 {
 	const int	full_screen = img->size.x * img->size.y;
@@ -47,33 +38,6 @@ void	img_ceilfloor_rgb(t_img *img, unsigned ceil, unsigned floor)
 		img->data[i++] = ceil;
 	while (i < full_screen)
 		img->data[i++] = floor;
-}
-
-void	fizzlefade(t_img *img, unsigned color)
-{
-	static unsigned	rndval = 1;
-	static int		frames;
-	unsigned		lsb;
-	t_upoint		pos;
-	int				i;
-
-	if (frames == 256)
-		return ;
-	frames++;
-	i = 0;
-	while (i++ < 512)
-	{
-		pos.x = ((rndval & 0x1FF00) >> 8) * 2;
-		pos.y = (rndval & 0x000FF) * 2;
-		lsb = rndval & 1;
-		rndval >>= 1;
-		if (lsb)
-			rndval ^= 0x12000;
-		pixel_put(img, pos.x, pos.y, color);
-		pixel_put(img, pos.x + 1, pos.y, color);
-		pixel_put(img, pos.x, pos.y + 1, color);
-		pixel_put(img, pos.x + 1, pos.y + 1, color);
-	}
 }
 
 /*

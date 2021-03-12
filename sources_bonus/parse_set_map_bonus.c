@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:49 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/08 22:02:43 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/12 23:12:10 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,6 @@ void	set_map_process(t_game *game)
 
 void	set_map_object_add(t_game *game, char chr, unsigned type, t_upoint pt)
 {
-	t_list		*obj_list;
 	t_object	*obj;
 	const char	*dirs = "eswn";
 
@@ -76,14 +75,12 @@ void	set_map_object_add(t_game *game, char chr, unsigned type, t_upoint pt)
 		obj->type = type - (sizeof(CHAR_DECOR) - 2);
 	if (obj->type == T_ENEMY)
 	{
-		obj->angle = M_PI_2 * (ft_strchr(dirs, chr) - dirs);
 		if ((obj->e = ft_calloc(1, sizeof(*obj->e))) == NULL)
 			terminate(game, ERR_MEM, "Memory allocation failed (enemy)");
-		obj->e->health = 100;
+		obj->e->angle = M_PI_2 * (ft_strchr(dirs, chr) - dirs);
+		obj->e->health = ENEMY_HEALTH;
 	}
-	if ((obj_list = ft_lstnew(obj)) == NULL)
-		terminate(game, ERR_MEM, "Memory allocation failed (obj_list)");
-	ft_lstadd_front(&game->objects, obj_list);
+	object_add(game, &game->objects, obj);
 }
 
 void	set_map_check_cell(t_game *game, char **map, t_upoint pt)

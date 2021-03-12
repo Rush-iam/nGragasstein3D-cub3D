@@ -109,7 +109,7 @@ void	validate_settings(t_game *game)
 		terminate(game, ERR_PARSE,
 		"Resolution doesn't set. Format: 'R WIDTH HEIGHT' (max 32767x32767)");
 	i = 0;
-	while (i < sizeof(game->texture) / sizeof(*game->texture))
+	while (i < sizeof(game->texture) / sizeof(*game->texture) / 2)
 		if (game->texture[i++].ptr == NULL)
 			terminate(game, ERR_PARSE, "Missing wall texture");
 	i = 0;

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:41 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/08 23:28:56 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/12 18:35:55 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,55 @@ char	*atoi_limited(unsigned *dst_int, const char *src_string, unsigned limit)
 	while (*src_string == ' ')
 		src_string++;
 	return ((char *)src_string);
+}
+
+t_img	img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres)
+{
+	t_img		dst_img;
+	int			n;
+	t_upoint	src_pix;
+	t_upoint	dst_pix;
+
+	if ((dst_img.ptr = mlx_new_image(mlx_ptr, dstres.x, dstres.y)) == NULL)
+		return (dst_img);
+	dst_img.data = (unsigned *)mlx_get_data_addr(dst_img.ptr, &n, &n, &n);
+	dst_img.size = dstres;
+	dst_img.aspect = dstres.x / dstres.y;
+	dst_pix.y = 0;
+	while (dst_pix.y < dst_img.size.y)
+	{
+		dst_pix.x = 0;
+		while (dst_pix.x < dst_img.size.x)
+		{
+			src_pix = (t_upoint){src_img->size.x * dst_pix.x / dst_img.size.x,
+								 src_img->size.y * dst_pix.y / dst_img.size.y};
+			dst_img.data[dst_pix.y * dst_img.size.x + dst_pix.x++] =
+					src_img->data[src_pix.y * src_img->size.x + src_pix.x];
+		}
+		dst_pix.y++;
+	}
+	mlx_destroy_image(mlx_ptr, src_img->ptr);
+	return (dst_img);
+}
+
+t_img	img_faded_copy(void *mlx_ptr, t_img *img)
+{
+	t_img	img_faded;
+	int		i;
+
+	img_faded.ptr = mlx_new_image(mlx_ptr, img->size.x, img->size.y);
+	if (img_faded.ptr == NULL)
+		return (img_faded);
+	img_faded.data = (unsigned *)mlx_get_data_addr(img_faded.ptr, &i, &i, &i);
+	img_faded.size = img->size;
+	img_faded.aspect = img->aspect;
+	i = 0;
+	while (i < (int)(img->size.x * img->size.y))
+	{
+		img_faded.data[i] = pixel_fade(img->data[i], 0.65);
+		i++;
+	}
+	return (img_faded);
 }
 
 void	write_screenshot_and_exit(t_game *game)

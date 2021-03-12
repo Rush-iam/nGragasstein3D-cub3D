@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/11 23:48:54 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/12 17:01:37 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ void	player_control(t_game *game)
 {
 	player_control_rotate(game);
 	player_control_move(game);
+	player_control_weapon(game);
 	player_control_extra(game);
 	player_control_borders(game);
 }
@@ -58,7 +59,31 @@ void	player_control_move(t_game *game)
 		game->p.pos.y + (game->key.k[K_RUN] + 1) * PL_SPEED * game->p.vector.x};
 }
 
-void	set_fov(t_game *game, double fov, bool reset)
+void	player_control_weapon(t_game *game)
+{
+	if (game->p.weapon.frame == 0)
+	{
+		if (game->key.k[K_KNIFE] && game->p.weapon_cur != W_KNIFE)
+			player_set_weapon(game, W_KNIFE);
+		else if (game->key.k[K_PISTOL] && game->p.weapon_cur != W_PISTOL &&
+				 game->p.ammo && (game->p.weapons_mask & W_PISTOL_MASK))
+			player_set_weapon(game, W_PISTOL);
+		else if (game->key.k[K_RIFLE] && game->p.weapon_cur != W_RIFLE &&
+				 game->p.ammo && (game->p.weapons_mask & W_RIFLE_MASK))
+			player_set_weapon(game, W_RIFLE);
+	}
+	if (game->key.m[M_SHOOT] && game->p.weapon.lock == false &&
+		(game->p.ammo || game->p.weapon_cur == W_KNIFE))
+	{
+		game->p.weapon.lock = true;
+		game->p.weapon.tick = ANIM_TICKS - 1;
+	}
+	if (game->key.m[M_SHOOT] == false && game->p.weapon.lock == true
+		&& game->p.weapon.frame == 0)
+		game->p.weapon.lock = false;
+}
+
+void	player_set_fov(t_game *game, double fov, bool reset)
 {
 	if (reset)
 		fov = ((game->img.aspect >= 1.77) - (game->img.aspect < 1.77)) *
@@ -71,30 +96,6 @@ void	set_fov(t_game *game, double fov, bool reset)
 		game->fov = fov;
 }
 
-void	player_set_weapon(t_game *game, enum e_weapon weapon)
-{
-	game->p.weapon_cur = weapon;
-	if (weapon == W_KNIFE)
-	{
-		ft_memcpy(game->p.weapon.animation, ANIM_KNIFE, sizeof(ANIM_KNIFE));
-		game->p.weapon.frames = sizeof(ANIM_KNIFE);
-	}
-	else if (weapon == W_PISTOL)
-	{
-		ft_memcpy(game->p.weapon.animation, ANIM_PISTOL, sizeof(ANIM_PISTOL));
-		game->p.weapon.frames = sizeof(ANIM_PISTOL);
-	}
-	else if (weapon == W_RIFLE)
-	{
-		ft_memcpy(game->p.weapon.animation, ANIM_RIFLE, sizeof(ANIM_RIFLE));
-		game->p.weapon.frames = sizeof(ANIM_RIFLE);
-	}
-	game->p.weapon.ticks = game->p.weapon.frames * ANIM_TICKS;
-	game->p.weapon_pos = (t_upoint){
-	game->win_center.x - game->p.weapon_img[game->p.weapon_cur][0].size.x / 2,
-	game->img.size.y - game->p.weapon_img[game->p.weapon_cur][0].size.y};
-}
-
 void	player_control_toggler(t_game *game, int key_code)
 {
 	if (key_code == K_MAP_TOGGLE && game->key.k[key_code] == false)
@@ -103,25 +104,12 @@ void	player_control_toggler(t_game *game, int key_code)
 
 void	player_control_extra(t_game *game)
 {
-	if (game->key.k[K_KNIFE] && game->p.weapon.frame == 0)
-		player_set_weapon(game, W_KNIFE);
-	else if (game->key.k[K_PISTOL] && game->p.weapon.frame == 0)
-		player_set_weapon(game, W_PISTOL);
-	else if (game->key.k[K_RIFLE] && game->p.weapon.frame == 0)
-		player_set_weapon(game, W_RIFLE);
-	if (game->key.m[M_SHOOT] && game->p.weapon.lock == false)
-	{
-		game->p.weapon.lock = true;
-		game->p.weapon.tick = ANIM_TICKS - 1;
-	}
-	if (game->key.m[M_SHOOT] == 0 && game->p.weapon.lock == true && game->p.weapon.frame == 0)
-		game->p.weapon.lock = false;
 	if (game->key.k[K_FOV_WIDE])
-		set_fov(game, game->fov * FOV_ZOOMSPEED, false);
+		player_set_fov(game, game->fov * FOV_ZOOMSPEED, false);
 	if (game->key.k[K_FOV_TELE])
-		set_fov(game, game->fov / FOV_ZOOMSPEED, false);
+		player_set_fov(game, game->fov / FOV_ZOOMSPEED, false);
 	if (game->key.k[K_FOV_RESET])
-		set_fov(game, 0, true);
+		player_set_fov(game, 0, true);
 }
 
 void	player_control_borders(t_game *g)

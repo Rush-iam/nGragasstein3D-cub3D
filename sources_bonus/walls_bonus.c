@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:35 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/11 16:27:10 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/12 21:15:47 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,12 @@ void	draw_walls(t_game *game)
 		fade = 8.f / game->column[ray]->distance;
 		if (fade > 1)
 			fade = 1;
-		if (game->column[ray]->dir == 'W' || game->column[ray]->dir == 'E')
-			fade /= 2;
 		texture_id = game->map.grid[(int)game->column[ray]->cell.y]
 									[(int)game->column[ray]->cell.x] - '0';
+		if (game->column[ray]->dir == 'W' || game->column[ray]->dir == 'E')
+			texture_id += sizeof(game->texture) / sizeof(*game->texture) / 2;
 		draw_wall_scaled(game, &game->texture[texture_id], ray, fade);
+//		draw_wall_solid(game, ray, fade);
 		ray++;
 	}
 }
@@ -64,9 +65,25 @@ void	draw_wall_scaled(t_game *game, t_img *src, unsigned x, float fade)
 
 void	draw_wall_solid(t_game *game, unsigned x, float fade)
 {
-	draw_line(&game->img,
-		(t_point){x, (game->img.size.y - game->column[x]->height) / 2},
-		(t_point){x, (game->img.size.y + game->column[x]->height) / 2},
-		((int)(0x60 * fade) << 16) + ((int)(0x80 * fade) << 8) +
-		(int)(0x80 * fade));
+	unsigned	start_y;
+	unsigned	end_y;
+
+	if (game->column[x]->height >= game->img.size.y)
+	{
+		start_y = 0;
+		end_y = game->img.size.y;
+	}
+	else
+	{
+		start_y = ((int)game->img.size.y - (int)game->column[x]->height) / 2;
+		end_y = start_y + game->column[x]->height;
+
+	}
+	(void)fade;
+	while (start_y < end_y)
+//		game->img.data[start_y++ + x * game->img.size.x] = 0x608080;
+//		game->img.data[start_y++ * game->img.size.x + x] = 0x608080;
+		game->img.data[start_y++ * game->img.size.x + x] =
+				((int)(0x60 * fade) << 16) + ((int)(0x80 * fade) << 8) +
+				(int)(0x80 * fade);
 }

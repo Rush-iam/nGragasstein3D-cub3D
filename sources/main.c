@@ -68,7 +68,7 @@ void	initialize_game_2(t_game *game)
 	t_object	*obj;
 
 	__sincos(game->p.angle, &game->p.vector.y, &game->p.vector.x);
-	set_fov(game, 0, true);
+	player_set_fov(game, 0, true);
 	cur_list = game->objects;
 	while (cur_list)
 	{
@@ -79,7 +79,7 @@ void	initialize_game_2(t_game *game)
 	}
 }
 
-void	set_fov(t_game *game, double fov, bool reset)
+void	player_set_fov(t_game *game, double fov, bool reset)
 {
 	if (reset)
 		fov = ((game->img.aspect >= 1.77) - (game->img.aspect < 1.77)) *

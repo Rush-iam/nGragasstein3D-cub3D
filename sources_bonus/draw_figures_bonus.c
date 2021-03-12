@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:09 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/11 15:50:33 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/12 18:31:30 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,36 @@ void	pixel_put(t_img *img, unsigned x, unsigned y, int color)
 
 int		pixel_fade(int color, float fade)
 {
-	if (fade <= 0.5f)
+	if (fade < 0.5f)
 		return (color >> 1 & 0x7F7F7F);
 	else
 		return (((int)((color & 0xFF0000) * fade) & 0xFF0000) |
 			((int)((color & 0xFF00) * fade) & 0xFF00) |
 			(int)((color & 0xFF) * fade));
+}
+
+int		pixel_fade_contrast(int color, float fade)
+{
+	int r, g, b;
+	int res;
+
+	r = (color & 0xFF0000) >> 16;
+	g = (color & 0xFF00) >> 8;
+	b = color & 0xFF;
+	if (r > fade * 255)
+		r = r - fade * (255 - r);
+	else
+		r = r * sqrt(fade);
+	if (g > fade * 255)
+		g = g - fade * (255 - g);
+	else
+		g = g * sqrt(fade);
+	if (b > fade * 255)
+		b = b - fade * (255 - b);
+	else
+		b = b * sqrt(fade);
+	res = (r << 16) | (g << 8) | b;
+	return (pixel_fade(res, 0.85));
 }
 
 void	draw_line(t_img *img, t_point p1, t_point p2, int color)

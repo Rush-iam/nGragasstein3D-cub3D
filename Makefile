@@ -6,12 +6,12 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/03/11 21:47:00 by ngragas          ###   ########.fr        #
+#    Updated: 2021/03/12 22:57:50 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME 	= 	cub3D
-CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g -Ofast -march=native
+CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g #-Ofast -march=native
 SRC    :=		main			\
 				control			\
 				objects			\
@@ -29,12 +29,17 @@ SRC_BONUS :=	demo_tools		\
 				draw_map		\
 				draw_sprite		\
 				hooks			\
-				terminate
+				terminate		\
+				weapons
 
 SRC_DIR := sources/
-INC_DIR = includes/
+INC_DIR := includes/
 OBJ_DIR = objects/
 SRC_BONUS_DIR = sources_bonus/
+
+#SRC_DIR := $(SRC_BONUS_DIR)
+#SRC += $(SRC_BONUS)
+#SRC := $(addsuffix _bonus, $(SRC))
 
 ifeq ($(filter bonus, $(MAKECMDGOALS)), bonus)
 	SWITCH_CLEAN := $(addsuffix .o, $(SRC))

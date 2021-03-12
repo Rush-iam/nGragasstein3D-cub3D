@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/11 23:51:54 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/13 00:08:55 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 # include "x_events.h"
 
 # define WIN_TITLE	"nGragasstein 3D"
-# define MAX_WIN	(t_upoint){2560, 1440}
+# define MAX_WIN	(t_upoint){2559, 1394}
 # define MAX_SCR	(t_upoint){20000, 20000}
 # define MIN_RES_X	2
 
@@ -59,6 +59,7 @@
 # define K_RIFLE	KEY_3
 # define M_SHOOT	MOUSE_LEFT
 
+# define SHOT_FRAME_ID	2
 # define ANIM_TICKS		5
 # define ANIM_KNIFE		(char []){0, 1, 2, 3, 2, 1}
 # define ANIM_PISTOL	(char []){0, 1, 2, 3, 1}
@@ -106,8 +107,6 @@ typedef struct	s_img
 	double		aspect;
 }				t_img;
 
-# define SHOT_FRAME_ID	2
-
 # define CHAR_DECOR		"^*$:;,!@%#&|{}_<`"
 # define CHAR_PICKUP	"+HhAaZzXx"
 # define CHAR_ENEMY		"nswe"
@@ -125,15 +124,20 @@ typedef struct	s_img
 # define VAL_SCORE_M	500
 # define VAL_SCORE_S	100
 # define VAL_SCORE_KILL	100
-# define WEAPON_KNIFE	0b001
-# define WEAPON_PISTOL	0b010
-# define WEAPON_RIFLE	0b100
+# define W_KNIFE_MASK	0b001
+# define W_PISTOL_MASK	0b010
+# define W_RIFLE_MASK	0b100
+
+# define START_HEALTH	100
+# define START_AMMO		8
+# define START_WEAPONS	W_KNIFE_MASK | W_PISTOL_MASK
+
+# define ENEMY_HEALTH	25
 
 typedef struct	s_object
 {
 	t_img		*sprite;
 	t_fpoint	pos;
-	double		angle;
 	t_upoint	size;
 	double		distance;
 	double		distance_real;
@@ -154,6 +158,8 @@ typedef struct	s_object
 	}			type;
 	struct		s_enemy
 	{
+		bool	targeted;
+		double	angle;
 		short	health;
 		short	frame;
 		time_t	tick_nextframe;
@@ -163,7 +169,7 @@ typedef struct	s_object
 		{
 			S_WAIT = 0,
 			S_ATTACK,
-			S_GETHIT,
+			S_PAIN,
 			S_SEARCH,
 			S_DEAD
 		}		state;
@@ -185,7 +191,7 @@ typedef struct	s_game
 		short		health;
 		short		ammo;
 		short		score;
-		short		weapons;
+		short		weapons_mask;
 		enum	e_weapon
 		{
 			W_KNIFE = 0,
@@ -234,9 +240,11 @@ typedef struct	s_game
 	}			**column;
 	unsigned	color_ceil;
 	unsigned	color_floor;
-	t_img		texture[10];
+	t_img		texture[20];
 	t_img		sprite[sizeof(CHAR_OBJECTS) - 4];
 	t_list		*objects;
+	t_list		*pickups;
+	t_list		*enemies;
 	struct		s_effect
 	{
 		unsigned	frames;
@@ -251,9 +259,9 @@ typedef struct	s_game
 	t_img		effect_img;
 }				t_game;
 
-void			initialize_game		(t_game *game, bool screenshot);
+void			initialize_game		(t_game *game, bool screenshot_only);
 void			initialize_game_2	(t_game *game);
-void			set_fov				(t_game *game, double aspect, bool reset);
+void			player_set_fov				(t_game *game, double fov, bool reset);
 
 int				game_loop		(t_game *game);
 
@@ -285,7 +293,8 @@ int				hook_exit			(t_game *game);
 void			player_control			(t_game *game);
 void			player_control_rotate	(t_game *game);
 void			player_control_move		(t_game *game);
-void			set_fov					(t_game *game, double fov, bool reset);
+void			player_control_weapon(t_game *game);
+void			player_set_fov			(t_game *game, double fov, bool reset);
 void			player_control_toggler	(t_game *game, int key_code);
 void			player_control_extra	(t_game *game);
 void			player_control_borders	(t_game *g);
@@ -299,13 +308,11 @@ t_fpoint		ray_intersect_y	(t_game *game, t_fpoint step);
 
 void			img_clear				(t_img *img);
 void			img_clear_rgb			(t_img *img, unsigned color);
-void			img_ceilfloor			(t_img *img, unsigned char ceil,
-										unsigned char floor);
 void			img_ceilfloor_rgb	(t_img *img, unsigned ceil, unsigned floor);
-void			fizzlefade				(t_img *img, unsigned color);
 
 void			pixel_put	(t_img *img, unsigned x, unsigned y, int color);
 int				pixel_fade	(int color, float fade);
+int				pixel_fade_contrast(int color, float fade);
 void			draw_line	(t_img *img, t_point p1, t_point p2, int color);
 void			draw_square	(t_img *img, t_point center, int size, int color);
 void			draw_4pts	(t_img *img, t_point *pts, int color);
@@ -321,27 +328,38 @@ void			draw_wall_scaled(t_game *game, t_img *src, unsigned x,
 void			draw_wall_solid	(t_game *game, unsigned x, float fade);
 
 void			objects				(t_game *g);
+void			pickups(t_game *g);
+void			enemies(t_game *g);
+void			object_add(t_game *game, t_list **dst, t_object *obj);
 void			draw_objects		(t_game *g);
 int				objects_sort		(t_object *obj1, t_object *obj2);
-t_list			*object_pickup		(t_game *game, t_list *cur_list,
-												enum e_objtype type);
+int				objects_find(t_object *obj1, t_object *obj2);
+bool			object_pickup(t_game *game, enum e_objtype type);
+
 void			object_pickup_add(t_game *game, enum e_objtype type);
 void			draw_sprite			(t_game *game, t_object *obj, double angle);
 void			draw_sprite_scaled	(t_img *img, t_object *obj, unsigned x,
 																unsigned src_x);
 
+void			weapon(t_game *game, struct s_weapon *weapon);
+void			draw_weapon(t_game *game, struct s_weapon *weapon);
+void			weapon_shoot(t_game *game);
+
 void			draw_effect(t_game *game, struct s_effect *ef);
 void			effect_flash(t_game *game, unsigned color, float power);
-
+void			effect_fizzlefade				(t_img *img, unsigned color);
 
 char			*atoi_limited	(unsigned *dst_int, const char *src_string,
 															unsigned limit);
+t_img			img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres);
+t_img			img_faded_copy(void *mlx_ptr, t_img *img);
 void			write_screenshot_and_exit	(t_game *game);
 void			write_screenshot_data	(t_game *game, int file_id);
 
 int				terminate		(t_game *game, int return_value, char *message);
 void			terminate_free	(t_game *game);
 void			terminate_free_object(void *object);
+void			void_function(void *ptr);
 
 void			demo_fillrate	(t_game *mlx, int step);
 void			demo_radar		(t_game *mlx, int rays);

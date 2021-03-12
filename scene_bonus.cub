@@ -1,4 +1,4 @@
-R 2400 1200
+R 2560 1294
 W0 ./resources/walls/wall_0.png
 W1 ./resources/walls/wall_1.png
 W2 ./resources/walls/wall_2.png

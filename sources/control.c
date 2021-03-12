@@ -31,11 +31,11 @@ void	player_control(t_game *game)
 		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vector.y,
 								game->p.pos.y + PL_SPEED * game->p.vector.x};
 	if (game->key[K_FOV_WIDE])
-		set_fov(game, game->fov * 1.03, false);
+		player_set_fov(game, game->fov * 1.03, false);
 	if (game->key[K_FOV_TELE])
-		set_fov(game, game->fov / 1.03, false);
+		player_set_fov(game, game->fov / 1.03, false);
 	if (game->key[K_FOV_RESET])
-		set_fov(game, 0, true);
+		player_set_fov(game, 0, true);
 	player_control_borders(game);
 	__sincos(game->p.angle, &game->p.vector.y, &game->p.vector.x);
 }

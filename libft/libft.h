@@ -69,6 +69,8 @@ void			ft_lstadd_front(t_list **lst, t_list *new);
 void			ft_lstadd_back(t_list **lst, t_list *new);
 void			*ft_lstpop(t_list **lst);
 void			ft_lstremove(t_list **begin, t_list *to_delete);
+void			ft_lstremoveif(t_list **begin, void *data_ref, int (*cmp)(),
+										void (*free_fct)(void *));
 void			ft_lstsort(t_list **lst, int (*cmp)());
 int				ft_lstsize(t_list *lst);
 t_list			*ft_lstlast(t_list *lst);

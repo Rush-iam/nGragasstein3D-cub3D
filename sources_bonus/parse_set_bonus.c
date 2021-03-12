@@ -74,7 +74,7 @@ void	set_weapons(char *string, t_game *game)
 		texture = &game->p.weapon_img[id][i];
 		path = ft_strjoin(string, (char []){'0' + i, '.', 'p', 'n', 'g', '\0'});
 		if (!(texture->ptr = mlx_png_file_to_image(game->mlx, path,
-												   (int *)&texture->size.x, (int *)&texture->size.y)))
+							(int *)&texture->size.x, (int *)&texture->size.y)))
 			terminate(game, ERR_PARSE, "Can't load weapon texture file");
 		texture->data = (unsigned *)mlx_get_data_addr(texture->ptr, &n, &n, &n);
 		texture->aspect = texture->size.x / texture->size.y;
