@@ -72,8 +72,3 @@ void	terminate_free_object(void *object)
 	free(((t_object *)object)->e);
 	free(object);
 }
-
-void	void_function(void *ptr)
-{
-	(void)ptr;
-}

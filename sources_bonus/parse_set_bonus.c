@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:55 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/11 20:22:53 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/13 22:23:00 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,12 +54,11 @@ void	set_colors(const char *color_string, unsigned *target, t_game *game)
 	*target = (r << 16) | (g << 8) | b;
 }
 
+
 void	set_weapons(char *string, t_game *game)
 {
-	int			n;
 	unsigned	id;
 	int			i;
-	t_img		*texture;
 	char		*path;
 
 	if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
@@ -71,13 +70,11 @@ void	set_weapons(char *string, t_game *game)
 	i = 0;
 	while (i < 4)
 	{
-		texture = &game->p.weapon_img[id][i];
-		path = ft_strjoin(string, (char []){'0' + i, '.', 'p', 'n', 'g', '\0'});
-		if (!(texture->ptr = mlx_png_file_to_image(game->mlx, path,
-							(int *)&texture->size.x, (int *)&texture->size.y)))
-			terminate(game, ERR_PARSE, "Can't load weapon texture file");
-		texture->data = (unsigned *)mlx_get_data_addr(texture->ptr, &n, &n, &n);
-		texture->aspect = texture->size.x / texture->size.y;
+		if ((path = ft_strjoin(string,
+						(char []){'0' + i, '.', 'p', 'n', 'g', '\0'})) == NULL)
+			terminate(game, ERR_PARSE, strerror(errno));
+		load_texture_file(path, &game->p.weapon_img[id][i],
+										"Can't load weapon texture file", game);
 		free(path);
 		i++;
 	}
@@ -95,7 +92,8 @@ void	set_textures(char *string, t_game *game)
 			terminate(game, ERR_PARSE, "Texture ID out of array range");
 		if (game->texture[id].ptr != NULL)
 			terminate(game, ERR_PARSE, "Duplicated texture setting");
-		set_textures_import(string, &game->texture[id], game);
+		load_texture_file(string, &game->texture[id],
+										"Can't load wall texture file", game);
 	}
 	else if (*string == 'S')
 	{
@@ -105,32 +103,51 @@ void	set_textures(char *string, t_game *game)
 			terminate(game, ERR_PARSE, "Sprite ID out of array range");
 		if (game->sprite[id].ptr != NULL)
 			terminate(game, ERR_PARSE, "Duplicated sprite setting");
-		set_textures_import(string, &game->sprite[id], game);
+		load_texture_file(string, &game->sprite[id],
+										"Can't load sprite file", game);
 	}
 }
 
-void	set_textures_import(char *string, t_img *texture, t_game *game)
+void	load_spriteset(t_img dst[], int count, char *path, t_game *game)
+{
+	int		i;
+	char	*path2;
+
+	i = 0;
+	while (i < count)
+	{
+		if ((path2 = ft_strjoin(path,
+							(char []){'0' + i, '.', 'p', 'n', 'g', 0})) == NULL)
+			terminate(game, ERR_PARSE, strerror(errno));
+		load_texture_file(path2, &dst[i], "Can't load enemy sprite file", game);
+		free(path2);
+		i++;
+	}
+	free(path);
+}
+
+void	load_texture_file(char *path, t_img *dst_img, char *err, t_game *game)
 {
 	int				null;
-	const size_t	str_len = ft_strlen(string);
+	const size_t	str_len = ft_strlen(path);
 
 	if (str_len < 5)
 		terminate(game, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
-	if (ft_memcmp(".xpm", string + str_len - 4, 5) == 0)
+	if (ft_memcmp(".xpm", path + str_len - 4, 5) == 0)
 	{
-		if (!(texture->ptr = mlx_xpm_file_to_image(game->mlx, string,
-							(int *)&texture->size.x, (int *)&texture->size.y)))
-			terminate(game, ERR_PARSE, "Can't load texture file");
+		if (!(dst_img->ptr = mlx_xpm_file_to_image(game->mlx, path,
+							(int *)&dst_img->size.x, (int *)&dst_img->size.y)))
+			terminate(game, ERR_PARSE, err);
 	}
-	else if (ft_memcmp(".png", string + str_len - 4, 5) == 0)
+	else if (ft_memcmp(".png", path + str_len - 4, 5) == 0)
 	{
-		if (!(texture->ptr = mlx_png_file_to_image(game->mlx, string,
-							(int *)&texture->size.x, (int *)&texture->size.y)))
-			terminate(game, ERR_PARSE, "Can't load texture file");
+		if (!(dst_img->ptr = mlx_png_file_to_image(game->mlx, path,
+							(int *)&dst_img->size.x, (int *)&dst_img->size.y)))
+			terminate(game, ERR_PARSE, err);
 	}
 	else
 		terminate(game, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
-	texture->data = (unsigned *)mlx_get_data_addr(texture->ptr, &null, &null,
-																		&null);
-	texture->aspect = texture->size.x / texture->size.y;
+	dst_img->data = (unsigned *)mlx_get_data_addr(dst_img->ptr, &null, &null,
+												  &null);
+	dst_img->aspect = dst_img->size.x / dst_img->size.y;
 }

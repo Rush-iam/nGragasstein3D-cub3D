@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:03 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/13 00:12:07 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/13 17:57:49 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,68 +14,25 @@
 
 void	objects(t_game *g)
 {
-	(void)g;
-//	t_list		*cur_list;
-//	t_object	*obj;
-//	t_fpoint	diff;
-
-//	cur_list = g->objects;
-//	while (cur_list)
-//	{
-//		obj = (t_object *)cur_list->content;
-//		diff = (t_fpoint){obj->pos.x - g->p.pos.x, obj->pos.y - g->p.pos.y};
-//		obj->distance_real = hypot(diff.x, diff.y);
-//		if (obj->distance_real < 0.5)
-//			cur_list = object_pickup(g, cur_list, obj->type);
-//		else
-//			cur_list = cur_list->next;
-//		if (obj->type == T_ENEMY && obj->e->state == S_DEAD)
-//			obj->sprite = &g->sprite[16];
-//	}
-}
-
-void	pickups(t_game *g)
-{
 	t_list		*cur_list;
-	t_list		*prev_list;
 	t_list		*next_list;
 	t_object	*obj;
 	t_fpoint	diff;
 
-	cur_list = g->pickups;
-	prev_list = NULL;
+	cur_list = g->objects;
+	g->p.target = NULL;
 	while (cur_list)
 	{
 		next_list = cur_list->next;
 		obj = (t_object *)cur_list->content;
 		diff = (t_fpoint){obj->pos.x - g->p.pos.x, obj->pos.y - g->p.pos.y};
 		obj->distance_real = hypot(diff.x, diff.y);
-		if (obj->distance_real < 0.5 && object_pickup(g, obj->type))
-		{
-			if (prev_list == NULL)
-				prev_list = cur_list;
-			ft_lstremove(&g->pickups, cur_list);
-			ft_lstremoveif(&g->objects, obj, objects_find, void_function);
-		}
+		if (obj->type != T_ENEMY && obj->type != T_DECOR &&
+					obj->distance_real < 0.5 && object_pickup(g, obj->type))
+			ft_lstremove(&g->objects, cur_list);
+		if (obj->type == T_ENEMY && obj->e->targeted && obj->e->state != S_DEAD)
+			g->p.target = obj;
 		cur_list = next_list;
-	}
-}
-
-void	enemies(t_game *g)
-{
-	t_list		*cur_list;
-	t_object	*obj;
-	t_fpoint	diff;
-
-	cur_list = g->enemies;
-	while (cur_list)
-	{
-		obj = (t_object *)cur_list->content;
-		diff = (t_fpoint){obj->pos.x - g->p.pos.x, obj->pos.y - g->p.pos.y};
-		obj->distance_real = hypot(diff.x, diff.y);
-		if (obj->type == T_ENEMY && obj->e->state == S_DEAD)
-			obj->sprite = &g->sprite[16];
-		cur_list = cur_list->next;
 	}
 }
 
@@ -120,11 +77,6 @@ void	object_add(t_game *game, t_list **dst, t_object *obj)
 int		objects_sort(t_object *obj1, t_object *obj2)
 {
 	return (obj1->distance < obj2->distance);
-}
-
-int		objects_find(t_object *obj1, t_object *obj2)
-{
-	return (obj1 == obj2);
 }
 
 bool	object_pickup(t_game *game, enum e_objtype type)

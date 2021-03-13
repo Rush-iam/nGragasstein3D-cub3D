@@ -88,7 +88,7 @@ void	set_map_check_cell(t_game *game, char **map, t_upoint pt)
 	const char	*dirs = "ESWN";
 
 	if (ft_strchr(CHAR_ALLOWED, map[pt.y][pt.x]) == NULL)
-		terminate(game, ERR_PARSE, "Wrong map character.");
+		terminate(game, ERR_PARSE, "Wrong map character");
 	if (map[pt.y][pt.x] == ' ' || ft_isdigit(map[pt.y][pt.x]))
 		return ;
 	if (pt.x == 0 || pt.x == game->map.size.x - 1 ||

@@ -133,7 +133,7 @@ void			set_resolution		(const char *res_string, t_upoint *res,
 void			set_colors			(const char *color_string, unsigned *target,
 															t_game *game);
 void			set_textures		(char *string, t_game *game);
-void			set_textures_import(char *string, t_img *texture, t_game *game);
+void			set_textures_import(char *path, t_img *dst_img, t_game *game);
 
 void			set_map				(t_game *game, t_list *map);
 void			set_map_process		(t_game *game);

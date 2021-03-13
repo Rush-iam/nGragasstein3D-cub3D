@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/12 16:12:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/12 23:09:45 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/13 16:01:57 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,9 @@ void	player_set_weapon(t_game *game, enum e_weapon weapon)
 
 void	draw_weapon(t_game *game, struct s_weapon *weapon)
 {
-	mlx_put_image_to_window(game->mlx, game->win, game->p.weapon_img
-							[game->p.weapon_cur][weapon->animation[weapon->frame]].ptr,
-							game->p.weapon_pos.x, game->p.weapon_pos.y);
+	mlx_put_image_to_window(game->mlx, game->win,game->p.weapon_img
+					[game->p.weapon_cur][weapon->animation[weapon->frame]].ptr,
+					game->p.weapon_pos.x, game->p.weapon_pos.y);
 }
 
 void	object_drop(t_game *game, t_fpoint pos, enum e_objtype type)
@@ -77,36 +77,23 @@ void	object_drop(t_game *game, t_fpoint pos, enum e_objtype type)
 	obj->sprite = &game->sprite[type - 1 + (sizeof(CHAR_DECOR) - 1)];
 	obj->type = type;
 	object_add(game, &game->objects, obj);
-	object_add(game, &game->pickups, obj);
 }
 
 void	weapon_shoot(t_game *game)
 {
-	t_list		*cur_list;
-	t_object	*obj;
-	t_object	*nearest_target;
-
 	if (game->p.weapon_cur != W_KNIFE)
 		game->p.ammo--;
-	cur_list = game->objects;
-	nearest_target = NULL;
-	while (cur_list)
+	if (game->p.target)
 	{
-		obj = (t_object *)cur_list->content;
-		if (obj->type == T_ENEMY && obj->e->targeted && obj->e->state != S_DEAD)
-			nearest_target = obj;
-		cur_list = cur_list->next;
-	}
-	if (nearest_target)
-	{
-		if (game->p.weapon_cur == W_KNIFE && nearest_target->distance_real < 1)
-			nearest_target->e->health -= 13;
+		if (game->p.weapon_cur == W_KNIFE && game->p.target->distance_real < 1)
+			game->p.target->e->health -= 13;
 		else if (game->p.weapon_cur != W_KNIFE)
-			nearest_target->e->health -= 13;
-		if (nearest_target->e->health <= 0)
+			game->p.target->e->health -= 13;
+		if (game->p.target->e->health <= 0)
 		{
-			object_drop(game, nearest_target->pos, T_AMMO);
-			nearest_target->e->state = S_DEAD;
+			object_drop(game, game->p.target->pos, T_AMMO);
+			game->p.target->e->state = S_DEAD;
+			game->p.target->sprite = &game->sprite[16];
 			game->p.score += VAL_SCORE_KILL;
 		}
 	}

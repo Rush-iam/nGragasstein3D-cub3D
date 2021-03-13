@@ -14,6 +14,8 @@ G0 ./resources/weapons/knife_
 G1 ./resources/weapons/pistol_
 G2 ./resources/weapons/rifle_
 
+E0 ./resources/enemies/guard_
+
 S0 ./resources/sprites/lamp.png
 S1 ./resources/sprites/chandelier.png
 S2 ./resources/sprites/lamp_stand.png

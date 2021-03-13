@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/11 20:22:53 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/13 22:18:10 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,42 @@ void	parse(int args, char **av, t_game *game, bool *screenshot_only)
 	}
 }
 
+void	set_enemies(char *string, t_game *game)
+{
+	unsigned	id;
+//	int			i;
+	char		*path;
+
+	if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
+		terminate(game, ERR_PARSE, "Enemies ID is wrong (Ex)");
+	if (id >= sizeof(game->spriteset) / sizeof(*game->spriteset))
+		terminate(game, ERR_PARSE, "Enemies ID out of array range");
+	if (game->spriteset[id].dead[0].ptr != NULL)
+		terminate(game, ERR_PARSE, "Duplicated enemy spriteset setting");
+	if ((path = ft_strjoin(string, "wait_")) == NULL)
+		terminate(game, ERR_PARSE, strerror(errno));
+	load_spriteset(game->spriteset[id].wait, 8, path, game);
+	if ((path = ft_strjoin(string, "attack_")) == NULL)
+		terminate(game, ERR_PARSE, strerror(errno));
+	load_spriteset(game->spriteset[id].attack, 3, path, game);
+	if ((path = ft_strjoin(string, "dead_")) == NULL)
+		terminate(game, ERR_PARSE, strerror(errno));
+	load_spriteset(game->spriteset[id].dead, 5, path, game);
+//	i = 0;
+//	if ((path = ft_strjoin(string, "pain_")) == NULL)
+//		terminate(game, ERR_PARSE, strerror(errno));
+//	load_spriteset(game->spriteset[id].pain, 5, path, game);
+//	while (i < 4)
+//	{
+//		if (!(texture->ptr = mlx_png_file_to_image(game->mlx, path,
+//							(int *)&texture->size.x, (int *)&texture->size.y)))
+//			terminate(game, ERR_PARSE, "Can't load weapon texture file");
+//		texture->data = (unsigned *)mlx_get_data_addr(texture->ptr, &n, &n, &n);
+//		texture->aspect = texture->size.x / texture->size.y;
+//		i++;
+//	}
+}
+
 void	parse_scene(int file_id, char **line, t_game *game)
 {
 	int	status;
@@ -59,6 +95,8 @@ void	parse_scene(int file_id, char **line, t_game *game)
 			set_textures(*line, game);
 		else if (**line == 'G')
 			set_weapons(*line, game);
+		else if (**line == 'E')
+			set_enemies(*line, game);
 		else if (**line != '\0')
 			return ;
 		free(*line);

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/13 00:08:55 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/13 22:04:53 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,16 @@ typedef struct	s_img
 
 # define ENEMY_HEALTH	25
 
+
+typedef struct	s_imgset
+{
+	t_img		wait[8];
+	t_img		walk[8][4];
+	t_img		attack[3];
+	t_img		pain[2];
+	t_img		dead[5];
+}				t_imgset;
+
 typedef struct	s_object
 {
 	t_img		*sprite;
@@ -162,15 +172,16 @@ typedef struct	s_object
 		double	angle;
 		short	health;
 		short	frame;
+		short	frames;
 		time_t	tick_nextframe;
 		time_t	tick_state_start;
 		time_t	tick_state_end;
 		enum	e_objstate
 		{
 			S_WAIT = 0,
+			S_WALK,
 			S_ATTACK,
 			S_PAIN,
-			S_SEARCH,
 			S_DEAD
 		}		state;
 	}			*e;
@@ -191,6 +202,7 @@ typedef struct	s_game
 		short		health;
 		short		ammo;
 		short		score;
+		t_object	*target;
 		short		weapons_mask;
 		enum	e_weapon
 		{
@@ -242,9 +254,8 @@ typedef struct	s_game
 	unsigned	color_floor;
 	t_img		texture[20];
 	t_img		sprite[sizeof(CHAR_OBJECTS) - 4];
+	t_imgset	spriteset[1];
 	t_list		*objects;
-	t_list		*pickups;
-	t_list		*enemies;
 	struct		s_effect
 	{
 		unsigned	frames;
@@ -276,7 +287,9 @@ void			set_colors			(const char *color_string, unsigned *target,
 															t_game *game);
 void			set_weapons			(char *string, t_game *game);
 void			set_textures		(char *string, t_game *game);
-void			set_textures_import(char *string, t_img *texture, t_game *game);
+void			load_spriteset(t_img dst[], int count, char *path, t_game *game);
+void			load_texture_file(char *path, t_img *dst_img, char *err,
+						t_game *game);
 
 void			set_map				(t_game *game, t_list *map);
 void			set_map_process		(t_game *game);
@@ -328,12 +341,9 @@ void			draw_wall_scaled(t_game *game, t_img *src, unsigned x,
 void			draw_wall_solid	(t_game *game, unsigned x, float fade);
 
 void			objects				(t_game *g);
-void			pickups(t_game *g);
-void			enemies(t_game *g);
 void			object_add(t_game *game, t_list **dst, t_object *obj);
 void			draw_objects		(t_game *g);
 int				objects_sort		(t_object *obj1, t_object *obj2);
-int				objects_find(t_object *obj1, t_object *obj2);
 bool			object_pickup(t_game *game, enum e_objtype type);
 
 void			object_pickup_add(t_game *game, enum e_objtype type);
@@ -359,7 +369,6 @@ void			write_screenshot_data	(t_game *game, int file_id);
 int				terminate		(t_game *game, int return_value, char *message);
 void			terminate_free	(t_game *game);
 void			terminate_free_object(void *object);
-void			void_function(void *ptr);
 
 void			demo_fillrate	(t_game *mlx, int step);
 void			demo_radar		(t_game *mlx, int rays);

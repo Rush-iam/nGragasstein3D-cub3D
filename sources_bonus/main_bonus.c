@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/12 23:29:39 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/13 15:52:50 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,10 +135,6 @@ void	initialize_game_2(t_game *game)
 		obj = (t_object *)cur_list->content;
 		obj->distance = game->p.vector.x * (obj->pos.x - game->p.pos.x) +
 						game->p.vector.y * (obj->pos.y - game->p.pos.y);
-		if (obj->type == T_ENEMY)
-			object_add(game, &game->enemies, obj);
-		else if (obj->type != T_DECOR && obj->type != T_ENEMY)
-			object_add(game, &game->pickups, obj);
 		cur_list = cur_list->next;
 	}
 }
@@ -160,8 +156,6 @@ int	game_loop(t_game *game)
 	{
 		player_control(game);
 		objects(game);
-		pickups(game);
-		enemies(game);
 		weapon(game, &game->p.weapon);
 		ray_cast(game);
 		game->tick_diff--;

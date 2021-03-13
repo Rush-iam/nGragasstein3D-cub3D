@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 NAME 	= 	cub3D
-CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g #-Ofast -march=native
+CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g -Ofast -march=native
 SRC    :=		main			\
 				control			\
 				objects			\
