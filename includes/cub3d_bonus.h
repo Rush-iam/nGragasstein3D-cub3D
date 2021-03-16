@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/13 22:04:53 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/16 23:28:48 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,8 +83,8 @@
 
 typedef struct	s_point
 {
-	signed int	x;
-	signed int	y;
+	int	x;
+	int	y;
 }				t_point;
 
 typedef struct	s_upoint
@@ -111,8 +111,8 @@ typedef struct	s_img
 # define CHAR_PICKUP	"+HhAaZzXx"
 # define CHAR_ENEMY		"nswe"
 # define CHAR_SOLID		"$:;,!@%#&|"
-# define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP CHAR_ENEMY
-# define CHAR_ALLOWED	" .0123456789NSWE" CHAR_OBJECTS
+# define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP
+# define CHAR_ALLOWED	" .0123456789NSWE" CHAR_OBJECTS CHAR_ENEMY
 
 # define VAL_HEALTH_XL	200
 # define VAL_HEALTH_L	25
@@ -128,17 +128,23 @@ typedef struct	s_img
 # define W_PISTOL_MASK	0b010
 # define W_RIFLE_MASK	0b100
 
+# define DMG_KNIFE_MIN	1
+# define DMG_KNIFE		16
+# define DMG_FIRE_MIN	13
+# define DMG_FIRE		35
+
 # define START_HEALTH	100
 # define START_AMMO		8
 # define START_WEAPONS	W_KNIFE_MASK | W_PISTOL_MASK
 
-# define ENEMY_HEALTH	25
-
+# define ENEMY_ID_GUARD		0
+# define ENEMY_HEALTH		25
+# define ANIM_ENEMY_TICKS	10
 
 typedef struct	s_imgset
 {
 	t_img		wait[8];
-	t_img		walk[8][4];
+	t_img		walk[4][8];
 	t_img		attack[3];
 	t_img		pain[2];
 	t_img		dead[5];
@@ -169,13 +175,16 @@ typedef struct	s_object
 	struct		s_enemy
 	{
 		bool	targeted;
-		double	angle;
+		bool	shot;
+		float	angle;
+		float	angle_to_p;
+		float	angle_from_p;
 		short	health;
+		t_img	*imgset;
 		short	frame;
 		short	frames;
-		time_t	tick_nextframe;
-		time_t	tick_state_start;
-		time_t	tick_state_end;
+		time_t	tick;
+		time_t	ticks;
 		enum	e_objstate
 		{
 			S_WAIT = 0,
@@ -213,10 +222,10 @@ typedef struct	s_game
 		struct	s_weapon
 		{
 			unsigned char	animation[5];
-			unsigned		frame;
-			unsigned		frames;
-			unsigned		tick;
-			unsigned		ticks;
+			unsigned short	frame;
+			unsigned short	frames;
+			unsigned short	tick;
+			unsigned short	ticks;
 			bool			lock;
 		}		weapon;
 		bool		weapon_shot;
@@ -253,8 +262,8 @@ typedef struct	s_game
 	unsigned	color_ceil;
 	unsigned	color_floor;
 	t_img		texture[20];
-	t_img		sprite[sizeof(CHAR_OBJECTS) - 4];
-	t_imgset	spriteset[1];
+	t_img		sprite[sizeof(CHAR_OBJECTS) - 1];
+	t_imgset	imgset[1];
 	t_list		*objects;
 	struct		s_effect
 	{
@@ -342,7 +351,9 @@ void			draw_wall_solid	(t_game *game, unsigned x, float fade);
 
 void			objects				(t_game *g);
 void			object_add(t_game *game, t_list **dst, t_object *obj);
-void			draw_objects		(t_game *g);
+void			object_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img);
+void			enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state);
+void			draw_objects		(t_game *g, t_list *cur_list);
 int				objects_sort		(t_object *obj1, t_object *obj2);
 bool			object_pickup(t_game *game, enum e_objtype type);
 
@@ -353,7 +364,7 @@ void			draw_sprite_scaled	(t_img *img, t_object *obj, unsigned x,
 
 void			weapon(t_game *game, struct s_weapon *weapon);
 void			draw_weapon(t_game *game, struct s_weapon *weapon);
-void			weapon_shoot(t_game *game);
+void			weapon_shoot(t_game *game, t_object *target);
 
 void			draw_effect(t_game *game, struct s_effect *ef);
 void			effect_flash(t_game *game, unsigned color, float power);

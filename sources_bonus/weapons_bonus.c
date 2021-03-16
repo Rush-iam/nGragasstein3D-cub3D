@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/12 16:12:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/13 16:01:57 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/16 23:26:58 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	weapon(t_game *game, struct s_weapon *weapon)
 		weapon->frame = weapon->frames * weapon->tick / weapon->ticks;
 		if (game->p.weapon_shot == false && weapon->frame == SHOT_FRAME_ID)
 		{
-			weapon_shoot(game);
+			weapon_shoot(game, game->p.target);
 			game->p.weapon_shot = true;
 		}
 		else if (weapon->frame == 3)
@@ -39,17 +39,17 @@ void	weapon(t_game *game, struct s_weapon *weapon)
 void	player_set_weapon(t_game *game, enum e_weapon weapon)
 {
 	game->p.weapon_cur = weapon;
-	if (weapon == W_KNIFE)
+	if (game->p.weapon_cur == W_KNIFE)
 	{
 		ft_memcpy(game->p.weapon.animation, ANIM_KNIFE, sizeof(ANIM_KNIFE));
 		game->p.weapon.frames = sizeof(ANIM_KNIFE);
 	}
-	else if (weapon == W_PISTOL)
+	else if (game->p.weapon_cur == W_PISTOL)
 	{
 		ft_memcpy(game->p.weapon.animation, ANIM_PISTOL, sizeof(ANIM_PISTOL));
 		game->p.weapon.frames = sizeof(ANIM_PISTOL);
 	}
-	else if (weapon == W_RIFLE)
+	else if (game->p.weapon_cur == W_RIFLE)
 	{
 		ft_memcpy(game->p.weapon.animation, ANIM_RIFLE, sizeof(ANIM_RIFLE));
 		game->p.weapon.frames = sizeof(ANIM_RIFLE);
@@ -67,35 +67,45 @@ void	draw_weapon(t_game *game, struct s_weapon *weapon)
 					game->p.weapon_pos.x, game->p.weapon_pos.y);
 }
 
-void	object_drop(t_game *game, t_fpoint pos, enum e_objtype type)
+void	object_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img)
 {
 	t_object	*obj;
 
 	if ((obj = ft_calloc(1, sizeof(t_object))) == NULL)
 		terminate(game, ERR_MEM, "Memory allocation failed (object)");
 	obj->pos = pos;
-	obj->sprite = &game->sprite[type - 1 + (sizeof(CHAR_DECOR) - 1)];
+	if (img == NULL)
+		obj->sprite = &game->sprite[type - 1 + (sizeof(CHAR_DECOR) - 1)];
+	else
+		obj->sprite = img;
 	obj->type = type;
 	object_add(game, &game->objects, obj);
 }
 
-void	weapon_shoot(t_game *game)
+void	weapon_shoot(t_game *game, t_object *target)
 {
+	unsigned	damage;
+
 	if (game->p.weapon_cur != W_KNIFE)
 		game->p.ammo--;
-	if (game->p.target)
+	if (target)
 	{
-		if (game->p.weapon_cur == W_KNIFE && game->p.target->distance_real < 1)
-			game->p.target->e->health -= 13;
+		if (game->p.weapon_cur == W_KNIFE && target->distance_real < 1)
+			damage = DMG_KNIFE_MIN + arc4random() % (DMG_KNIFE - DMG_KNIFE_MIN);
 		else if (game->p.weapon_cur != W_KNIFE)
-			game->p.target->e->health -= 13;
-		if (game->p.target->e->health <= 0)
+			damage = DMG_FIRE_MIN + arc4random() % (1 + DMG_FIRE - DMG_FIRE_MIN);
+		else
+			return ;
+		target->e->health -= damage;
+		if (target->e->health <= 0)
 		{
-			object_drop(game, game->p.target->pos, T_AMMO);
-			game->p.target->e->state = S_DEAD;
-			game->p.target->sprite = &game->sprite[16];
+			object_drop(game, target->pos, T_AMMO_ENEMY,
+				&game->sprite[sizeof(CHAR_DECOR) - 1 + T_AMMO - 1]);
+			enemy_set_state(target, &game->imgset[ENEMY_ID_GUARD], S_DEAD);
 			game->p.score += VAL_SCORE_KILL;
 		}
+		else
+			enemy_set_state(target, &game->imgset[ENEMY_ID_GUARD], S_PAIN);
+		printf("bam! ammo left: %hd RND damage: %u\n", game->p.ammo, damage);
 	}
-	printf("bam! ammo left: %hd\n", game->p.ammo);
 }

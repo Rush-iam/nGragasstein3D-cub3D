@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/13 15:52:50 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/16 23:02:13 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,8 @@ int	game_loop(t_game *game)
 //	for (int i = 0; i < 500; ++i)
 	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
 	draw_walls(game);
-	draw_objects(game);
+	ft_lstsort(&game->objects, objects_sort);
+	draw_objects(game, game->objects);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
 	draw_effect(game, &game->effect);
 	draw_weapon(game, &game->p.weapon);

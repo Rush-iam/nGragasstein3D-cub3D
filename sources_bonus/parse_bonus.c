@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/13 22:18:10 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/16 17:17:39 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,31 +41,33 @@ void	parse(int args, char **av, t_game *game, bool *screenshot_only)
 	}
 }
 
-void	set_enemies(char *string, t_game *game)
+void	set_enemies(char *string, t_game *g)
 {
 	unsigned	id;
 //	int			i;
 	char		*path;
 
 	if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
-		terminate(game, ERR_PARSE, "Enemies ID is wrong (Ex)");
-	if (id >= sizeof(game->spriteset) / sizeof(*game->spriteset))
-		terminate(game, ERR_PARSE, "Enemies ID out of array range");
-	if (game->spriteset[id].dead[0].ptr != NULL)
-		terminate(game, ERR_PARSE, "Duplicated enemy spriteset setting");
+		terminate(g, ERR_PARSE, "Enemies ID is wrong (Ex)");
+	if (id >= sizeof(g->imgset) / sizeof(*g->imgset))
+		terminate(g, ERR_PARSE, "Enemies ID out of array range");
+	if (g->imgset[id].dead[0].ptr != NULL)
+		terminate(g, ERR_PARSE, "Duplicated enemy spriteset setting");
 	if ((path = ft_strjoin(string, "wait_")) == NULL)
-		terminate(game, ERR_PARSE, strerror(errno));
-	load_spriteset(game->spriteset[id].wait, 8, path, game);
+		terminate(g, ERR_PARSE, strerror(errno));
+	load_spriteset(g->imgset[id].wait, 8, path, g);
 	if ((path = ft_strjoin(string, "attack_")) == NULL)
-		terminate(game, ERR_PARSE, strerror(errno));
-	load_spriteset(game->spriteset[id].attack, 3, path, game);
+		terminate(g, ERR_PARSE, strerror(errno));
+	load_spriteset(g->imgset[id].attack, 3, path, g);
 	if ((path = ft_strjoin(string, "dead_")) == NULL)
-		terminate(game, ERR_PARSE, strerror(errno));
-	load_spriteset(game->spriteset[id].dead, 5, path, game);
+		terminate(g, ERR_PARSE, strerror(errno));
+	load_spriteset(g->imgset[id].dead, 5, path, g);
+	if ((path = ft_strjoin(string, "pain.png")) == NULL)
+		terminate(g, ERR_PARSE, strerror(errno));
+	load_texture_file(path, &g->imgset[id].pain[0], "Can't load sprite", g);
+	free(path);
+	g->imgset[id].pain[1] = g->imgset[id].dead[0];
 //	i = 0;
-//	if ((path = ft_strjoin(string, "pain_")) == NULL)
-//		terminate(game, ERR_PARSE, strerror(errno));
-//	load_spriteset(game->spriteset[id].pain, 5, path, game);
 //	while (i < 4)
 //	{
 //		if (!(texture->ptr = mlx_png_file_to_image(game->mlx, path,
@@ -97,7 +99,7 @@ void	parse_scene(int file_id, char **line, t_game *game)
 			set_weapons(*line, game);
 		else if (**line == 'E')
 			set_enemies(*line, game);
-		else if (**line != '\0')
+		else if (**line != '#' && **line != '\0')
 			return ;
 		free(*line);
 		if (status == 0)
@@ -145,7 +147,7 @@ void	validate_settings(t_game *game)
 		terminate(game, ERR_PARSE, "Ceil color not found. Format: C R,G,B");
 	if (game->img.size.x == 0 || game->img.size.y == 0)
 		terminate(game, ERR_PARSE,
-		"Resolution doesn't set. Format: 'R WIDTH HEIGHT' (max 32767x32767)");
+		"Resolution doesn't set. Format: 'R WIDTH HEIGHT'");
 	i = 0;
 	while (i < sizeof(game->texture) / sizeof(*game->texture) / 2)
 		if (game->texture[i++].ptr == NULL)

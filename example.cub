@@ -1,0 +1,67 @@
+R 2560 1294
+C 56,56,56
+F 112,112,112
+
+W0 ./resources/walls/wall_0.png
+W1 ./resources/walls/wall_1.png
+W2 ./resources/walls/wall_2.png
+W3 ./resources/walls/wall_3.png
+W4 ./resources/walls/wall_4.png
+W5 ./resources/walls/wall_5.png
+W6 ./resources/walls/wall_6.png
+W7 ./resources/walls/wall_7.png
+W8 ./resources/walls/wall_8.png
+W9 ./resources/walls/wall_9.png
+
+G0 ./resources/weapons/knife_
+G1 ./resources/weapons/pistol_
+G2 ./resources/weapons/rifle_
+
+E0 ./resources/enemies/guard_
+
+S0 ./resources/sprites/lamp.png
+S1 ./resources/sprites/chandelier.png
+S2 ./resources/sprites/lamp_stand.png
+S3 ./resources/sprites/plant_green.png
+S4 ./resources/sprites/plant_dry.png
+S5 ./resources/sprites/vase.png
+S6 ./resources/sprites/flag.png
+S7 ./resources/sprites/barrel_brown.png
+S8 ./resources/sprites/barrel_green.png
+S9 ./resources/sprites/table.png
+S10 ./resources/sprites/table_chairs.png
+S11 ./resources/sprites/statue.png
+S12 ./resources/sprites/skeleton.png
+S13 ./resources/sprites/bones.png
+S14 ./resources/sprites/puddle.png
+S15 ./resources/sprites/pot.png
+S16 ./resources/sprites/guard_dead.png
+S17 ./resources/sprites/health_xl.png
+S18 ./resources/sprites/health_l.png
+S19 ./resources/sprites/health_m.png
+S20 ./resources/sprites/gun_rifle.png
+S21 ./resources/sprites/ammo.png
+S22 ./resources/sprites/bonus_xl.png
+S23 ./resources/sprites/bonus_l.png
+S24 ./resources/sprites/bonus_m.png
+S25 ./resources/sprites/bonus_s.png
+
+# W0-W9   = 0123456789		  - стены
+# S0-S16  = ^*$:;,!@%#&|{}_<` - декорации
+# S17-S25 = +HhAaZzXx		  - предметы
+# S26	  = nswe			  - враги (направление взгляда)
+
+# Символы NSWE - стартовая точка игрока.
+# Пока что непроходимые вот эти спрайты: (задаётся в коде)
+# S2-S10  = $:;,!@%#&|
+
+  0000000000000000001234567890
+  0^*$:;,!@%#&|{}_<`.........0
+  0+HhAaZzXx.................000
+  0............nswe............0
+000..........................000
+0..........................000
+0...........N..............0
+0.nnnnnnnnnnnnnnnnnnnnnnnn.0
+0..........................0
+0000000000000000000000000000

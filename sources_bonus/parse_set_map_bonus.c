@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:49 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/12 23:12:10 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/16 20:47:57 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,8 @@ void	set_map_process(t_game *game)
 {
 	t_upoint	pt;
 	const char	obj_chars[] = CHAR_OBJECTS;
-	char		*chr;
+	char		*chr_ptr;
+	char		chr;
 
 	pt.y = 0;
 	while (pt.y < game->map.size.y)
@@ -49,13 +50,11 @@ void	set_map_process(t_game *game)
 		while (pt.x < game->map.size.x)
 		{
 			set_map_check_cell(game, game->map.grid, pt);
-			if ((chr = ft_strchr(obj_chars, game->map.grid[pt.y][pt.x])))
-			{
-				if (*chr == 'n' || *chr == 's' || *chr == 'w' || *chr == 'e')
-					set_map_object_add(game, *chr, sizeof(obj_chars) - 5, pt);
-				else
-					set_map_object_add(game, *chr, chr - obj_chars, pt);
-			}
+			chr = game->map.grid[pt.y][pt.x];
+			if ((chr_ptr = ft_strchr(obj_chars, chr)))
+				set_map_object_add(game, chr, chr_ptr - obj_chars, pt);
+			else if (chr == 'n' || chr == 's' || chr == 'w' || chr == 'e')
+				set_map_object_add(game, chr, sizeof(obj_chars) - 1, pt);
 			pt.x++;
 		}
 		pt.y++;
@@ -70,7 +69,8 @@ void	set_map_object_add(t_game *game, char chr, unsigned type, t_upoint pt)
 	if ((obj = ft_calloc(1, sizeof(t_object))) == NULL)
 		terminate(game, ERR_MEM, "Memory allocation failed (object)");
 	obj->pos = (t_fpoint){pt.x + 0.5, pt.y + 0.5};
-	obj->sprite = &game->sprite[type];
+	if (obj->type != T_ENEMY)
+		obj->sprite = &game->sprite[type];
 	if (type > sizeof(CHAR_DECOR) - 2)
 		obj->type = type - (sizeof(CHAR_DECOR) - 2);
 	if (obj->type == T_ENEMY)
@@ -79,6 +79,7 @@ void	set_map_object_add(t_game *game, char chr, unsigned type, t_upoint pt)
 			terminate(game, ERR_MEM, "Memory allocation failed (enemy)");
 		obj->e->angle = M_PI_2 * (ft_strchr(dirs, chr) - dirs);
 		obj->e->health = ENEMY_HEALTH;
+		enemy_set_state(obj, &game->imgset[ENEMY_ID_GUARD], S_WAIT);
 	}
 	object_add(game, &game->objects, obj);
 }
