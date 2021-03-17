@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/12 16:12:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/17 16:20:12 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/17 21:21:46 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ void	weapon(t_game *game, struct s_weapon *weapon)
 		weapon->frame = weapon->frames * weapon->tick / weapon->ticks;
 		if (game->p.weapon_shot == false && weapon->frame == SHOT_FRAME_ID)
 		{
-			printf("attack! %p\n", game->p.target);
 			weapon_shoot(game, game->p.target);
 			game->p.weapon_shot = true;
 		}

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/17 15:59:26 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/17 23:35:12 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,10 +154,16 @@ typedef struct	s_object
 {
 	t_img		*sprite;
 	t_fpoint	pos;
-	t_fpoint	size;
 	double		distance;
 	double		distance_real;
 	float		angle_from_p;
+	struct		s_render
+	{
+		t_fpoint	size;
+		t_point		start;
+		t_point		end;
+		t_fpoint	step;
+	}			render;
 	enum		e_objtype
 	{
 		T_DECOR = 0,
@@ -175,7 +181,6 @@ typedef struct	s_object
 	}			type;
 	struct		s_enemy
 	{
-		bool	targeted;
 		bool	shot;
 		float	angle;
 		float	angle_to_p;
@@ -354,15 +359,15 @@ void			object_add(t_game *game, t_list **dst, t_object *obj);
 void			object_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img);
 void			enemy_logic(t_game *game, t_object *enemy);
 void			enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state);
-void			draw_objects		(t_game *game, t_list *cur_list);
 void			enemy_settings(t_game *game, t_object *obj, float atan2_diff);
 int				objects_sort		(t_object *obj1, t_object *obj2);
 bool			object_pickup(t_game *game, enum e_objtype type);
-
 void			object_pickup_add(t_game *game, enum e_objtype type);
-void			draw_sprite			(t_game *game, t_object *obj);
-void			draw_sprite_scaled	(t_img *img, t_object *obj, unsigned x,
-																unsigned src_x);
+
+void			draw_objects		(t_game *game, t_list *cur_list);
+void			draw_object_properties(t_game *game, t_object *obj);
+void			draw_sprite(t_game *game, t_object *obj);
+void			draw_sprite_scaled(t_img *img, t_object *obj, t_point min, t_point max);
 
 void			weapon(t_game *game, struct s_weapon *weapon);
 void			draw_weapon(t_game *game, struct s_weapon *weapon);

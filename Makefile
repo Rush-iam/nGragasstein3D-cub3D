@@ -6,28 +6,28 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/03/17 15:08:40 by ngragas          ###   ########.fr        #
+#    Updated: 2021/03/17 23:40:24 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME 	= 	cub3D
-CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g #-Ofast -march=native
+CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g -Ofast -march=native
 SRC    :=		main			\
 				control			\
+				draw_walls		\
 				objects			\
 				parse			\
 				parse_set		\
 				parse_set_map	\
 				raycasting		\
-				utils			\
-				walls
+				utils
 
 SRC_BONUS :=	demo_tools		\
 				draw_effects	\
 				draw_figures	\
 				draw_fills		\
+				draw_objects	\
 				draw_map		\
-				draw_sprite		\
 				hooks			\
 				terminate		\
 				weapons
