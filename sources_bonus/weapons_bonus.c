@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/12 16:12:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/16 23:26:58 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/17 16:20:12 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ void	weapon(t_game *game, struct s_weapon *weapon)
 		weapon->frame = weapon->frames * weapon->tick / weapon->ticks;
 		if (game->p.weapon_shot == false && weapon->frame == SHOT_FRAME_ID)
 		{
+			printf("attack! %p\n", game->p.target);
 			weapon_shoot(game, game->p.target);
 			game->p.weapon_shot = true;
 		}
@@ -67,21 +68,6 @@ void	draw_weapon(t_game *game, struct s_weapon *weapon)
 					game->p.weapon_pos.x, game->p.weapon_pos.y);
 }
 
-void	object_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img)
-{
-	t_object	*obj;
-
-	if ((obj = ft_calloc(1, sizeof(t_object))) == NULL)
-		terminate(game, ERR_MEM, "Memory allocation failed (object)");
-	obj->pos = pos;
-	if (img == NULL)
-		obj->sprite = &game->sprite[type - 1 + (sizeof(CHAR_DECOR) - 1)];
-	else
-		obj->sprite = img;
-	obj->type = type;
-	object_add(game, &game->objects, obj);
-}
-
 void	weapon_shoot(t_game *game, t_object *target)
 {
 	unsigned	damage;
@@ -93,7 +79,7 @@ void	weapon_shoot(t_game *game, t_object *target)
 		if (game->p.weapon_cur == W_KNIFE && target->distance_real < 1)
 			damage = DMG_KNIFE_MIN + arc4random() % (DMG_KNIFE - DMG_KNIFE_MIN);
 		else if (game->p.weapon_cur != W_KNIFE)
-			damage = DMG_FIRE_MIN + arc4random() % (1 + DMG_FIRE - DMG_FIRE_MIN);
+			damage = DMG_SHOT_MIN + arc4random() % (1 + DMG_SHOT - DMG_SHOT_MIN);
 		else
 			return ;
 		target->e->health -= damage;

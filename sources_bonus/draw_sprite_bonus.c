@@ -6,27 +6,24 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 23:33:45 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/12 23:13:28 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/17 16:01:32 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
 
-void	draw_sprite(t_game *game, t_object *obj, double angle)
+void	draw_sprite(t_game *game, t_object *obj)
 {
 	int	start_x;
 	int	cur_x;
 	int	max_x;
 
-	obj->size.x = game->col_scale / obj->distance;
-	obj->size.y = obj->size.x * obj->sprite->aspect;
-	start_x = game->col_center + tan(angle) / game->col_step - obj->size.x / 2;
+	start_x = game->col_center + tan(obj->angle_from_p) / game->col_step -
+														obj->size.x / 2;
 	cur_x = start_x;
 	max_x = cur_x + obj->size.x;
-	if (cur_x < 0)
-		cur_x = 0;
-	if (max_x >= (int)game->img.size.x)
-		max_x = (int)game->img.size.x;
+	cur_x = ft_max(cur_x, 0);
+	max_x = ft_min(max_x, (int)game->img.size.x);
 	while (cur_x < max_x)
 	{
 		if (obj->distance < game->column[cur_x]->distance)
@@ -43,7 +40,7 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 void	draw_sprite_scaled(t_img *img, t_object *obj, unsigned x,
 						   unsigned src_x)
 {
-	const double	step = (double)obj->sprite->size.y / obj->size.y;
+	const double	step = obj->sprite->size.y / obj->size.y;
 	int				y;
 	double			src_y;
 	int				max_height;
@@ -64,7 +61,7 @@ void	draw_sprite_scaled(t_img *img, t_object *obj, unsigned x,
 	while (++y < max_height)
 	{
 		if (((src_pixel = obj->sprite->data[(unsigned)src_y *
-											obj->sprite->size.x + src_x]) & 0xFF000000) == 0)
+							obj->sprite->size.x + src_x]) & 0xFF000000) == 0)
 			img->data[y * img->size.x + x] = src_pixel;
 		src_y += step;
 	}

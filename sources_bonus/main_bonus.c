@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/16 23:02:13 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/17 15:05:03 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,12 +45,9 @@ void	initialize_game_images(t_game *game, bool screenshot_only)
 	const t_upoint	max_res = (screenshot_only == true) ? MAX_SCR : MAX_WIN;
 	int				n;
 
-	if (game->img.size.x < MIN_RES_X)
-		game->img.size.x = MIN_RES_X;
-	if (game->img.size.x > max_res.x)
-		game->img.size.x = max_res.x;
-	if (game->img.size.y > max_res.y)
-		game->img.size.y = max_res.y;
+	game->img.size.x = ft_umax(game->img.size.x, MIN_RES_X);
+	game->img.size.x = ft_umin(game->img.size.x, max_res.x);
+	game->img.size.y = ft_umin(game->img.size.y, max_res.y);
 	game->img.aspect = (double)game->img.size.x / game->img.size.y;
 	if (screenshot_only == false)
 		if (!(game->win = mlx_new_window(

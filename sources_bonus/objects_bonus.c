@@ -6,15 +6,66 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:03 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/16 23:14:02 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/17 15:43:35 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
 
-void	enemy(t_game *game, t_object *enemy)
+void	objects(t_game *g)
 {
-	(void)game;
+	t_list		*cur_list;
+	t_list		*next_list;
+	t_object	*obj;
+	t_fpoint	diff;
+	float		atan2_diff;
+
+	cur_list = g->objects;
+	g->p.target = NULL;
+	while (cur_list)
+	{
+		next_list = cur_list->next;
+		obj = (t_object *)cur_list->content;
+		diff = (t_fpoint){obj->pos.x - g->p.pos.x, obj->pos.y - g->p.pos.y};
+		obj->distance = g->p.vector.x * diff.x + g->p.vector.y * diff.y;
+		obj->distance_real = hypot(diff.x, diff.y);
+		atan2_diff = atan2(diff.y, diff.x);
+		if (fabs(g->p.angle - atan2_diff - PI2) <= M_PI)
+			obj->angle_from_p = atan2_diff + PI2 - g->p.angle;
+		else
+			obj->angle_from_p = atan2_diff - g->p.angle;
+		if (obj->type == T_ENEMY)
+			enemy_settings(g, obj, atan2_diff);
+		if (obj->type != T_ENEMY && obj->type != T_DECOR &&
+			obj->distance_real < 0.5 && object_pickup(g, obj->type))
+			ft_lstremove(&g->objects, cur_list);
+		cur_list = next_list;
+	}
+}
+
+void	enemy_settings(t_game *game, t_object *obj, float atan2_diff)
+{
+	if (obj->e->targeted && obj->e->state != S_DEAD)
+		game->p.target = obj;
+	obj->e->targeted = false;
+	if (fabs(obj->e->angle - atan2_diff - PI2) <= M_PI + M_PI_4 / 2)
+		obj->e->angle_to_p = atan2_diff + PI2 - obj->e->angle + M_PI;
+	else
+		obj->e->angle_to_p = atan2_diff - obj->e->angle + M_PI;
+	if (obj->e->state == S_WAIT)
+		obj->e->imgset = &game->imgset[ENEMY_ID_GUARD].
+				wait[7 - (int)((obj->e->angle_to_p - M_PI_4 / 2) / M_PI_4)];
+	obj->sprite = &obj->e->imgset[obj->e->frame];
+	enemy_logic(game, obj);
+}
+
+void	enemy_logic(t_game *game, t_object *enemy)
+{
+//	if (enemy->distance_real < PL_RADIUS * 2)
+//	{
+//		game->p.pos = (t_fpoint){enemy->pos.x - PL_RADIUS * 2 * cos(enemy->e->angle_to_p),
+//								 enemy->pos.y - PL_RADIUS * 2 * sin(enemy->e->angle_to_p)};
+//	}
 	if (enemy->e->state == S_WAIT)
 		return ;
 	if (enemy->e->state == S_DEAD && enemy->e->tick + 1 >= enemy->e->ticks)
@@ -54,7 +105,7 @@ void	enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state)
 	}
 	else if (state == S_PAIN)
 	{
-		obj->e->imgset = &imgset->pain[obj->e->angle_from_p < 0];
+		obj->e->imgset = &imgset->pain[obj->angle_from_p < 0];
 		obj->e->frames = 1;
 	}
 	else if (state == S_DEAD)
@@ -67,72 +118,36 @@ void	enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state)
 	obj->e->frame = 0;
 }
 
-void	objects(t_game *g)
-{
-	t_list		*cur_list;
-	t_list		*next_list;
-	t_object	*obj;
-	t_fpoint	diff;
-
-	cur_list = g->objects;
-	g->p.target = NULL;
-	while (cur_list)
-	{
-		next_list = cur_list->next;
-		obj = (t_object *)cur_list->content;
-		diff = (t_fpoint){obj->pos.x - g->p.pos.x, obj->pos.y - g->p.pos.y};
-		obj->distance_real = hypot(diff.x, diff.y);
-		if (obj->type != T_ENEMY && obj->type != T_DECOR &&
-					obj->distance_real < 0.5 && object_pickup(g, obj->type))
-			ft_lstremove(&g->objects, cur_list);
-		if (obj->type == T_ENEMY && obj->e->targeted && obj->e->state != S_DEAD)
-			g->p.target = obj;
-		if (obj->type == T_ENEMY)
-			enemy(g, obj);
-		cur_list = next_list;
-	}
-}
-
-void	draw_enemy_settings(t_game *game, t_object *obj, float angle, float atan2_diff)
-{
-	obj->e->targeted = false;
-	obj->e->angle_from_p = angle;
-	obj->e->angle_to_p = atan2_diff;
-	if (fabs(obj->e->angle - obj->e->angle_to_p - PI2) <= M_PI + M_PI_4 / 2)
-		obj->e->angle_to_p += PI2;
-	obj->e->angle_to_p -= obj->e->angle - M_PI + M_PI_4 / 2;
-	if (obj->e->state == S_WAIT)
-		obj->e->imgset = &game->imgset[ENEMY_ID_GUARD].wait[
-										7 - (int)(obj->e->angle_to_p / M_PI_4)];
-	obj->sprite = &obj->e->imgset[obj->e->frame];
-}
-
-void	draw_objects(t_game *g, t_list *cur_list)
+void	draw_objects(t_game *game, t_list *cur_list)
 {
 	t_object	*obj;
-	float		atan2_diff;
-	float		angle;
-	t_fpoint	diff;
 
 	while (cur_list)
 	{
 		obj = (t_object *)cur_list->content;
-		diff = (t_fpoint){obj->pos.x - g->p.pos.x, obj->pos.y - g->p.pos.y};
-		obj->distance = g->p.vector.x * diff.x + g->p.vector.y * diff.y;
-		if (obj->distance > 0.1)
+		if (fabs(obj->angle_from_p) < game->fov + M_PI_4 && obj->distance > 0.1)
 		{
-			atan2_diff = atan2(diff.y, diff.x);
-			if (fabs(g->p.angle - atan2_diff - PI2) <= M_PI)
-				angle = atan2_diff + PI2 - g->p.angle;
-			else
-				angle = atan2_diff - g->p.angle;
-			if (obj->type == T_ENEMY)
-				draw_enemy_settings(g, obj, angle, atan2_diff);
-			if (fabs(angle) < g->fov + M_PI_4)
-				draw_sprite(g, obj, angle);
+			obj->size.x = game->col_scale / obj->distance;
+			obj->size.y = obj->size.x * obj->sprite->aspect;
+			draw_sprite(game, obj);
 		}
 		cur_list = cur_list->next;
 	}
+}
+
+void	object_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img)
+{
+	t_object	*obj;
+
+	if ((obj = ft_calloc(1, sizeof(t_object))) == NULL)
+		terminate(game, ERR_MEM, "Memory allocation failed (object)");
+	obj->pos = pos;
+	if (img == NULL)
+		obj->sprite = &game->sprite[type - 1 + (sizeof(CHAR_DECOR) - 1)];
+	else
+		obj->sprite = img;
+	obj->type = type;
+	object_add(game, &game->objects, obj);
 }
 
 void	object_add(t_game *game, t_list **dst, t_object *obj)
@@ -161,9 +176,8 @@ bool	object_pickup(t_game *game, enum e_objtype type)
 	else if (type == T_RIFLE)
 		player_set_weapon(game, W_RIFLE);
 	object_pickup_add(game, type);
-	if (game->p.ammo > 99)
-		game->p.ammo = 99;
-	else if (game->p.health > 100 && (type == T_HEALTH_L || type == T_HEALTH_M))
+	game->p.ammo = ft_min(game->p.ammo, 99);
+	if ((type == T_HEALTH_L || type == T_HEALTH_M) && game->p.health > 100)
 		game->p.health = 100;
 	printf("PICK UP! Health = %hd; Ammo = %hd; Score = %hd\n",
 					game->p.health, game->p.ammo, game->p.score);

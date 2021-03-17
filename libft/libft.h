@@ -83,4 +83,9 @@ t_list			*ft_lstmap(t_list *lst, void *(*f)(void *),
 int				ft_wchrto8(char *dst_utf8, wchar_t src_utf32);
 size_t			ft_wstrto8(char *dst_utf8, const wchar_t *src_utf32, size_t n);
 
+int				ft_min(int a, int b);
+int				ft_max(int a, int b);
+unsigned		ft_umin(unsigned a, unsigned b);
+unsigned		ft_umax(unsigned a, unsigned b);
+
 #endif

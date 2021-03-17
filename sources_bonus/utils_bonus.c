@@ -30,7 +30,7 @@ char	*atoi_limited(unsigned *dst_int, const char *src_string, unsigned limit)
 			while (ft_isdigit(*src_string))
 				src_string++;
 	}
-	*dst_int = (num > UINT_MAX) ? UINT_MAX : num;
+	*dst_int = ft_umin(num, UINT_MAX);
 	while (*src_string == ' ')
 		src_string++;
 	return ((char *)src_string);

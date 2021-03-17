@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/16 23:28:48 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/17 15:59:26 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,8 +130,8 @@ typedef struct	s_img
 
 # define DMG_KNIFE_MIN	1
 # define DMG_KNIFE		16
-# define DMG_FIRE_MIN	13
-# define DMG_FIRE		35
+# define DMG_SHOT_MIN	13
+# define DMG_SHOT		35
 
 # define START_HEALTH	100
 # define START_AMMO		8
@@ -154,9 +154,10 @@ typedef struct	s_object
 {
 	t_img		*sprite;
 	t_fpoint	pos;
-	t_upoint	size;
+	t_fpoint	size;
 	double		distance;
 	double		distance_real;
+	float		angle_from_p;
 	enum		e_objtype
 	{
 		T_DECOR = 0,
@@ -178,7 +179,6 @@ typedef struct	s_object
 		bool	shot;
 		float	angle;
 		float	angle_to_p;
-		float	angle_from_p;
 		short	health;
 		t_img	*imgset;
 		short	frame;
@@ -352,13 +352,15 @@ void			draw_wall_solid	(t_game *game, unsigned x, float fade);
 void			objects				(t_game *g);
 void			object_add(t_game *game, t_list **dst, t_object *obj);
 void			object_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img);
+void			enemy_logic(t_game *game, t_object *enemy);
 void			enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state);
-void			draw_objects		(t_game *g, t_list *cur_list);
+void			draw_objects		(t_game *game, t_list *cur_list);
+void			enemy_settings(t_game *game, t_object *obj, float atan2_diff);
 int				objects_sort		(t_object *obj1, t_object *obj2);
 bool			object_pickup(t_game *game, enum e_objtype type);
 
 void			object_pickup_add(t_game *game, enum e_objtype type);
-void			draw_sprite			(t_game *game, t_object *obj, double angle);
+void			draw_sprite			(t_game *game, t_object *obj);
 void			draw_sprite_scaled	(t_img *img, t_object *obj, unsigned x,
 																unsigned src_x);
 
