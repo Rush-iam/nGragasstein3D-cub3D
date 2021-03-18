@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/17 15:39:05 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/18 16:26:02 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,30 @@ void	player_control_extra(t_game *game)
 		player_set_fov(game, 0, true);
 }
 
+void	player_control_borders_enemies(t_game *game)
+{
+	t_list		*cur_list;
+	t_object	*obj;
+	t_fpoint	diff;
+
+	cur_list = game->objects;
+	while (cur_list)
+	{
+		obj = (t_object *)cur_list->content;
+		diff = (t_fpoint){obj->pos.x - game->p.pos.x, obj->pos.y - game->p.pos.y};
+		obj->distance_real = hypot(diff.x, diff.y);
+		if (obj->distance_real < PL_RADIUS * 1.5 &&
+			obj->type == T_ENEMY && obj->e->state != S_DEAD)
+		{
+			obj->atan_diff = atan2(diff.y, diff.x);
+			obj->distance = game->p.vector.x * diff.x + game->p.vector.y * diff.y;
+			game->p.pos.x = obj->pos.x - PL_RADIUS * 1.5 * cosf(obj->atan_diff);
+			game->p.pos.y = obj->pos.y - PL_RADIUS * 1.5 * sinf(obj->atan_diff);
+		}
+		cur_list = cur_list->next;
+	}
+}
+
 void	player_control_borders(t_game *g)
 {
 	const t_point	plus = {g->p.pos.x + PL_RADIUS, g->p.pos.y + PL_RADIUS};
@@ -134,6 +158,7 @@ void	player_control_borders(t_game *g)
 		CHAR_SOLID, g->map.grid[plus.y][(int)g->p.pos.x], sizeof(CHAR_SOLID)))
 		g->p.pos.y = plus.y - PL_RADIUS - FLOAT_FIX;
 	player_control_borders_diag(g);
+	player_control_borders_enemies(g);
 }
 
 void	player_control_borders_diag(t_game *g)

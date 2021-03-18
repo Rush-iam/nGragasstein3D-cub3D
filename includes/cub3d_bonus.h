@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/17 23:35:12 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/18 23:31:39 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 # include "x_events.h"
 
 # define WIN_TITLE	"nGragasstein 3D"
-# define MAX_WIN	(t_upoint){2559, 1394}
+# define MAX_WIN	(t_upoint){2559, 1395}
 # define MAX_SCR	(t_upoint){20000, 20000}
 # define MIN_RES_X	2
 
@@ -105,6 +105,9 @@ typedef struct	s_img
 	unsigned	*data;
 	t_upoint	size;
 	double		aspect;
+	float		min_x;
+	float		max_x;
+	bool		*alpha_y;
 }				t_img;
 
 # define CHAR_DECOR		"^*$:;,!@%#&|{}_<`"
@@ -156,10 +159,12 @@ typedef struct	s_object
 	t_fpoint	pos;
 	double		distance;
 	double		distance_real;
-	float		angle_from_p;
+	float		atan_diff;
+	float		angle_to_p;
 	struct		s_render
 	{
 		t_fpoint	size;
+		int			start_0;
 		t_point		start;
 		t_point		end;
 		t_fpoint	step;
@@ -183,7 +188,7 @@ typedef struct	s_object
 	{
 		bool	shot;
 		float	angle;
-		float	angle_to_p;
+		float	p_to_angle;
 		short	health;
 		t_img	*imgset;
 		short	frame;
@@ -357,15 +362,15 @@ void			draw_wall_solid	(t_game *game, unsigned x, float fade);
 void			objects				(t_game *g);
 void			object_add(t_game *game, t_list **dst, t_object *obj);
 void			object_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img);
-void			enemy_logic(t_game *game, t_object *enemy);
+void			enemy_logic(t_game *game, t_object *obj);
 void			enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state);
-void			enemy_settings(t_game *game, t_object *obj, float atan2_diff);
+void			enemy_settings(t_game *game, t_object *obj);
 int				objects_sort		(t_object *obj1, t_object *obj2);
 bool			object_pickup(t_game *game, enum e_objtype type);
 void			object_pickup_add(t_game *game, enum e_objtype type);
 
-void			draw_objects		(t_game *game, t_list *cur_list);
 void			draw_object_properties(t_game *game, t_object *obj);
+void			draw_objects(t_game *game);
 void			draw_sprite(t_game *game, t_object *obj);
 void			draw_sprite_scaled(t_img *img, t_object *obj, t_point min, t_point max);
 
@@ -381,6 +386,7 @@ char			*atoi_limited	(unsigned *dst_int, const char *src_string,
 															unsigned limit);
 t_img			img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres);
 t_img			img_faded_copy(void *mlx_ptr, t_img *img);
+void			img_alpha_columns_get(t_img *img);
 void			write_screenshot_and_exit	(t_game *game);
 void			write_screenshot_data	(t_game *game, int file_id);
 

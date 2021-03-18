@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:55 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/13 22:23:00 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/18 21:27:28 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ void	load_spriteset(t_img dst[], int count, char *path, t_game *game)
 
 void	load_texture_file(char *path, t_img *dst_img, char *err, t_game *game)
 {
-	int				null;
+	int				n;
 	const size_t	str_len = ft_strlen(path);
 
 	if (str_len < 5)
@@ -147,7 +147,9 @@ void	load_texture_file(char *path, t_img *dst_img, char *err, t_game *game)
 	}
 	else
 		terminate(game, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
-	dst_img->data = (unsigned *)mlx_get_data_addr(dst_img->ptr, &null, &null,
-												  &null);
+	dst_img->data = (unsigned *)mlx_get_data_addr(dst_img->ptr, &n, &n, &n);
 	dst_img->aspect = dst_img->size.x / dst_img->size.y;
+	if ((dst_img->alpha_y = ft_calloc(dst_img->size.y, sizeof(bool))) == NULL)
+		terminate(game, ERR_MEM, strerror(errno));
+	img_alpha_columns_get(dst_img);
 }

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:41 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/12 18:35:55 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/18 23:25:19 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,16 +85,48 @@ t_img	img_faded_copy(void *mlx_ptr, t_img *img)
 	return (img_faded);
 }
 
+void	img_alpha_columns_get(t_img *img)
+{
+	t_upoint	px;
+	bool		alpha_y;
+
+	img->min_x = img->size.x - 1;
+	img->max_x = 0;
+	px.y = 0;
+	while (px.y < img->size.y)
+	{
+		px.x = 0;
+		alpha_y = true;
+		while (px.x < img->size.x)
+		{
+			if ((img->data[px.y * img->size.x + px.x] >> 24) != 0xFF)
+			{
+				img->min_x = ft_umin(img->min_x, px.x);
+				img->max_x = ft_umax(img->max_x, px.x + 1);
+				alpha_y = false;
+			}
+			px.x++;
+		}
+		img->alpha_y[px.y++] = alpha_y;
+	}
+	img->min_x = fminf(img->min_x, img->max_x);
+	img->min_x = img->min_x / img->size.x;
+	img->max_x = img->max_x / img->size.x;
+}
+
+
 void	write_screenshot_and_exit(t_game *game)
 {
 	int				file_id;
 	char			header[26];
 	const unsigned	filesize = 26 + 3 * game->img.size.x * game->img.size.y;
 
-	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
-	ray_cast(game);
-	draw_walls(game);
 	objects(game);
+	weapon(game, &game->p.weapon);
+	ray_cast(game);
+	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
+	draw_walls(game);
+	draw_objects(game);
 	if ((file_id = open("shot.bmp", O_WRONLY | O_CREAT | O_TRUNC)) == -1)
 		terminate(game, ERR_BMP, strerror(errno));
 	ft_memcpy(header, "BM", 2);

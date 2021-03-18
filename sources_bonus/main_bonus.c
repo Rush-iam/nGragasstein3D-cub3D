@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/17 15:05:03 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/18 19:59:58 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,10 +49,14 @@ void	initialize_game_images(t_game *game, bool screenshot_only)
 	game->img.size.x = ft_umin(game->img.size.x, max_res.x);
 	game->img.size.y = ft_umin(game->img.size.y, max_res.y);
 	game->img.aspect = (double)game->img.size.x / game->img.size.y;
+	game->win_center = (t_upoint){game->img.size.x / 2, game->img.size.y / 2};
 	if (screenshot_only == false)
+	{
 		if (!(game->win = mlx_new_window(
 				game->mlx, game->img.size.x, game->img.size.y, WIN_TITLE)))
 			terminate(game, ERR_MLX, strerror(errno));
+		mlx_mouse_move(game->win, game->win_center.x, game->win_center.y);
+	}
 	if (!(game->img.ptr = mlx_new_image(
 			game->mlx, game->img.size.x, game->img.size.y)))
 		terminate(game, ERR_MLX, strerror(errno));
@@ -89,18 +93,44 @@ void	initialize_weapons_scale(t_game *game)
 	}
 }
 
+//void	initialize_sprites_trim(t_game *game)
+//{
+//	unsigned	i;
+//	t_img		trimmed;
+//
+//	i = 0;
+//	while (i < sizeof(game->sprite) / sizeof(*game->sprite))
+//	{
+//		trimmed = img_alpha_trimmed_copy(game->mlx, &game->sprite[i]);
+//		if (trimmed.ptr == NULL)
+//			terminate(game, ERR_MLX, strerror(errno));
+//		mlx_destroy_image(game->mlx, game->sprite[i].ptr);
+//		game->sprite[i++] = trimmed;
+//	}
+//	i = 0;
+//	while (i < sizeof(game->sprite) / sizeof(*game->sprite))
+//	{
+//		trimmed = img_alpha_trimmed_copy(game->mlx, &game->sprite[i]);
+//		if (trimmed.ptr == NULL)
+//			terminate(game, ERR_MLX, strerror(errno));
+//		mlx_destroy_image(game->mlx, game->sprite[i].ptr);
+//		game->sprite[i++] = trimmed;
+//	}
+//}
+
 void	initialize_game(t_game *game, bool screenshot_only)
 {
 	unsigned		n;
-	const unsigned	txts = sizeof(game->texture) / sizeof(*game->texture) / 2;
+	const unsigned	n_tex = sizeof(game->texture) / sizeof(*game->texture) / 2;
 
 	initialize_game_images(game, screenshot_only);
 	initialize_weapons_scale(game);
+//	initialize_sprites_trim(game);
 	n = 0;
-	while (n < txts)
+	while (n < n_tex)
 	{
-		game->texture[n + txts] = img_faded_copy(game->mlx, &game->texture[n]);
-		if (game->texture[n + txts].ptr == NULL)
+		game->texture[n + n_tex] = img_faded_copy(game->mlx, &game->texture[n]);
+		if (game->texture[n + n_tex].ptr == NULL)
 			terminate(game, ERR_MLX, strerror(errno));
 		n++;
 	}
@@ -115,25 +145,12 @@ void	initialize_game(t_game *game, bool screenshot_only)
 
 void	initialize_game_2(t_game *game)
 {
-	t_list		*cur_list;
-	t_object	*obj;
-
 	__sincos(game->p.angle, &game->p.vector.y, &game->p.vector.x);
-	game->win_center = (t_upoint){game->img.size.x / 2, game->img.size.y / 2};
-	mlx_mouse_move(game->win, game->win_center.x, game->win_center.y);
 	player_set_fov(game, 0, true);
 	game->p.health = START_HEALTH;
 	game->p.ammo = START_AMMO;
 	game->p.weapons_mask = START_WEAPONS;
 	player_set_weapon(game, W_PISTOL);
-	cur_list = game->objects;
-	while (cur_list)
-	{
-		obj = (t_object *)cur_list->content;
-		obj->distance = game->p.vector.x * (obj->pos.x - game->p.pos.x) +
-						game->p.vector.y * (obj->pos.y - game->p.pos.y);
-		cur_list = cur_list->next;
-	}
 }
 
 int	game_loop(t_game *game)
@@ -160,8 +177,7 @@ int	game_loop(t_game *game)
 //	for (int i = 0; i < 500; ++i)
 	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
 	draw_walls(game);
-	ft_lstsort(&game->objects, objects_sort);
-	draw_objects(game, game->objects);
+	draw_objects(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
 	draw_effect(game, &game->effect);
 	draw_weapon(game, &game->p.weapon);

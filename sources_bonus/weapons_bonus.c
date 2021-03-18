@@ -62,7 +62,7 @@ void	player_set_weapon(t_game *game, enum e_weapon weapon)
 
 void	draw_weapon(t_game *game, struct s_weapon *weapon)
 {
-	mlx_put_image_to_window(game->mlx, game->win,game->p.weapon_img
+	mlx_put_image_to_window(game->mlx, game->win, game->p.weapon_img
 					[game->p.weapon_cur][weapon->animation[weapon->frame]].ptr,
 					game->p.weapon_pos.x, game->p.weapon_pos.y);
 }

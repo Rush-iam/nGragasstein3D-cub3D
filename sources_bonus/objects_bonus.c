@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:03 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/17 23:50:36 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/18 21:53:56 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ void	objects(t_game *g)
 	t_list		*next_list;
 	t_object	*obj;
 	t_fpoint	diff;
-	float		atan2_diff;
 
 	next_list = g->objects;
 	g->p.target = NULL;
@@ -29,20 +28,16 @@ void	objects(t_game *g)
 		diff = (t_fpoint){obj->pos.x - g->p.pos.x, obj->pos.y - g->p.pos.y};
 		obj->distance = g->p.vector.x * diff.x + g->p.vector.y * diff.y;
 		obj->distance_real = hypot(diff.x, diff.y);
-		atan2_diff = atan2(diff.y, diff.x);
-		obj->angle_from_p = atan2_diff - g->p.angle;
-		if (obj->angle_from_p < -M_PI)
-			obj->angle_from_p += PI2;
-		if (fabs(obj->angle_from_p) < g->fov + M_PI_4)
-			draw_object_properties(g, obj);
+		obj->atan_diff = atan2(diff.y, diff.x);
+		draw_object_properties(g, obj);
 		if (obj->type == T_ENEMY)
-			enemy_settings(g, obj, atan2_diff);
+			enemy_settings(g, obj);
 		if (obj->distance_real < 0.5 && object_pickup(g, obj->type))
 			ft_lstremove(&g->objects, cur_list);
 	}
 }
 
-void	enemy_settings(t_game *game, t_object *obj, float atan2_diff)
+void	enemy_settings(t_game *game, t_object *obj)
 {
 	if (obj->e->state != S_DEAD)
 	{
@@ -51,42 +46,37 @@ void	enemy_settings(t_game *game, t_object *obj, float atan2_diff)
 			obj->distance_real < game->p.target->distance_real))
 			game->p.target = obj;
 	}
-	obj->e->angle_to_p = atan2_diff - obj->e->angle + M_PI;
-	if (obj->e->angle_to_p < M_PI_4 / 2)
-		obj->e->angle_to_p += PI2;
+	obj->e->p_to_angle = (obj->atan_diff - obj->e->angle) - M_PI;
+	if (obj->e->p_to_angle < -M_PI)
+		obj->e->p_to_angle += PI2;
 	if (obj->e->state == S_WAIT)
 		obj->e->imgset = &game->imgset[ENEMY_ID_GUARD].
-				wait[7 - (int)((obj->e->angle_to_p - M_PI_4 / 2) / M_PI_4)];
+				wait[(8 - (int)ceil(obj->e->p_to_angle / M_PI_4 - 0.5)) % 8];
 	enemy_logic(game, obj);
 	obj->sprite = &obj->e->imgset[obj->e->frame];
 }
 
-void	enemy_logic(t_game *game, t_object *enemy)
+void	enemy_logic(t_game *game, t_object *obj)
 {
-//	if (enemy->distance_real < PL_RADIUS * 2)
-//	{
-//		game->p.pos = (t_fpoint){enemy->pos.x - PL_RADIUS * 2 * cos(enemy->e->angle_to_p),
-//								 enemy->pos.y - PL_RADIUS * 2 * sin(enemy->e->angle_to_p)};
-//	}
-	if (enemy->e->state == S_WAIT)
+	if (obj->e->state == S_WAIT)
 		return ;
-	if (enemy->e->state == S_DEAD && enemy->e->tick + 1 >= enemy->e->ticks)
+	if (obj->e->state == S_DEAD && obj->e->tick + 1 >= obj->e->ticks)
 		return ;
-	if (++enemy->e->tick >= enemy->e->ticks)
+	if (++obj->e->tick >= obj->e->ticks)
 	{
-		enemy_set_state(enemy, &game->imgset[ENEMY_ID_GUARD], S_WAIT);
+		enemy_set_state(obj, &game->imgset[ENEMY_ID_GUARD], S_WAIT);
 		return ;
 	}
-	enemy->e->frame = enemy->e->frames * enemy->e->tick / enemy->e->ticks;
-	if (enemy->e->state == S_ATTACK)
+	obj->e->frame = obj->e->frames * obj->e->tick / obj->e->ticks;
+	if (obj->e->state == S_ATTACK)
 	{
-		if (enemy->e->shot == false && enemy->e->frame == SHOT_FRAME_ID)
+		if (obj->e->shot == false && obj->e->frame == SHOT_FRAME_ID)
 		{
 //			enemy_shoot(game);
-			enemy->e->shot = true;
+			obj->e->shot = true;
 		}
-		else if (enemy->e->frame == 3)
-			enemy->e->shot = false;
+		else if (obj->e->frame == 3)
+			obj->e->shot = false;
 	}
 }
 
@@ -107,7 +97,7 @@ void	enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state)
 	}
 	else if (state == S_PAIN)
 	{
-		obj->e->imgset = &imgset->pain[obj->angle_from_p < 0];
+		obj->e->imgset = &imgset->pain[obj->angle_to_p < 0];
 		obj->e->frames = 1;
 	}
 	else if (state == S_DEAD)
