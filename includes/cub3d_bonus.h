@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/19 23:36:03 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/19 23:56:57 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,8 +146,10 @@ typedef struct	s_img
 # define ENEMY_FOV_HALF		M_PI_4 * 1.5
 # define ENEMY_SHOT_DELAY	1.5
 # define ENEMY_MISS_MAX		60
-# define ENEMY_DMG_MIN		10
-# define ENEMY_DMG_MAX		40
+//# define ENEMY_DMG_MIN		10
+//# define ENEMY_DMG_MAX		40
+# define ENEMY_DMG_MIN		0
+# define ENEMY_DMG_MAX		1
 # define ANIM_ENEMY_TICKS	10
 
 typedef struct	s_imgset

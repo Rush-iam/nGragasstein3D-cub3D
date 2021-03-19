@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:03 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/19 23:07:58 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/19 23:51:21 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void	enemy_logic(t_game *game, t_object *obj)
 		return ;
 	if (see == true)
 	{
-		obj->e->angle += obj->e->p_to_angle;
+//		obj->e->angle += obj->e->p_to_angle;
 		obj->e->alarmed = true;
 	}
 	if (++obj->e->tick >= obj->e->ticks ||
@@ -133,7 +133,7 @@ void	enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state)
 		obj->e->imgset = &imgset->pain[obj->angle_to_p < 0];
 		obj->e->frames = 1;
 		obj->e->alarmed = true;
-		obj->e->angle += obj->e->p_to_angle;
+//		obj->e->angle += obj->e->p_to_angle;
 	}
 	else if (state == S_DEAD)
 	{
