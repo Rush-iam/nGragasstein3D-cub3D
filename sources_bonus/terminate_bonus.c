@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 23:31:40 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/08 23:31:40 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/19 20:24:42 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,6 @@ void	terminate_free(t_game *game)
 	unsigned	i;
 
 	ft_lstclear(&game->objects, terminate_free_object);
-	if (game->column && (i = 0) == 0)
-		while (i < game->img.size.x)
-			free(game->column[i++]);
 	free(game->column);
 	if (game->map.grid && (i = 0) == 0)
 		while (i < game->map.size.y)

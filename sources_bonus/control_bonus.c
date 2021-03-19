@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/18 16:26:02 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/19 20:07:05 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,12 @@ void	player_control(t_game *game)
 	player_control_move(game);
 	player_control_weapon(game);
 	player_control_extra(game);
+	game->p.pos.x = fmax(game->p.pos.x, PL_RADIUS + FLOAT_FIX);
+	game->p.pos.y = fmax(game->p.pos.y, PL_RADIUS + FLOAT_FIX);
+	game->p.pos.x = fmin(game->p.pos.x,
+									game->map.size.x - PL_RADIUS - FLOAT_FIX);
+	game->p.pos.y = fmin(game->p.pos.y,
+									game->map.size.y - PL_RADIUS - FLOAT_FIX);
 	player_control_borders(game);
 }
 
@@ -65,11 +71,9 @@ void	player_control_weapon(t_game *game)
 	{
 		if (game->key.k[K_KNIFE] && game->p.weapon_cur != W_KNIFE)
 			player_set_weapon(game, W_KNIFE);
-		else if (game->key.k[K_PISTOL] && game->p.weapon_cur != W_PISTOL &&
-				 game->p.ammo && (game->p.weapons_mask & W_PISTOL_MASK))
+		else if (game->key.k[K_PISTOL])
 			player_set_weapon(game, W_PISTOL);
-		else if (game->key.k[K_RIFLE] && game->p.weapon_cur != W_RIFLE &&
-				 game->p.ammo && (game->p.weapons_mask & W_RIFLE_MASK))
+		else if (game->key.k[K_RIFLE])
 			player_set_weapon(game, W_RIFLE);
 	}
 	if (game->key.m[M_SHOOT] && game->p.weapon.lock == false &&
@@ -141,10 +145,6 @@ void	player_control_borders(t_game *g)
 	const t_point	plus = {g->p.pos.x + PL_RADIUS, g->p.pos.y + PL_RADIUS};
 	const t_point	minus = {g->p.pos.x - PL_RADIUS, g->p.pos.y - PL_RADIUS};
 
-	g->p.pos.x = fmax(g->p.pos.x, PL_RADIUS);
-	g->p.pos.y = fmax(g->p.pos.y, PL_RADIUS);
-	g->p.pos.x = fmin(g->p.pos.x, g->map.size.x - PL_RADIUS);
-	g->p.pos.y = fmin(g->p.pos.y, g->map.size.y - PL_RADIUS);
 	if (ft_isdigit(g->map.grid[(int)g->p.pos.y][minus.x]) || ft_memchr(
 		CHAR_SOLID, g->map.grid[(int)g->p.pos.y][minus.x], sizeof(CHAR_SOLID)))
 		g->p.pos.x = minus.x + 1 + PL_RADIUS + FLOAT_FIX;

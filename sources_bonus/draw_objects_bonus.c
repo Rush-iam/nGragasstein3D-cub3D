@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 23:32:43 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/18 23:34:05 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/19 20:52:57 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	draw_object_properties(t_game *game, t_object *obj)
 		obj->render.size.y = game->col_scale / obj->distance;
 		obj->render.size.x = obj->render.size.y * obj->sprite->aspect;
 		obj->render.start_0 = game->col_center + tan(obj->angle_to_p) /
-												 game->col_step - obj->render.size.x / 2;
+								game->col_step - obj->render.size.x / 2;
 		obj->render.start.x = obj->render.start_0 +
 									obj->render.size.x * obj->sprite->min_x;
 		obj->render.end.x = obj->render.start_0 +
@@ -56,9 +56,9 @@ void	draw_sprite(t_game *game, t_object *obj)
 
 	min.x = ft_max(obj->render.start.x, 0);
 	max.x = ft_min(obj->render.end.x, (int)game->img.size.x);
-	while (obj->distance >= game->column[min.x]->distance && min.x < max.x)
+	while (min.x < max.x && obj->distance >= game->column[min.x].distance)
 		min.x++;
-	while (obj->distance >= game->column[max.x - 1]->distance && min.x < max.x)
+	while (min.x < max.x && obj->distance >= game->column[max.x - 1].distance)
 		max.x--;
 	if (min.x == max.x)
 		return ;
@@ -97,3 +97,43 @@ void	draw_sprite_scaled(t_img *img, t_object *obj, t_point min, t_point max)
 		cur.y++;
 	}
 }
+
+//void	draw_sprite_scaled2(t_img *img, t_object *obj, t_point min, t_point max)
+//{
+//	const double	x_src = obj->render.step.x * (min.x - obj->render.start_0);
+//	t_upoint 		cur;
+//	t_fpoint		cur_src;
+//	int				src_pixel;
+//	const unsigned	half = ft_umin(img->size.y / 2, obj->render.size.y / 2);
+//	const float		half_src = (float)obj->sprite->size.y / 2.f;
+//
+//	cur_src.y = 0;
+//	cur.y = 0;
+//	while (cur.y < half)
+//	{
+//		cur.x = min.x;
+//		cur_src.x = x_src;
+//		if (obj->sprite->alpha_y[(int)(half_src - cur_src.y)] == false)
+//			while (cur.x < (unsigned)max.x)
+//			{
+//				if (((src_pixel = obj->sprite->data[(int)(half_src - cur_src.y) *
+//					obj->sprite->size.x + (int)cur_src.x]) >> 24) == 0)
+//					img->data[(img->size.y / 2 - cur.y) * img->size.x + cur.x] = src_pixel;
+//				cur_src.x += obj->render.step.x;
+//				cur.x++;
+//			}
+//		cur.x = min.x;
+//		cur_src.x = x_src;
+//		if (obj->sprite->alpha_y[(int)(half_src + cur_src.y)] == false)
+//			while (cur.x < (unsigned)max.x)
+//			{
+//				if (((src_pixel = obj->sprite->data[(int)(half_src + cur_src.y) *
+//					obj->sprite->size.x + (int)cur_src.x]) >> 24) == 0)
+//					img->data[(img->size.y / 2 + cur.y) * img->size.x + cur.x] = src_pixel;
+//				cur_src.x += obj->render.step.x;
+//				cur.x++;
+//			}
+//		cur_src.y += obj->render.step.y;
+//		cur.y++;
+//	}
+//}

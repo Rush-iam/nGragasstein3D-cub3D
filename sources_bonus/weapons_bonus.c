@@ -38,6 +38,10 @@ void	weapon(t_game *game, struct s_weapon *weapon)
 
 void	player_set_weapon(t_game *game, enum e_weapon weapon)
 {
+	if (game->p.weapons_mask == 0 || (weapon != W_KNIFE && game->p.ammo == 0) ||
+		(weapon == W_PISTOL && (game->p.weapons_mask & W_PISTOL_MASK) == 0) ||
+		(weapon == W_RIFLE && (game->p.weapons_mask & W_RIFLE_MASK) == 0))
+		return ;
 	game->p.weapon_cur = weapon;
 	if (game->p.weapon_cur == W_KNIFE)
 	{

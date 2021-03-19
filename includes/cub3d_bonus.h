@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/18 23:31:39 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/19 23:36:03 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 # include "x_events.h"
 
 # define WIN_TITLE	"nGragasstein 3D"
-# define MAX_WIN	(t_upoint){2559, 1395}
+# define MAX_WIN	(t_upoint){2559, 1396}
 # define MAX_SCR	(t_upoint){20000, 20000}
 # define MIN_RES_X	2
 
@@ -49,9 +49,10 @@
 # define K_RUN			KEY_SHIFT_LEFT
 
 # define COLOR_WHITE	0xFFFFFF
-# define COLOR_YELLOW	0xFFFF00
 # define COLOR_GREEN	0x7AFF40
+# define COLOR_RED		0xFF0000
 # define COLOR_ORANGE	0xFF7A40
+# define COLOR_YELLOW	0xFFFF00
 # define COLOR_GREY		0x808080
 
 # define K_KNIFE	KEY_1
@@ -142,6 +143,11 @@ typedef struct	s_img
 
 # define ENEMY_ID_GUARD		0
 # define ENEMY_HEALTH		25
+# define ENEMY_FOV_HALF		M_PI_4 * 1.5
+# define ENEMY_SHOT_DELAY	1.5
+# define ENEMY_MISS_MAX		60
+# define ENEMY_DMG_MIN		10
+# define ENEMY_DMG_MAX		40
 # define ANIM_ENEMY_TICKS	10
 
 typedef struct	s_imgset
@@ -186,6 +192,7 @@ typedef struct	s_object
 	}			type;
 	struct		s_enemy
 	{
+		bool	alarmed;
 		bool	shot;
 		float	angle;
 		float	p_to_angle;
@@ -268,7 +275,7 @@ typedef struct	s_game
 		t_fpoint	cell;
 		double		texture_pos;
 		char		dir;
-	}			**column;
+	}			*column;
 	unsigned	color_ceil;
 	unsigned	color_floor;
 	t_img		texture[20];
@@ -281,7 +288,8 @@ typedef struct	s_game
 		unsigned	frame_cur;
 		enum	e_effect
 		{
-			EF_FLASH = 0
+			EF_FLASH = 0,
+			EF_FIZZLEFADE
 		}		type;
 		unsigned	color;
 		float		max_power;
@@ -290,7 +298,6 @@ typedef struct	s_game
 }				t_game;
 
 void			initialize_game		(t_game *game, bool screenshot_only);
-void			initialize_game_2	(t_game *game);
 void			player_set_fov				(t_game *game, double fov, bool reset);
 
 int				game_loop		(t_game *game);
@@ -334,7 +341,8 @@ void			player_control_borders_diag(t_game *g);
 void			player_set_weapon(t_game *game, enum e_weapon weapon);
 
 void			ray_cast		(t_game *game);
-void			ray_intersect	(t_game *game, double cur_angle, unsigned ray);
+struct s_column	ray_intersect	(t_game *game, double cur_angle);
+double			ray_intersect_distance(t_game *game, double cur_angle);
 t_fpoint		ray_intersect_x	(t_game *game, t_fpoint step);
 t_fpoint		ray_intersect_y	(t_game *game, t_fpoint step);
 
@@ -347,6 +355,7 @@ int				pixel_fade	(int color, float fade);
 int				pixel_fade_contrast(int color, float fade);
 void			draw_line	(t_img *img, t_point p1, t_point p2, int color);
 void			draw_square	(t_img *img, t_point center, int size, int color);
+void			draw_square_fill(t_img *img, t_point top_left, int size, int color);
 void			draw_4pts	(t_img *img, t_point *pts, int color);
 
 void			draw_map_init	(t_game *game);
@@ -355,8 +364,10 @@ void			draw_map_player	(t_game *game);
 void			draw_map_objects(t_game *game);
 
 void			draw_walls		(t_game *game);
-void			draw_wall_scaled(t_game *game, t_img *src, unsigned x,
-						float fade);
+void			draw_wall_scaled(t_game *g, t_img src, unsigned x,
+								 float fade);
+void			draw_wall_scaled_90(t_game *game, t_img *src, unsigned x,
+								 float fade);
 void			draw_wall_solid	(t_game *game, unsigned x, float fade);
 
 void			objects				(t_game *g);
@@ -380,7 +391,7 @@ void			weapon_shoot(t_game *game, t_object *target);
 
 void			draw_effect(t_game *game, struct s_effect *ef);
 void			effect_flash(t_game *game, unsigned color, float power);
-void			effect_fizzlefade				(t_img *img, unsigned color);
+void			effect_fizzlefade(t_game *game, unsigned color);
 
 char			*atoi_limited	(unsigned *dst_int, const char *src_string,
 															unsigned limit);

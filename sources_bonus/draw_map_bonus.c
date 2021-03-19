@@ -67,8 +67,8 @@ void	draw_map_player(t_game *game)
 	{
 		draw_line(&game->map.img,
 				(t_point){game->p.pos.x * MAP_SCALE, game->p.pos.y * MAP_SCALE},
-				(t_point){game->column[ray]->cell.x * MAP_SCALE,
-						game->column[ray]->cell.y * MAP_SCALE}, 0x888015);
+				(t_point){game->column[ray].cell.x * MAP_SCALE,
+						game->column[ray].cell.y * MAP_SCALE}, 0x888015);
 		ray += 32;
 	}
 	draw_line(&game->map.img, (t_point){game->p.pos.x * MAP_SCALE,

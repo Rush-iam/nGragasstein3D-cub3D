@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:09 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/12 18:31:30 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/19 23:43:09 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,4 +101,21 @@ void	draw_square(t_img *img, t_point center, int size, int color)
 	draw_line(img, (t_point){center.x + size, center.y + size},
 					(t_point){center.x, center.y + size}, color);
 	draw_line(img, (t_point){center.x, center.y + size}, center, color);
+}
+
+void	draw_square_fill(t_img *img, t_point top_left, int size, int color)
+{
+	t_point		px;
+
+	px.y = top_left.y;
+	while (px.y < top_left.y + size)
+	{
+		px.x = top_left.x;
+		while (px.x < top_left.x + size)
+		{
+			pixel_put(img, px.x, px.y, color);
+			px.x++;
+		}
+		px.y++;
+	}
 }

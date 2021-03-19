@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:03 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/18 21:53:56 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/19 23:07:58 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,27 +56,55 @@ void	enemy_settings(t_game *game, t_object *obj)
 	obj->sprite = &obj->e->imgset[obj->e->frame];
 }
 
+void	enemy_shoot(t_game *game, t_object *obj)
+{
+	unsigned	damage;
+	float		power;
+	unsigned	miss_chance;
+
+	power = fminf(1, 1 / sqrt(obj->distance_real));
+	miss_chance = ft_umin(ENEMY_MISS_MAX, sqrt(obj->distance_real) * 10);
+	if (arc4random() % 100 < miss_chance)
+		return ;
+	damage = ENEMY_DMG_MIN * power +
+				arc4random() % (ENEMY_DMG_MAX - ENEMY_DMG_MIN) * power;
+	game->p.health -= damage;
+	printf("Enemy shot you! -%u HP. Health: %hd\n", damage, game->p.health);
+	if (game->p.health > 0)
+		game->effect = (struct s_effect){30, 15, EF_FLASH, COLOR_RED, damage / 100.};
+}
+
 void	enemy_logic(t_game *game, t_object *obj)
 {
-	if (obj->e->state == S_WAIT)
-		return ;
+	bool	see;
+
 	if (obj->e->state == S_DEAD && obj->e->tick + 1 >= obj->e->ticks)
 		return ;
-	if (++obj->e->tick >= obj->e->ticks)
-	{
-		enemy_set_state(obj, &game->imgset[ENEMY_ID_GUARD], S_WAIT);
+	see = false;
+	if (obj->e->state != S_DEAD && fabsf(obj->e->p_to_angle) < ENEMY_FOV_HALF)
+		see = ray_intersect_distance(game, obj->atan_diff) > obj->distance_real;
+	if (obj->e->state == S_WAIT && see == false)
 		return ;
-	}
-	obj->e->frame = obj->e->frames * obj->e->tick / obj->e->ticks;
-	if (obj->e->state == S_ATTACK)
+	if (see == true)
 	{
-		if (obj->e->shot == false && obj->e->frame == SHOT_FRAME_ID)
-		{
-//			enemy_shoot(game);
-			obj->e->shot = true;
-		}
-		else if (obj->e->frame == 3)
-			obj->e->shot = false;
+		obj->e->angle += obj->e->p_to_angle;
+		obj->e->alarmed = true;
+	}
+	if (++obj->e->tick >= obj->e->ticks ||
+								(obj->e->state == S_ATTACK && see == false))
+	{
+		if (see == true && (obj->e->state == S_WAIT || obj->e->state == S_PAIN))
+			enemy_set_state(obj, &game->imgset[ENEMY_ID_GUARD], S_ATTACK);
+		else
+			enemy_set_state(obj, &game->imgset[ENEMY_ID_GUARD], S_WAIT);
+	}
+	if (obj->e->state != S_WAIT)
+		obj->e->frame = obj->e->frames * obj->e->tick / obj->e->ticks;
+	if (obj->e->state == S_ATTACK && obj->e->shot == false &&
+											obj->e->frame == SHOT_FRAME_ID)
+	{
+		enemy_shoot(game, obj);
+		obj->e->shot = true;
 	}
 }
 
@@ -84,7 +112,10 @@ void	enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state)
 {
 	obj->e->state = state;
 	if (state == S_WAIT)
+	{
 		obj->e->imgset = imgset->wait;
+		obj->e->frames = 2;
+	}
 	else if (state == S_WALK)
 	{
 		obj->e->imgset = imgset->walk[0];
@@ -94,11 +125,15 @@ void	enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state)
 	{
 		obj->e->imgset = imgset->attack;
 		obj->e->frames = 3;
+		obj->e->ticks *= ENEMY_SHOT_DELAY;
+		obj->e->shot = false;
 	}
 	else if (state == S_PAIN)
 	{
 		obj->e->imgset = &imgset->pain[obj->angle_to_p < 0];
 		obj->e->frames = 1;
+		obj->e->alarmed = true;
+		obj->e->angle += obj->e->p_to_angle;
 	}
 	else if (state == S_DEAD)
 	{
@@ -107,6 +142,8 @@ void	enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state)
 	}
 	obj->e->tick = 0;
 	obj->e->ticks = obj->e->frames * ANIM_ENEMY_TICKS;
+	if (state == S_ATTACK)
+		obj->e->ticks *= ENEMY_SHOT_DELAY;
 	obj->e->frame = 0;
 	obj->sprite = &obj->e->imgset[obj->e->frame];
 }
@@ -148,12 +185,17 @@ bool	object_pickup(t_game *game, enum e_objtype type)
 		return (false);
 	if (game->p.health >= 100 && (type == T_HEALTH_M || type == T_HEALTH_L))
 		return (false);
-	if (game->p.ammo == 0 && (type == T_AMMO || type == T_AMMO_ENEMY))
-		player_set_weapon(game,
-					(game->p.weapons_mask & W_RIFLE_MASK) ? W_RIFLE : W_PISTOL);
-	else if (type == T_RIFLE)
-		player_set_weapon(game, W_RIFLE);
-	object_pickup_add(game, type);
+	if ((game->p.ammo == 0 && (type == T_AMMO || type == T_AMMO_ENEMY)) ||
+		type == T_RIFLE)
+	{
+		object_pickup_add(game, type);
+		if (game->p.weapons_mask & W_RIFLE_MASK)
+			player_set_weapon(game, W_RIFLE);
+		else
+			player_set_weapon(game, W_PISTOL);
+	}
+	else
+		object_pickup_add(game, type);
 	game->p.ammo = ft_min(game->p.ammo, 99);
 	if ((type == T_HEALTH_L || type == T_HEALTH_M) && game->p.health > 100)
 		game->p.health = 100;

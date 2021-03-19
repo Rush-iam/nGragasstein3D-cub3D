@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:45 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/07 17:55:36 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/19 21:34:02 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,18 @@ void		ray_cast(t_game *game)
 			angle += PI2;
 		else if (angle > PI2)
 			angle -= PI2;
-		ray_intersect(game, angle, ray);
-		if (game->column[ray]->dir == 'N')
-			game->column[ray]->cell.y -= FLOAT_FIX;
-		if (game->column[ray]->dir == 'W')
-			game->column[ray]->cell.x -= FLOAT_FIX;
+		game->column[ray] = ray_intersect(game, angle);
+		if (game->column[ray].dir == 'S' || game->column[ray].dir == 'W')
+			game->column[ray].texture_pos = 1. - game->column[ray].texture_pos;
+		if (game->column[ray].dir == 'N')
+			game->column[ray].cell.y -= FLOAT_FIX;
+		else if (game->column[ray].dir == 'W')
+			game->column[ray].cell.x -= FLOAT_FIX;
 		ray++;
 	}
 }
 
-void		ray_intersect(t_game *game, double cur_angle, unsigned ray)
+struct s_column	ray_intersect(t_game *game, double cur_angle)
 {
 	t_fpoint		x1;
 	t_fpoint		y1;
@@ -52,15 +54,29 @@ void		ray_intersect(t_game *game, double cur_angle, unsigned ray)
 	distance.y = game->p.vector.x * (y1.x - game->p.pos.x) +
 				 game->p.vector.y * (y1.y - game->p.pos.y);
 	if (distance.x < distance.y)
-		*game->column[ray] = (struct s_column)
-				{distance.x, game->col_scale / distance.x, x1,
-				 x1.y - (int)x1.y, (x1.x < game->p.pos.x) ? 'W' : 'E'};
+		return ((struct s_column){distance.x, game->col_scale / distance.x, x1,
+				 x1.y - (int)x1.y, "EW"[x1.x < game->p.pos.x]});
 	else
-		*game->column[ray] = (struct s_column)
-				{distance.y, game->col_scale / distance.y, y1,
-				 y1.x - (int)y1.x, (y1.y < game->p.pos.y) ? 'N' : 'S'};
-	if (game->column[ray]->dir == 'W' || game->column[ray]->dir == 'S')
-		game->column[ray]->texture_pos = 1. - game->column[ray]->texture_pos;
+		return ((struct s_column){distance.y, game->col_scale / distance.y, y1,
+				 y1.x - (int)y1.x, "SN"[y1.y < game->p.pos.y]});
+}
+
+double		ray_intersect_distance(t_game *game, double cur_angle)
+{
+	t_fpoint		x1;
+	t_fpoint		y1;
+	t_fpoint		distance;
+	const double	tan_cur_angle = tan(cur_angle);
+
+	x1 = (cur_angle < -M_PI_2 || cur_angle >= M_PI_2) ?
+		 ray_intersect_x(game, (t_fpoint){-1, -tan_cur_angle}) :
+		 ray_intersect_x(game, (t_fpoint){1, tan_cur_angle});
+	y1 = (cur_angle >= 0) ?
+		 ray_intersect_y(game, (t_fpoint){1 / tan_cur_angle, 1}) :
+		 ray_intersect_y(game, (t_fpoint){-1 / tan_cur_angle, -1});
+	distance.x = hypot(x1.x - game->p.pos.x, x1.y - game->p.pos.y);
+	distance.y = hypot(y1.x - game->p.pos.x, y1.y - game->p.pos.y);
+	return (fmin(distance.x, distance.y));
 }
 
 t_fpoint	ray_intersect_x(t_game *game, t_fpoint step)
