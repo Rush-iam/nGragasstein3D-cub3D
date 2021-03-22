@@ -1,4 +1,4 @@
-R 2560 1395
+R 2560 1296
 C 56,56,56
 F 112,112,112
 
@@ -12,6 +12,9 @@ W6 ./resources/walls/wall_6.png
 W7 ./resources/walls/wall_7.png
 W8 ./resources/walls/wall_8.png
 W9 ./resources/walls/wall_9.png
+
+W10 ./resources/walls/door_0.png
+W11 ./resources/walls/door_1.png
 
 G0 ./resources/weapons/knife_
 G1 ./resources/weapons/pistol_
@@ -31,33 +34,36 @@ S8 ./resources/sprites/barrel_green.png
 S9 ./resources/sprites/table.png
 S10 ./resources/sprites/table_chairs.png
 S11 ./resources/sprites/statue.png
-S12 ./resources/sprites/skeleton.png
-S13 ./resources/sprites/bones.png
-S14 ./resources/sprites/puddle.png
-S15 ./resources/sprites/pot.png
-S16 ./resources/sprites/guard_dead.png
-S17 ./resources/sprites/health_xl.png
-S18 ./resources/sprites/health_l.png
-S19 ./resources/sprites/health_m.png
-S20 ./resources/sprites/gun_rifle.png
-S21 ./resources/sprites/ammo.png
-S22 ./resources/sprites/bonus_xl.png
-S23 ./resources/sprites/bonus_l.png
-S24 ./resources/sprites/bonus_m.png
-S25 ./resources/sprites/bonus_s.png
+S12 ./resources/sprites/well_empty.png
+S13 ./resources/sprites/well_full.png
+S14 ./resources/sprites/skeleton.png
+S15 ./resources/sprites/bones.png
+S16 ./resources/sprites/puddle.png
+S17 ./resources/sprites/pot.png
+S18 ./resources/sprites/guard_dead.png
+S19 ./resources/sprites/health_xl.png
+S20 ./resources/sprites/health_l.png
+S21 ./resources/sprites/health_m.png
+S22 ./resources/sprites/gun_rifle.png
+S23 ./resources/sprites/ammo.png
+S24 ./resources/sprites/bonus_xl.png
+S25 ./resources/sprites/bonus_l.png
+S26 ./resources/sprites/bonus_m.png
+S27 ./resources/sprites/bonus_s.png
 
-# W0-W9   = 0123456789		  - стены
-# S0-S16  = ^*$:;,!@%#&|{}_<` - декорации
-# S17-S25 = +HhAaZzXx		  - предметы
-# S26	  = nswe			  - враги (направление взгляда)
+# W0-W9   = 0123456789			- стены
+# W10-W11 = v>					- двери
+# S0-S18  = ^*$:;,!@%#&|[]{}_<`	- декорации
+# S19-S27 = +HhAaZzXx			- предметы
+# E0		nswe				- враги (направление взгляда)
 
 # Символы NSWE - стартовая точка игрока.
 # Пока что непроходимые вот эти спрайты: (задаётся в коде)
-# S2-S10  = $:;,!@%#&|
+# S2-S13  = $:;,!@%#&|[]
 
   0000000000000000001234567890
-  0^*$:;,!@%#&|{}_<`...n.....0
-  0+HhAaZzXx.................00000000000000000000000
+  0^*$:;,!@%#&|{}_~`...n.....>0
+  0+HhAaZzXx.................0v000000000000000000000
   0............nswe................................0
 000................................................000
 0..................................................000

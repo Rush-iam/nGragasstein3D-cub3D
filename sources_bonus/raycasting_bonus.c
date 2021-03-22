@@ -6,11 +6,53 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:45 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/19 21:34:02 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/23 00:00:33 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
+
+t_door		*door_find(t_game *game, t_upoint cell)
+{
+	t_list	*cur_list;
+	t_door	*door;
+
+	cur_list = game->doors;
+	while (cur_list)
+	{
+		door = (t_door *)cur_list->content;
+		if (door->cell.x == cell.x && door->cell.y == cell.y)
+			return (door);
+		cur_list = cur_list->next;
+	}
+	printf("DOOR ERROR!\n");
+	return (NULL);
+}
+
+void	draw_wall_texture_set(t_game *game, struct s_column *col, t_upoint cell)
+{
+	const char	chr = game->map.grid[cell.y][cell.x];
+
+	if ((chr == '>' && (col->dir == 'W' || col->dir == 'E')) ||
+		(chr == 'v' && (col->dir == 'N' || col->dir == 'S')))
+		col->texture_id = TEXTURE_DOOR;
+	else if ((col->dir == 'N' && game->map.grid[cell.y + 1][cell.x] == '>') ||
+		(col->dir == 'S' && game->map.grid[cell.y - 1][cell.x] == '>') ||
+		(col->dir == 'W' && game->map.grid[cell.y][cell.x + 1] == 'v') ||
+		(col->dir == 'E' && game->map.grid[cell.y][cell.x - 1] == 'v'))
+		col->texture_id = TEXTURE_DOOR_W;
+	else
+		col->texture_id = chr - '0';
+	if (((col->dir == 'W' || col->dir == 'E') &&
+										col->texture_id != TEXTURE_DOOR_W) ||
+		(col->texture_id == TEXTURE_DOOR_W &&
+										(col->dir == 'N' || col->dir == 'S')))
+		col->texture_id += sizeof(game->texture) / sizeof(*game->texture) / 2;
+	if (chr == '>' || chr == 'v')
+		col->texture_pos -= door_find(game, cell)->part_opened;
+	else if (col->dir == 'S' || col->dir == 'W')
+		col->texture_pos = 1. - col->texture_pos;
+}
 
 void		ray_cast(t_game *game)
 {
@@ -26,12 +68,13 @@ void		ray_cast(t_game *game)
 		else if (angle > PI2)
 			angle -= PI2;
 		game->column[ray] = ray_intersect(game, angle);
-		if (game->column[ray].dir == 'S' || game->column[ray].dir == 'W')
-			game->column[ray].texture_pos = 1. - game->column[ray].texture_pos;
 		if (game->column[ray].dir == 'N')
 			game->column[ray].cell.y -= FLOAT_FIX;
 		else if (game->column[ray].dir == 'W')
 			game->column[ray].cell.x -= FLOAT_FIX;
+		draw_wall_texture_set(game, &game->column[ray], (t_upoint){
+						(unsigned)game->column[ray].cell.x,
+						(unsigned)game->column[ray].cell.y});
 		ray++;
 	}
 }
@@ -44,21 +87,95 @@ struct s_column	ray_intersect(t_game *game, double cur_angle)
 	const double	tan_cur_angle = tan(cur_angle);
 
 	x1 = (cur_angle <= M_PI_2 || cur_angle > 3 * M_PI_2) ?
-		 ray_intersect_x(game, (t_fpoint){1, tan_cur_angle}) :
-		 ray_intersect_x(game, (t_fpoint){-1, -tan_cur_angle});
+		 ray_intersect_x(game, game->p.pos, (t_fpoint){1, tan_cur_angle}) :
+		 ray_intersect_x(game, game->p.pos, (t_fpoint){-1, -tan_cur_angle});
 	y1 = (cur_angle <= M_PI) ?
-		 ray_intersect_y(game, (t_fpoint){1 / tan_cur_angle, 1}) :
-		 ray_intersect_y(game, (t_fpoint){-1 / tan_cur_angle, -1});
+		 ray_intersect_y(game, game->p.pos, (t_fpoint){1 / tan_cur_angle, 1}) :
+		 ray_intersect_y(game, game->p.pos, (t_fpoint){-1 / tan_cur_angle, -1});
 	distance.x = game->p.vector.x * (x1.x - game->p.pos.x) +
 				 game->p.vector.y * (x1.y - game->p.pos.y);
 	distance.y = game->p.vector.x * (y1.x - game->p.pos.x) +
 				 game->p.vector.y * (y1.y - game->p.pos.y);
 	if (distance.x < distance.y)
 		return ((struct s_column){distance.x, game->col_scale / distance.x, x1,
-				 x1.y - (int)x1.y, "EW"[x1.x < game->p.pos.x]});
+				-1U, x1.y - (int)x1.y, "EW"[x1.x < game->p.pos.x]});
 	else
 		return ((struct s_column){distance.y, game->col_scale / distance.y, y1,
-				 y1.x - (int)y1.x, "SN"[y1.y < game->p.pos.y]});
+				-1U, y1.x - (int)y1.x, "SN"[y1.y < game->p.pos.y]});
+}
+
+t_fpoint	ray_intersect_x_door(t_game *game, t_fpoint step, t_fpoint check)
+{
+	t_fpoint	check_door;
+	float		position;
+
+	check_door = (t_fpoint){check.x + step.x / 2, check.y + step.y / 2};
+	position = check_door.y - (unsigned)check.y;
+	if (0 < position &&
+		position < door_find(game, (t_upoint){check.x, check.y})->part_opened)
+		return (ray_intersect_x(game, (t_fpoint){
+				check_door.x + (step.x < 0), check_door.y}, step));
+	return ((t_fpoint){check_door.x + (step.x < 0), check_door.y});
+}
+
+t_fpoint	ray_intersect_y_door(t_game *game, t_fpoint step, t_fpoint check)
+{
+	t_fpoint	check_door;
+	float		position;
+
+	check_door = (t_fpoint){check.x + step.x / 2, check.y + step.y / 2};
+	position = check_door.x - (unsigned)check.x;
+	if (0 < position &&
+		position < door_find(game, (t_upoint){check.x, check.y})->part_opened)
+		return (ray_intersect_y(game, (t_fpoint){
+				check_door.x, check_door.y + (step.y < 0)}, step));
+	return ((t_fpoint){check_door.x, check_door.y + (step.y < 0)});
+}
+
+t_fpoint	ray_intersect_x(t_game *game, t_fpoint from, t_fpoint step)
+{
+	t_fpoint	check;
+
+	check.x = (int)from.x + (step.x > 0) - (step.x < 0);
+	if (step.x > 0)
+		check.y = from.y + step.y * (1 - (from.x - (int)from.x));
+	else
+		check.y = from.y + step.y * (from.x - (int)from.x);
+	while ((unsigned)check.y < game->map.size.y &&
+			(unsigned)check.x < game->map.size.x)
+	{
+		if (ft_isdigit(game->map.grid[(unsigned)check.y][(unsigned)check.x]))
+			break ;
+		else if (ft_memchr(CHAR_DOORS, game->map.grid[(unsigned)check.y]
+									[(unsigned)check.x], sizeof(CHAR_DOORS)))
+			return (ray_intersect_x_door(game, step, check));
+		check = (t_fpoint){check.x + step.x, check.y + step.y};
+	}
+	check.x += (step.x < 0);
+	return (check);
+}
+
+t_fpoint	ray_intersect_y(t_game *game, t_fpoint from, t_fpoint step)
+{
+	t_fpoint	check;
+
+	check.y = (int)from.y + (step.y > 0) - (step.y < 0);
+	if (step.y > 0)
+		check.x = from.x + step.x * (1 - (from.y - (int)from.y));
+	else
+		check.x = from.x + step.x * (from.y - (int)from.y);
+	while ((unsigned)check.y < game->map.size.y &&
+			(unsigned)check.x < game->map.size.x)
+	{
+		if (ft_isdigit(game->map.grid[(unsigned)check.y][(unsigned)check.x]))
+			break ;
+		else if (ft_memchr(CHAR_DOORS, game->map.grid[(unsigned)check.y]
+									[(unsigned)check.x], sizeof(CHAR_DOORS)))
+			return (ray_intersect_y_door(game, step, check));
+		check = (t_fpoint){check.x + step.x, check.y + step.y};
+	}
+	check.y += (step.y < 0);
+	return (check);
 }
 
 double		ray_intersect_distance(t_game *game, double cur_angle)
@@ -69,50 +186,14 @@ double		ray_intersect_distance(t_game *game, double cur_angle)
 	const double	tan_cur_angle = tan(cur_angle);
 
 	x1 = (cur_angle < -M_PI_2 || cur_angle >= M_PI_2) ?
-		 ray_intersect_x(game, (t_fpoint){-1, -tan_cur_angle}) :
-		 ray_intersect_x(game, (t_fpoint){1, tan_cur_angle});
+		 ray_intersect_x(game, game->p.pos, (t_fpoint){-1, -tan_cur_angle}) :
+		 ray_intersect_x(game, game->p.pos, (t_fpoint){1, tan_cur_angle});
 	y1 = (cur_angle >= 0) ?
-		 ray_intersect_y(game, (t_fpoint){1 / tan_cur_angle, 1}) :
-		 ray_intersect_y(game, (t_fpoint){-1 / tan_cur_angle, -1});
+		 ray_intersect_y(game, game->p.pos, (t_fpoint){1 / tan_cur_angle, 1}) :
+		 ray_intersect_y(game, game->p.pos, (t_fpoint){-1 / tan_cur_angle, -1});
 	distance.x = hypot(x1.x - game->p.pos.x, x1.y - game->p.pos.y);
 	distance.y = hypot(y1.x - game->p.pos.x, y1.y - game->p.pos.y);
 	return (fmin(distance.x, distance.y));
-}
-
-t_fpoint	ray_intersect_x(t_game *game, t_fpoint step)
-{
-	t_fpoint	check;
-
-	check.x = (int)game->p.pos.x + (step.x > 0) - (step.x < 0);
-	if (step.x > 0)
-		check.y = game->p.pos.y + step.y *
-								(1 - (game->p.pos.x - (int)game->p.pos.x));
-	else
-		check.y = game->p.pos.y + step.y * (game->p.pos.x - (int)game->p.pos.x);
-	while ((unsigned)check.y < game->map.size.y &&
-			(unsigned)check.x < game->map.size.x &&
-			!ft_isdigit(game->map.grid[(unsigned)check.y][(unsigned)check.x]))
-		check = (t_fpoint){check.x + step.x, check.y + step.y};
-	check.x += (step.x < 0);
-	return (check);
-}
-
-t_fpoint	ray_intersect_y(t_game *game, t_fpoint step)
-{
-	t_fpoint	check;
-
-	check.y = (int)game->p.pos.y + (step.y > 0) - (step.y < 0);
-	if (step.y > 0)
-		check.x = game->p.pos.x + step.x *
-								(1 - (game->p.pos.y - (int)game->p.pos.y));
-	else
-		check.x = game->p.pos.x + step.x * (game->p.pos.y - (int)game->p.pos.y);
-	while ((unsigned)check.y < game->map.size.y &&
-			(unsigned)check.x < game->map.size.x &&
-			!ft_isdigit(game->map.grid[(unsigned)check.y][(unsigned)check.x]))
-		check = (t_fpoint){check.x + step.x, check.y + step.y};
-	check.y += (step.y < 0);
-	return (check);
 }
 
 /*

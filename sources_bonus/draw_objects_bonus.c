@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 23:32:43 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/19 20:52:57 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/22 16:32:19 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,16 @@ void	draw_object_properties(t_game *game, t_object *obj)
 		obj->angle_to_p += PI2;
 	if (obj->distance > 0.1)
 	{
-		obj->render.size.y = game->col_scale / obj->distance;
-		obj->render.size.x = obj->render.size.y * obj->sprite->aspect;
+		obj->render.size.y = (unsigned)(game->col_scale / obj->distance) & ~1;
+		obj->render.size.x = (unsigned)
+							(obj->render.size.y * obj->sprite->aspect) & ~1;
 		obj->render.start_0 = game->col_center + tan(obj->angle_to_p) /
 								game->col_step - obj->render.size.x / 2;
 		obj->render.start.x = obj->render.start_0 +
 									obj->render.size.x * obj->sprite->min_x;
 		obj->render.end.x = obj->render.start_0 +
 									obj->render.size.x * obj->sprite->max_x;
-		obj->render.start.y = (game->img.size.y - obj->render.size.y) / 2;
+		obj->render.start.y = game->win_center.y - obj->render.size.y / 2;
 		obj->render.end.y = obj->render.start.y + obj->render.size.y;
 	}
 }
@@ -62,10 +63,11 @@ void	draw_sprite(t_game *game, t_object *obj)
 		max.x--;
 	if (min.x == max.x)
 		return ;
-	min.y = ft_max((game->img.size.y - obj->render.size.y) / 2, 0);
+	min.y = ft_max(game->win_center.y - obj->render.size.y / 2, 0);
 	max.y = ft_min(min.y + obj->render.size.y, game->img.size.y);
-	obj->render.step = (t_fpoint){obj->sprite->size.x / obj->render.size.x,
-								  obj->sprite->size.y / obj->render.size.y};
+	obj->render.step = (t_fpoint){
+		(double)obj->sprite->size.x / obj->render.size.x,
+		(double)obj->sprite->size.y / obj->render.size.y};
 	draw_sprite_scaled(&game->img, obj, min, max);
 }
 

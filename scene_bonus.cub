@@ -1,4 +1,4 @@
-R 2560 1196
+R 2560 1280
 C 56,56,56
 F 112,112,112
 
@@ -12,6 +12,9 @@ W6 ./resources/walls/wall_6.png
 W7 ./resources/walls/wall_7.png
 W8 ./resources/walls/wall_8.png
 W9 ./resources/walls/wall_9.png
+
+W10 ./resources/walls/door_0.png
+W11 ./resources/walls/door_1.png
 
 G0 ./resources/weapons/knife_
 G1 ./resources/weapons/pistol_
@@ -31,20 +34,22 @@ S8 ./resources/sprites/barrel_green.png
 S9 ./resources/sprites/table.png
 S10 ./resources/sprites/table_chairs.png
 S11 ./resources/sprites/statue.png
-S12 ./resources/sprites/skeleton.png
-S13 ./resources/sprites/bones.png
-S14 ./resources/sprites/puddle.png
-S15 ./resources/sprites/pot.png
-S16 ./resources/sprites/guard_dead.png
-S17 ./resources/sprites/health_xl.png
-S18 ./resources/sprites/health_l.png
-S19 ./resources/sprites/health_m.png
-S20 ./resources/sprites/gun_rifle.png
-S21 ./resources/sprites/ammo.png
-S22 ./resources/sprites/bonus_xl.png
-S23 ./resources/sprites/bonus_l.png
-S24 ./resources/sprites/bonus_m.png
-S25 ./resources/sprites/bonus_s.png
+S12 ./resources/sprites/well_empty.png
+S13 ./resources/sprites/well_full.png
+S14 ./resources/sprites/skeleton.png
+S15 ./resources/sprites/bones.png
+S16 ./resources/sprites/puddle.png
+S17 ./resources/sprites/pot.png
+S18 ./resources/sprites/guard_dead.png
+S19 ./resources/sprites/health_xl.png
+S20 ./resources/sprites/health_l.png
+S21 ./resources/sprites/health_m.png
+S22 ./resources/sprites/gun_rifle.png
+S23 ./resources/sprites/ammo.png
+S24 ./resources/sprites/bonus_xl.png
+S25 ./resources/sprites/bonus_l.png
+S26 ./resources/sprites/bonus_m.png
+S27 ./resources/sprites/bonus_s.png
 
                             333433333334333
      666666                 3,...........,3
@@ -67,36 +72,36 @@ S25 ./resources/sprites/bonus_s.png
 6.^.6..h6...6               3AH3 3...3
 6.....^w8.^.8               3333 4.^.4
 6...6..X6.n.6                    3...3
-6...666666.66666                 34.43                0000000000
+6...666666.66666                 34v43                0000000000
 8.^.86e........6           666686;...;686666          0h..._@@@0
 6...66.;.....;.8           6;.............;6          0.....w.@0
 6...66..^...^..6           9...............900000000000........0
 6....6.........6           6................0.........0........0
-6......e.......8           6..*....*...w*......................1
+6......e.......8           6..*....*...w*...>.........>........1
 6....6.........6           6................0.........0........0
 6...66..^...^..6           9...............9000....0000..#h.#.w0
 6...66.;.....;.8           6;.............;6  00..00  0........0
 6...66.......n.6           667666.....667666   0n.0   0......h.0
-7.^.766666.66666                000.000        0..0   000.00.000
+7.^.766666.66666                000v000        0..0   000]00[000
 6...6   6...6                    0...0         0..0     000000
 6...66666...6                    0.^.0         0..0
 6...6s.%6...6                    0...0         0.n0 000000000
 6.....^.8.^.8                    0...0         0..000.0.0.0h00
 6...6h..6...6                    0...0         0...0.........0
-6.^.66666..n6                    0.^.0         0.....e.......1
-6...66666...6666666669666        0...0         0.n.0........<0
+6.^.66666..n6                    0.^.0         0...>.e.......1
+6...66666...6666666669666        0...0         0.n.0........~0
 6................6.....w8        0...0         000000.0.0.0{00
 6.n...^...n...^......w...6       0.n.0              000000000
 6................6.....w8        0.^.0
 666666666676666666.669666        0...0
-           8..66...H6       0000000.0000000
+           8..66...H6       0000000v0000000
           6...6..6666       0}h..0...0....0
-           8.....666        0......^...{..0
+           8.....666        0....>.^.>.{..0
            66.6666          0....0...0....0
             6..6            0....0...0....0
             66+6            000000...000000
             6666            0....0...0....0
-                            0.E.`..^..h..}0
+                            0.E.`>.^.>h..}0
                             0....0...0....0
                             000000...000000
                             0.............0

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/19 23:56:57 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/22 23:57:36 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@
 # define K_TURN_LEFT	KEY_LEFT
 # define K_TURN_RIGHT	KEY_RIGHT
 # define K_RUN			KEY_SHIFT_LEFT
+# define K_USE			KEY_E
 
 # define COLOR_WHITE	0xFFFFFF
 # define COLOR_GREEN	0x7AFF40
@@ -77,7 +78,7 @@
 # define FOV_ZOOMSPEED	1.03
 
 # define PL_SPEED		0.08
-# define PL_RADIUS		0.3
+# define PL_RADIUS		0.4
 # define FLOAT_FIX		0.0000001
 # define MOUSE_SPEED	2000.
 # define MAP_SCALE		8
@@ -111,12 +112,16 @@ typedef struct	s_img
 	bool		*alpha_y;
 }				t_img;
 
-# define CHAR_DECOR		"^*$:;,!@%#&|{}_<`"
+# define CHAR_DECOR		"^*$:;,!@%#&|[]{}_~`"
 # define CHAR_PICKUP	"+HhAaZzXx"
 # define CHAR_ENEMY		"nswe"
-# define CHAR_SOLID		"$:;,!@%#&|"
+# define CHAR_SOLID		"$:;,!@%#&|[]"
 # define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP
-# define CHAR_ALLOWED	" .0123456789NSWE" CHAR_OBJECTS CHAR_ENEMY
+# define CHAR_DOORS		"v>"
+# define CHAR_WALLS		"0123456789" CHAR_DOORS
+# define CHAR_ALLOWED	" .NSWE" CHAR_WALLS CHAR_DOORS CHAR_OBJECTS CHAR_ENEMY
+# define TEXTURE_DOOR		10
+# define TEXTURE_DOOR_W	11
 
 # define VAL_HEALTH_XL	200
 # define VAL_HEALTH_L	25
@@ -144,13 +149,15 @@ typedef struct	s_img
 # define ENEMY_ID_GUARD		0
 # define ENEMY_HEALTH		25
 # define ENEMY_FOV_HALF		M_PI_4 * 1.5
-# define ENEMY_SHOT_DELAY	1.5
+# define ENEMY_SHOT_DELAY	2
 # define ENEMY_MISS_MAX		60
-//# define ENEMY_DMG_MIN		10
-//# define ENEMY_DMG_MAX		40
+//# define ENEMY_DMG_MIN		3
+//# define ENEMY_DMG_MAX		30
 # define ENEMY_DMG_MIN		0
-# define ENEMY_DMG_MAX		1
+# define ENEMY_DMG_MAX		0
 # define ANIM_ENEMY_TICKS	10
+
+# define ANIM_DOOR_TICKS	60
 
 typedef struct	s_imgset
 {
@@ -160,6 +167,14 @@ typedef struct	s_imgset
 	t_img		pain[2];
 	t_img		dead[5];
 }				t_imgset;
+
+typedef struct	s_door
+{
+	t_upoint	cell;
+	bool		opening;
+	float		part_opened;
+	time_t		ticks_to_close;
+}				t_door;
 
 typedef struct	s_object
 {
@@ -171,7 +186,7 @@ typedef struct	s_object
 	float		angle_to_p;
 	struct		s_render
 	{
-		t_fpoint	size;
+		t_upoint	size;
 		int			start_0;
 		t_point		start;
 		t_point		end;
@@ -275,14 +290,16 @@ typedef struct	s_game
 		double		distance;
 		unsigned	height;
 		t_fpoint	cell;
+		unsigned	texture_id;
 		double		texture_pos;
 		char		dir;
 	}			*column;
 	unsigned	color_ceil;
 	unsigned	color_floor;
-	t_img		texture[20];
+	t_img		texture[24];
 	t_img		sprite[sizeof(CHAR_OBJECTS) - 1];
 	t_imgset	imgset[1];
+	t_list		*doors;
 	t_list		*objects;
 	struct		s_effect
 	{
@@ -321,6 +338,7 @@ void			load_texture_file(char *path, t_img *dst_img, char *err,
 
 void			set_map				(t_game *game, t_list *map);
 void			set_map_process		(t_game *game);
+void			set_map_door_add(t_game *game, t_upoint pt);
 void			set_map_object_add(t_game *game, char chr, unsigned type,
 											t_upoint pt);
 void			set_map_check_cell	(t_game *game, char **map, t_upoint pt);
@@ -345,8 +363,8 @@ void			player_set_weapon(t_game *game, enum e_weapon weapon);
 void			ray_cast		(t_game *game);
 struct s_column	ray_intersect	(t_game *game, double cur_angle);
 double			ray_intersect_distance(t_game *game, double cur_angle);
-t_fpoint		ray_intersect_x	(t_game *game, t_fpoint step);
-t_fpoint		ray_intersect_y	(t_game *game, t_fpoint step);
+t_fpoint		ray_intersect_x	(t_game *game, t_fpoint from, t_fpoint step);
+t_fpoint		ray_intersect_y	(t_game *game, t_fpoint from, t_fpoint step);
 
 void			img_clear				(t_img *img);
 void			img_clear_rgb			(t_img *img, unsigned color);
@@ -372,8 +390,11 @@ void			draw_wall_scaled_90(t_game *game, t_img *src, unsigned x,
 								 float fade);
 void			draw_wall_solid	(t_game *game, unsigned x, float fade);
 
+void			doors(t_game *game);
+t_door			*door_find(t_game *game, t_upoint cell);
+
 void			objects				(t_game *g);
-void			object_add(t_game *game, t_list **dst, t_object *obj);
+void			object_add(t_game *game, t_list **dst, void *obj);
 void			object_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img);
 void			enemy_logic(t_game *game, t_object *obj);
 void			enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state);

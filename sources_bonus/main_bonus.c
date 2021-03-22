@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/19 23:28:04 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/22 23:13:50 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,13 +119,30 @@ void	initialize_game(t_game *game, bool screenshot_only)
 	player_set_weapon(game, W_PISTOL);
 }
 
-void dead_exit(t_game *game)
+void	dead_exit(t_game *game)
 {
 	if (game->effect.type != EF_FIZZLEFADE)
 		game->effect = (struct s_effect){512, 0, EF_FIZZLEFADE, COLOR_RED, 0};
 	draw_effect(game, &game->effect);
 	if (game->effect.frame_cur > game->effect.frames)
 		exit(0);
+}
+
+void	doors(t_game *game)
+{
+	t_list	*cur_list;
+	t_door	*door;
+
+	cur_list = game->doors;
+	while (cur_list)
+	{
+		door = (t_door *)cur_list->content;
+		if (door->opening == true && door->part_opened < 1)
+			door->part_opened = fminf(1, door->part_opened + 1. / ANIM_DOOR_TICKS);
+		else if (door->opening == false && door->part_opened > 0)
+			door->part_opened = fmaxf(0, door->part_opened - 1. / ANIM_DOOR_TICKS);
+		cur_list = cur_list->next;
+	}
 }
 
 int	game_loop(t_game *game)
@@ -149,6 +166,7 @@ int	game_loop(t_game *game)
 		game->effect.frame_cur += game->tick_diff;
 	while (game->tick_diff > 0)
 	{
+		doors(game);
 		player_control(game);
 		objects(game);
 		weapon(game, &game->p.weapon);

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/19 20:07:05 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/22 23:46:32 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,10 @@ void	player_control(t_game *game)
 	player_control_move(game);
 	player_control_weapon(game);
 	player_control_extra(game);
-	game->p.pos.x = fmax(game->p.pos.x, PL_RADIUS + FLOAT_FIX);
-	game->p.pos.y = fmax(game->p.pos.y, PL_RADIUS + FLOAT_FIX);
-	game->p.pos.x = fmin(game->p.pos.x,
-									game->map.size.x - PL_RADIUS - FLOAT_FIX);
-	game->p.pos.y = fmin(game->p.pos.y,
-									game->map.size.y - PL_RADIUS - FLOAT_FIX);
+	game->p.pos.x = fmax(game->p.pos.x, 1);
+	game->p.pos.y = fmax(game->p.pos.y, 1);
+	game->p.pos.x = fmin(game->p.pos.x, game->map.size.x - 1);
+	game->p.pos.y = fmin(game->p.pos.y, game->map.size.y - 1);
 	player_control_borders(game);
 }
 
@@ -104,6 +102,11 @@ void	player_control_toggler(t_game *game, int key_code)
 {
 	if (key_code == K_MAP_TOGGLE && game->key.k[key_code] == false)
 		game->map.show = !game->map.show;
+	if (key_code == K_USE && game->key.k[key_code] == false && ft_memchr(
+			CHAR_DOORS, game->map.grid[(int)(game->p.pos.y + game->p.vector.y)]
+			[(int)(game->p.pos.x + game->p.vector.x)], sizeof(CHAR_DOORS)))
+		door_find(game, (t_upoint){(int)(game->p.pos.x + game->p.vector.x),
+					(int)(game->p.pos.y + game->p.vector.y)})->opening ^= true;
 }
 
 void	player_control_extra(t_game *game)
@@ -128,13 +131,13 @@ void	player_control_borders_enemies(t_game *game)
 		obj = (t_object *)cur_list->content;
 		diff = (t_fpoint){obj->pos.x - game->p.pos.x, obj->pos.y - game->p.pos.y};
 		obj->distance_real = hypot(diff.x, diff.y);
-		if (obj->distance_real < PL_RADIUS * 1.5 &&
+		if (obj->distance_real < PL_RADIUS * 2 &&
 			obj->type == T_ENEMY && obj->e->state != S_DEAD)
 		{
 			obj->atan_diff = atan2(diff.y, diff.x);
 			obj->distance = game->p.vector.x * diff.x + game->p.vector.y * diff.y;
-			game->p.pos.x = obj->pos.x - PL_RADIUS * 1.5 * cosf(obj->atan_diff);
-			game->p.pos.y = obj->pos.y - PL_RADIUS * 1.5 * sinf(obj->atan_diff);
+			game->p.pos.x = obj->pos.x - PL_RADIUS * 2 * cosf(obj->atan_diff);
+			game->p.pos.y = obj->pos.y - PL_RADIUS * 2 * sinf(obj->atan_diff);
 		}
 		cur_list = cur_list->next;
 	}
@@ -142,20 +145,29 @@ void	player_control_borders_enemies(t_game *game)
 
 void	player_control_borders(t_game *g)
 {
-	const t_point	plus = {g->p.pos.x + PL_RADIUS, g->p.pos.y + PL_RADIUS};
-	const t_point	minus = {g->p.pos.x - PL_RADIUS, g->p.pos.y - PL_RADIUS};
+	const t_upoint	plus = {g->p.pos.x + PL_RADIUS, g->p.pos.y + PL_RADIUS};
+	const t_upoint	minus = {g->p.pos.x - PL_RADIUS, g->p.pos.y - PL_RADIUS};
+	char			check;
 
-	if (ft_isdigit(g->map.grid[(int)g->p.pos.y][minus.x]) || ft_memchr(
-		CHAR_SOLID, g->map.grid[(int)g->p.pos.y][minus.x], sizeof(CHAR_SOLID)))
+	check = g->map.grid[(int)g->p.pos.y][minus.x];
+	if (ft_isdigit(check) || ft_memchr(CHAR_SOLID, check, sizeof(CHAR_SOLID)) ||
+			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_SOLID)) && door_find(g,
+					(t_upoint){minus.x, (int)g->p.pos.y})->part_opened < 0.5))
 		g->p.pos.x = minus.x + 1 + PL_RADIUS + FLOAT_FIX;
-	if (ft_isdigit(g->map.grid[(int)g->p.pos.y][plus.x]) || ft_memchr(
-		CHAR_SOLID, g->map.grid[(int)g->p.pos.y][plus.x], sizeof(CHAR_SOLID)))
+	check = g->map.grid[(int)g->p.pos.y][plus.x];
+	if (ft_isdigit(check) || ft_memchr(CHAR_SOLID, check, sizeof(CHAR_SOLID)) ||
+			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_SOLID)) && door_find(g,
+					(t_upoint){plus.x, (int)g->p.pos.y})->part_opened < 0.5))
 		g->p.pos.x = plus.x - PL_RADIUS - FLOAT_FIX;
-	if (ft_isdigit(g->map.grid[minus.y][(int)g->p.pos.x]) || ft_memchr(
-		CHAR_SOLID, g->map.grid[minus.y][(int)g->p.pos.x], sizeof(CHAR_SOLID)))
+	check = g->map.grid[minus.y][(int)g->p.pos.x];
+	if (ft_isdigit(check) || ft_memchr(CHAR_SOLID, check, sizeof(CHAR_SOLID)) ||
+			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_SOLID)) && door_find(g,
+					(t_upoint){(int)g->p.pos.x, minus.y})->part_opened < 0.5))
 		g->p.pos.y = minus.y + 1 + PL_RADIUS + FLOAT_FIX;
-	if (ft_isdigit(g->map.grid[plus.y][(int)g->p.pos.x]) || ft_memchr(
-		CHAR_SOLID, g->map.grid[plus.y][(int)g->p.pos.x], sizeof(CHAR_SOLID)))
+	check = g->map.grid[plus.y][(int)g->p.pos.x];
+	if (ft_isdigit(check) || ft_memchr(CHAR_SOLID, check, sizeof(CHAR_SOLID)) ||
+			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_SOLID)) && door_find(g,
+					(t_upoint){(int)g->p.pos.x, plus.y})->part_opened < 0.5))
 		g->p.pos.y = plus.y - PL_RADIUS - FLOAT_FIX;
 	player_control_borders_diag(g);
 	player_control_borders_enemies(g);
@@ -163,8 +175,8 @@ void	player_control_borders(t_game *g)
 
 void	player_control_borders_diag(t_game *g)
 {
-	const t_point	plus = {g->p.pos.x + PL_RADIUS, g->p.pos.y + PL_RADIUS};
-	const t_point	minus = {g->p.pos.x - PL_RADIUS, g->p.pos.y - PL_RADIUS};
+	const t_upoint	plus = {g->p.pos.x + PL_RADIUS, g->p.pos.y + PL_RADIUS};
+	const t_upoint	minus = {g->p.pos.x - PL_RADIUS, g->p.pos.y - PL_RADIUS};
 
 	if (ft_isdigit(g->map.grid[minus.y][minus.x]) || ft_memchr(
 			CHAR_SOLID, g->map.grid[minus.y][minus.x], sizeof(CHAR_SOLID)))

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 23:32:38 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/19 19:54:35 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/22 17:04:19 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ void	draw_walls(t_game *game)
 {
 	unsigned	ray;
 	float		fade;
-	unsigned	texture_id;
 
 	ray = 0;
 	while (ray < game->img.size.x)
@@ -26,11 +25,8 @@ void	draw_walls(t_game *game)
 			game->column[ray].cell.x >= 0 && game->column[ray].cell.y >= 0)
 		{
 			fade = fminf(8.f / (float)game->column[ray].distance, 1.f);
-			texture_id = game->map.grid[(int)game->column[ray].cell.y]
-						 [(int)game->column[ray].cell.x] - '0';
-			if (game->column[ray].dir == 'W' || game->column[ray].dir == 'E')
-				texture_id += sizeof(game->texture) / sizeof(*game->texture) / 2;
-			draw_wall_scaled(game, game->texture[texture_id], ray, fade);
+			draw_wall_scaled(game, game->texture[game->column[ray].texture_id],
+																	ray, fade);
 //			draw_wall_solid(game, ray, fade);
 		}
 		ray++;

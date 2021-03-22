@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:03 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/19 23:51:21 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/22 16:37:20 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,11 @@ void	enemy_settings(t_game *game, t_object *obj)
 			obj->distance_real < game->p.target->distance_real))
 			game->p.target = obj;
 	}
-	obj->e->p_to_angle = (obj->atan_diff - obj->e->angle) - M_PI;
+	obj->e->p_to_angle = obj->atan_diff - (obj->e->angle - M_PI);
 	if (obj->e->p_to_angle < -M_PI)
 		obj->e->p_to_angle += PI2;
+	else if (obj->e->p_to_angle > M_PI)
+		obj->e->p_to_angle -= PI2;
 	if (obj->e->state == S_WAIT)
 		obj->e->imgset = &game->imgset[ENEMY_ID_GUARD].
 				wait[(8 - (int)ceil(obj->e->p_to_angle / M_PI_4 - 0.5)) % 8];
@@ -66,12 +68,11 @@ void	enemy_shoot(t_game *game, t_object *obj)
 	miss_chance = ft_umin(ENEMY_MISS_MAX, sqrt(obj->distance_real) * 10);
 	if (arc4random() % 100 < miss_chance)
 		return ;
-	damage = ENEMY_DMG_MIN * power +
-				arc4random() % (ENEMY_DMG_MAX - ENEMY_DMG_MIN) * power;
+	damage = ENEMY_DMG_MIN +
+				arc4random() % (1 + ENEMY_DMG_MAX - ENEMY_DMG_MIN) * power;
 	game->p.health -= damage;
 	printf("Enemy shot you! -%u HP. Health: %hd\n", damage, game->p.health);
-	if (game->p.health > 0)
-		game->effect = (struct s_effect){30, 15, EF_FLASH, COLOR_RED, damage / 100.};
+	game->effect = (struct s_effect){30, 15, EF_FLASH, COLOR_RED, damage / 100.};
 }
 
 void	enemy_logic(t_game *game, t_object *obj)
@@ -87,7 +88,7 @@ void	enemy_logic(t_game *game, t_object *obj)
 		return ;
 	if (see == true)
 	{
-//		obj->e->angle += obj->e->p_to_angle;
+		obj->e->angle = obj->atan_diff + M_PI;
 		obj->e->alarmed = true;
 	}
 	if (++obj->e->tick >= obj->e->ticks ||
@@ -133,7 +134,7 @@ void	enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state)
 		obj->e->imgset = &imgset->pain[obj->angle_to_p < 0];
 		obj->e->frames = 1;
 		obj->e->alarmed = true;
-//		obj->e->angle += obj->e->p_to_angle;
+		obj->e->angle = obj->atan_diff + M_PI;
 	}
 	else if (state == S_DEAD)
 	{
@@ -163,7 +164,7 @@ void	object_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img)
 	object_add(game, &game->objects, obj);
 }
 
-void	object_add(t_game *game, t_list **dst, t_object *obj)
+void	object_add(t_game *game, t_list **dst, void *obj)
 {
 	t_list	*new;
 
