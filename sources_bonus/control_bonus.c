@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/22 23:46:32 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/23 21:54:09 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,15 +98,24 @@ void	player_set_fov(t_game *game, double fov, bool reset)
 		game->fov = fov;
 }
 
-void	player_control_toggler(t_game *game, int key_code)
+void	player_control_toggler(t_game *g, int key_code)
 {
-	if (key_code == K_MAP_TOGGLE && game->key.k[key_code] == false)
-		game->map.show = !game->map.show;
-	if (key_code == K_USE && game->key.k[key_code] == false && ft_memchr(
-			CHAR_DOORS, game->map.grid[(int)(game->p.pos.y + game->p.vector.y)]
-			[(int)(game->p.pos.x + game->p.vector.x)], sizeof(CHAR_DOORS)))
-		door_find(game, (t_upoint){(int)(game->p.pos.x + game->p.vector.x),
-					(int)(game->p.pos.y + game->p.vector.y)})->opening ^= true;
+	t_door	*door;
+
+	if (key_code == K_MAP_TOGGLE && g->key.k[key_code] == false)
+		g->map.show = !g->map.show;
+	if (key_code == K_USE && g->key.k[key_code] == false && ft_memchr(
+			CHAR_DOORS, g->map.grid[(int)(g->p.pos.y + g->p.vector.y)]
+			[(int)(g->p.pos.x + g->p.vector.x)], sizeof(CHAR_DOORS)))
+	{
+		door = door_find(g, (t_upoint){(int)(g->p.pos.x + g->p.vector.x),
+										(int)(g->p.pos.y + g->p.vector.y)});
+		door->opening ^= true;
+		if (door->opening == true)
+			door->ticks_to_close = DOOR_TIMER_TICKS;
+		else
+			door->ticks_to_close = 0;
+	}
 }
 
 void	player_control_extra(t_game *game)
@@ -132,7 +141,7 @@ void	player_control_borders_enemies(t_game *game)
 		diff = (t_fpoint){obj->pos.x - game->p.pos.x, obj->pos.y - game->p.pos.y};
 		obj->distance_real = hypot(diff.x, diff.y);
 		if (obj->distance_real < PL_RADIUS * 2 &&
-			obj->type == T_ENEMY && obj->e->state != S_DEAD)
+			obj->type == T_ENEMY && obj->e->state != ST_DEAD)
 		{
 			obj->atan_diff = atan2(diff.y, diff.x);
 			obj->distance = game->p.vector.x * diff.x + game->p.vector.y * diff.y;

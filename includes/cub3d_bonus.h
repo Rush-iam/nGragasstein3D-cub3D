@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/22 23:57:36 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/23 23:48:49 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <errno.h>
 # include <string.h>
 # include <limits.h>
+# include "cute_sound.h"
 # include "mlx.h"
 # include "libft.h"
 # include "get_next_line.h"
@@ -120,8 +121,27 @@ typedef struct	s_img
 # define CHAR_DOORS		"v>"
 # define CHAR_WALLS		"0123456789" CHAR_DOORS
 # define CHAR_ALLOWED	" .NSWE" CHAR_WALLS CHAR_DOORS CHAR_OBJECTS CHAR_ENEMY
-# define TEXTURE_DOOR		10
+# define TEXTURE_DOOR	10
 # define TEXTURE_DOOR_W	11
+
+enum	e_sounds
+{
+	SND_STEP = 0,
+	SND_USE,
+	SND_DOOR_OPEN,
+	SND_DOOR_CLOSE,
+	SND_PICKUP_AMMO,
+	SND_PICKUP_HEALTH,
+	SND_PICKUP_BONUS,
+	SND_KNIFE,
+	SND_PISTOL,
+	SND_RIFLE,
+	SND_ENEMY_ALARM,
+	SND_ENEMY_SHOOT,
+	SND_ENEMY_DEATH_1,
+	SND_ENEMY_DEATH_2,
+	SND_ENEMY_DEATH_3
+};
 
 # define VAL_HEALTH_XL	200
 # define VAL_HEALTH_L	25
@@ -151,18 +171,17 @@ typedef struct	s_img
 # define ENEMY_FOV_HALF		M_PI_4 * 1.5
 # define ENEMY_SHOT_DELAY	2
 # define ENEMY_MISS_MAX		60
-//# define ENEMY_DMG_MIN		3
-//# define ENEMY_DMG_MAX		30
-# define ENEMY_DMG_MIN		0
-# define ENEMY_DMG_MAX		0
+# define ENEMY_DMG_MIN		3
+# define ENEMY_DMG_MAX		30
 # define ANIM_ENEMY_TICKS	10
 
 # define ANIM_DOOR_TICKS	60
+# define DOOR_TIMER_TICKS	300
 
 typedef struct	s_imgset
 {
 	t_img		wait[8];
-	t_img		walk[4][8];
+//	t_img		walk[4][8];
 	t_img		attack[3];
 	t_img		pain[2];
 	t_img		dead[5];
@@ -221,11 +240,11 @@ typedef struct	s_object
 		time_t	ticks;
 		enum	e_objstate
 		{
-			S_WAIT = 0,
-			S_WALK,
-			S_ATTACK,
-			S_PAIN,
-			S_DEAD
+			ST_WAIT = 0,
+			ST_WALK,
+			ST_ATTACK,
+			ST_PAIN,
+			ST_DEAD
 		}		state;
 	}			*e;
 }				t_object;
@@ -235,6 +254,12 @@ typedef struct	s_game
 	void		*mlx;
 	void		*win;
 	t_img		img;
+	struct		s_sound
+	{
+		cs_context_t*		ctx;
+		cs_loaded_sound_t	music[1];
+		cs_loaded_sound_t	sound[10];
+	}			audio;
 	unsigned	tick;
 	unsigned	tick_diff;
 	struct		s_player
@@ -247,13 +272,13 @@ typedef struct	s_game
 		short		score;
 		t_object	*target;
 		short		weapons_mask;
-		enum	e_weapon
+		enum		e_weapon
 		{
 			W_KNIFE = 0,
 			W_PISTOL,
 			W_RIFLE
-		}		weapon_cur;
-		struct	s_weapon
+		}			weapon_cur;
+		struct		s_weapon
 		{
 			unsigned char	animation[5];
 			unsigned short	frame;
@@ -261,7 +286,7 @@ typedef struct	s_game
 			unsigned short	tick;
 			unsigned short	ticks;
 			bool			lock;
-		}		weapon;
+		}			weapon;
 		bool		weapon_shot;
 		t_img		weapon_img[3][4];
 		t_upoint	weapon_pos;
@@ -305,11 +330,11 @@ typedef struct	s_game
 	{
 		unsigned	frames;
 		unsigned	frame_cur;
-		enum	e_effect
+		enum		e_effect
 		{
 			EF_FLASH = 0,
 			EF_FIZZLEFADE
-		}		type;
+		}			type;
 		unsigned	color;
 		float		max_power;
 	}			effect;
@@ -354,7 +379,7 @@ void			player_control_rotate	(t_game *game);
 void			player_control_move		(t_game *game);
 void			player_control_weapon(t_game *game);
 void			player_set_fov			(t_game *game, double fov, bool reset);
-void			player_control_toggler	(t_game *game, int key_code);
+void			player_control_toggler	(t_game *g, int key_code);
 void			player_control_extra	(t_game *game);
 void			player_control_borders	(t_game *g);
 void			player_control_borders_diag(t_game *g);
@@ -384,10 +409,7 @@ void			draw_map_player	(t_game *game);
 void			draw_map_objects(t_game *game);
 
 void			draw_walls		(t_game *game);
-void			draw_wall_scaled(t_game *g, t_img src, unsigned x,
-								 float fade);
-void			draw_wall_scaled_90(t_game *game, t_img *src, unsigned x,
-								 float fade);
+void			draw_wall_scaled(t_game *g, t_img src, unsigned x, float fade);
 void			draw_wall_solid	(t_game *game, unsigned x, float fade);
 
 void			doors(t_game *game);
@@ -426,7 +448,9 @@ void			write_screenshot_data	(t_game *game, int file_id);
 
 int				terminate		(t_game *game, int return_value, char *message);
 void			terminate_free	(t_game *game);
+void			terminate_free_images(t_game *game, t_img *arr, unsigned count);
 void			terminate_free_object(void *object);
+void			terminate_audio(t_game *game);
 
 void			demo_fillrate	(t_game *mlx, int step);
 void			demo_radar		(t_game *mlx, int rays);

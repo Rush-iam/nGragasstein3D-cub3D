@@ -6,7 +6,7 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/03/22 15:59:08 by ngragas          ###   ########.fr        #
+#    Updated: 2021/03/23 21:34:21 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -63,8 +63,7 @@ LIB = $(LIB_DIR)libft.a
 MLX_DIR = minilibx_opengl/
 MLX = $(MLX_DIR)libmlx.a
 
-#MLX_DIR = minilibx_swift/
-#MLX = $(LIB_DIR)libmlx.dylib
+CUTE_SOUND = cute_sound/
 
 all: switch_clean
 	$(MAKE) $(NAME) -j8
@@ -75,12 +74,13 @@ $(MLX): FORCE
 	$(MAKE) -C $(MLX_DIR) CFLAGS=-DSTRINGPUTX11\ -Ofast\ -g\ -Wno-deprecated
 $(NAME): $(LIB) $(MLX) $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $@ -lft -L$(LIB_DIR) \
-	-lmlx -L$(MLX_DIR) -I$(MLX_DIR) -framework OpenGL -framework AppKit -lz
+	-lmlx -L$(MLX_DIR) -I$(MLX_DIR) -framework OpenGL -framework AppKit -lz \
+	-I$(CUTE_SOUND) -framework AudioUnit
 $(OBJ): | $(OBJ_DIR)
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c Makefile
-	$(CC) $(CFLAGS) -c $< -o $@ -I$(INC_DIR) -I$(LIB_DIR) -I$(MLX_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@ -I$(INC_DIR) -I$(LIB_DIR) -I$(MLX_DIR) -I$(CUTE_SOUND)
 -include $(DEP)
 
 switch_clean:

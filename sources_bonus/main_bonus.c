@@ -6,10 +6,11 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/22 23:13:50 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/23 23:48:12 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#define CUTE_SOUND_IMPLEMENTATION
 #include "cub3d_bonus.h"
 
 int	main(int args, char *av[])
@@ -22,6 +23,7 @@ int	main(int args, char *av[])
 	game = (t_game){0};
 	if (!(game.mlx = mlx_init()))
 		terminate(&game, ERR_MLX, strerror(errno));
+	game.audio.ctx = cs_make_context(0, 44100, 8192, 5, NULL);
 	parse(args, av, &game, &screenshot_only);
 	initialize_game(&game, screenshot_only);
 	draw_map_init(&game);
@@ -117,6 +119,9 @@ void	initialize_game(t_game *game, bool screenshot_only)
 	game->p.weapons_mask = START_WEAPONS;
 	player_set_weapon(game, W_KNIFE);
 	player_set_weapon(game, W_PISTOL);
+	if (game->audio.music[0].channels[0])
+		cs_play_sound(game->audio.ctx,
+						cs_make_def(&game->audio.music[0]))->looped = true;
 }
 
 void	dead_exit(t_game *game)
@@ -141,6 +146,12 @@ void	doors(t_game *game)
 			door->part_opened = fminf(1, door->part_opened + 1. / ANIM_DOOR_TICKS);
 		else if (door->opening == false && door->part_opened > 0)
 			door->part_opened = fmaxf(0, door->part_opened - 1. / ANIM_DOOR_TICKS);
+		if (door->ticks_to_close > 0)
+			--door->ticks_to_close;
+		if (door->ticks_to_close == 0 && door->opening == true &&
+				((unsigned)game->p.pos.x == door->cell.x &&
+				(unsigned)game->p.pos.y == door->cell.y) == false)
+			door->opening = false;
 		cur_list = cur_list->next;
 	}
 }
@@ -173,7 +184,7 @@ int	game_loop(t_game *game)
 		ray_cast(game);
 		game->tick_diff--;
 	}
-//	for (int i = 0; i < 500; ++i)
+//	for (int i = 0; i < 50; ++i)
 	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
 	draw_walls(game);
 	draw_objects(game);
@@ -181,6 +192,7 @@ int	game_loop(t_game *game)
 	draw_effect(game, &game->effect);
 	draw_weapon(game, &game->p.weapon);
 	draw_map(game);
+	cs_mix(game->audio.ctx);
 //	demo_fillrate(game, 1);
 //	demo_cursor(game, 0xFF88FF);
 //	demo_radar(game, 360);

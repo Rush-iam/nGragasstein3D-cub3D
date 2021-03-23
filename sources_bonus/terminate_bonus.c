@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 23:31:40 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/19 20:24:42 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/23 23:48:12 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,11 @@ int		terminate(t_game *game, int return_value, char *message)
 		mlx_destroy_image(game->mlx, game->map.img.ptr);
 	if (game->img.ptr)
 		mlx_destroy_image(game->mlx, game->img.ptr);
+	if (game->effect_img.ptr)
+		mlx_destroy_image(game->mlx, game->effect_img.ptr);
 	if (game->win)
 		mlx_destroy_window(game->mlx, game->win);
+	terminate_audio(game);
 	free(game->mlx);
 	exit(return_value);
 }
@@ -48,18 +51,33 @@ void	terminate_free(t_game *game)
 		while (i < game->map.size.y)
 			free(game->map.grid[i++]);
 	free(game->map.grid);
+	terminate_free_images(game, game->texture,
+								sizeof(game->texture) / sizeof(*game->texture));
+	terminate_free_images(game, game->sprite,
+								sizeof(game->sprite) / sizeof(*game->sprite));
+	i = -1U;
+	while (++i < sizeof(game->p.weapon_img) / sizeof(*game->p.weapon_img))
+		terminate_free_images(game, game->p.weapon_img[i],
+				sizeof(game->p.weapon_img[i]) / sizeof(*game->p.weapon_img[i]));
+	terminate_free_images(game, game->imgset[0].wait,
+			sizeof(game->imgset[0].wait) / sizeof(*game->imgset[0].wait));
+	terminate_free_images(game, game->imgset[0].attack,
+			sizeof(game->imgset[0].attack) / sizeof(*game->imgset[0].attack));
+	terminate_free_images(game, game->imgset[0].pain,
+			sizeof(game->imgset[0].pain) / sizeof(*game->imgset[0].pain));
+	terminate_free_images(game, game->imgset[0].dead,
+			sizeof(game->imgset[0].dead) / sizeof(*game->imgset[0].dead));
+}
+
+void	terminate_free_images(t_game *game, t_img *arr, unsigned count)
+{
+	unsigned	i;
+
 	i = 0;
-	while (i < sizeof(game->texture) / sizeof(*game->texture))
+	while (i < count)
 	{
-		if (game->texture[i].ptr)
-			mlx_destroy_image(game->mlx, game->texture[i].ptr);
-		i++;
-	}
-	i = 0;
-	while (i < sizeof(game->sprite) / sizeof(*game->sprite))
-	{
-		if (game->sprite[i].ptr)
-			mlx_destroy_image(game->mlx, game->sprite[i].ptr);
+		if (arr[i].ptr)
+			mlx_destroy_image(game->mlx, arr[i].ptr);
 		i++;
 	}
 }
@@ -68,4 +86,17 @@ void	terminate_free_object(void *object)
 {
 	free(((t_object *)object)->e);
 	free(object);
+}
+
+void	terminate_audio(t_game *game)
+{
+	unsigned	i;
+
+	i = 0;
+	while (i < sizeof(game->audio.music) / sizeof(*game->audio.music))
+		cs_free_sound(&game->audio.music[i++]);
+	i = 0;
+	while (i < sizeof(game->audio.sound) / sizeof(*game->audio.sound))
+		cs_free_sound(&game->audio.sound[i++]);
+	cs_shutdown_context(game->audio.ctx);
 }

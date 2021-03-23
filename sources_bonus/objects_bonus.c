@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:03 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/22 16:37:20 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/23 22:35:09 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,10 @@ void	objects(t_game *g)
 
 void	enemy_settings(t_game *game, t_object *obj)
 {
-	if (obj->e->state != S_DEAD)
+	if (obj->e->state != ST_DEAD)
 	{
-		if (obj->render.start.x <= (int)game->win_center.x &&
+		if (obj->distance_real < game->column[game->win_center.x].distance &&
+			obj->render.start.x <= (int)game->win_center.x &&
 			obj->render.end.x >= (int)game->win_center.x &&	(!game->p.target ||
 			obj->distance_real < game->p.target->distance_real))
 			game->p.target = obj;
@@ -51,7 +52,7 @@ void	enemy_settings(t_game *game, t_object *obj)
 		obj->e->p_to_angle += PI2;
 	else if (obj->e->p_to_angle > M_PI)
 		obj->e->p_to_angle -= PI2;
-	if (obj->e->state == S_WAIT)
+	if (obj->e->state == ST_WAIT)
 		obj->e->imgset = &game->imgset[ENEMY_ID_GUARD].
 				wait[(8 - (int)ceil(obj->e->p_to_angle / M_PI_4 - 0.5)) % 8];
 	enemy_logic(game, obj);
@@ -79,12 +80,12 @@ void	enemy_logic(t_game *game, t_object *obj)
 {
 	bool	see;
 
-	if (obj->e->state == S_DEAD && obj->e->tick + 1 >= obj->e->ticks)
+	if (obj->e->state == ST_DEAD && obj->e->tick + 1 >= obj->e->ticks)
 		return ;
 	see = false;
-	if (obj->e->state != S_DEAD && fabsf(obj->e->p_to_angle) < ENEMY_FOV_HALF)
+	if (obj->e->state != ST_DEAD && fabsf(obj->e->p_to_angle) < ENEMY_FOV_HALF)
 		see = ray_intersect_distance(game, obj->atan_diff) > obj->distance_real;
-	if (obj->e->state == S_WAIT && see == false)
+	if (obj->e->state == ST_WAIT && see == false)
 		return ;
 	if (see == true)
 	{
@@ -92,16 +93,16 @@ void	enemy_logic(t_game *game, t_object *obj)
 		obj->e->alarmed = true;
 	}
 	if (++obj->e->tick >= obj->e->ticks ||
-								(obj->e->state == S_ATTACK && see == false))
+								(obj->e->state == ST_ATTACK && see == false))
 	{
-		if (see == true && (obj->e->state == S_WAIT || obj->e->state == S_PAIN))
-			enemy_set_state(obj, &game->imgset[ENEMY_ID_GUARD], S_ATTACK);
+		if (see == true && (obj->e->state == ST_WAIT || obj->e->state == ST_PAIN))
+			enemy_set_state(obj, &game->imgset[ENEMY_ID_GUARD], ST_ATTACK);
 		else
-			enemy_set_state(obj, &game->imgset[ENEMY_ID_GUARD], S_WAIT);
+			enemy_set_state(obj, &game->imgset[ENEMY_ID_GUARD], ST_WAIT);
 	}
-	if (obj->e->state != S_WAIT)
+	if (obj->e->state != ST_WAIT)
 		obj->e->frame = obj->e->frames * obj->e->tick / obj->e->ticks;
-	if (obj->e->state == S_ATTACK && obj->e->shot == false &&
+	if (obj->e->state == ST_ATTACK && obj->e->shot == false &&
 											obj->e->frame == SHOT_FRAME_ID)
 	{
 		enemy_shoot(game, obj);
@@ -112,38 +113,38 @@ void	enemy_logic(t_game *game, t_object *obj)
 void	enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state)
 {
 	obj->e->state = state;
-	if (state == S_WAIT)
+	if (state == ST_WAIT)
 	{
 		obj->e->imgset = imgset->wait;
 		obj->e->frames = 2;
 	}
-	else if (state == S_WALK)
-	{
-		obj->e->imgset = imgset->walk[0];
-		obj->e->frames = 4;
-	}
-	else if (state == S_ATTACK)
+//	else if (state == ST_WALK)
+//	{
+//		obj->e->imgset = imgset->walk[0];
+//		obj->e->frames = 4;
+//	}
+	else if (state == ST_ATTACK)
 	{
 		obj->e->imgset = imgset->attack;
 		obj->e->frames = 3;
 		obj->e->ticks *= ENEMY_SHOT_DELAY;
 		obj->e->shot = false;
 	}
-	else if (state == S_PAIN)
+	else if (state == ST_PAIN)
 	{
 		obj->e->imgset = &imgset->pain[obj->angle_to_p < 0];
 		obj->e->frames = 1;
 		obj->e->alarmed = true;
 		obj->e->angle = obj->atan_diff + M_PI;
 	}
-	else if (state == S_DEAD)
+	else if (state == ST_DEAD)
 	{
 		obj->e->imgset = imgset->dead;
 		obj->e->frames = 5;
 	}
 	obj->e->tick = 0;
 	obj->e->ticks = obj->e->frames * ANIM_ENEMY_TICKS;
-	if (state == S_ATTACK)
+	if (state == ST_ATTACK)
 		obj->e->ticks *= ENEMY_SHOT_DELAY;
 	obj->e->frame = 0;
 	obj->sprite = &obj->e->imgset[obj->e->frame];

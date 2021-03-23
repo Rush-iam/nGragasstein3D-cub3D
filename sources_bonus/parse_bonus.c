@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/16 17:17:39 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/23 23:48:12 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,9 @@ void	set_enemies(char *string, t_game *g)
 	char		*path;
 
 	if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
-		terminate(g, ERR_PARSE, "Enemies ID is wrong (Ex)");
+		terminate(g, ERR_PARSE, "Enemy ID is wrong (Exx)");
 	if (id >= sizeof(g->imgset) / sizeof(*g->imgset))
-		terminate(g, ERR_PARSE, "Enemies ID out of array range");
+		terminate(g, ERR_PARSE, "Enemy ID out of array range");
 	if (g->imgset[id].dead[0].ptr != NULL)
 		terminate(g, ERR_PARSE, "Duplicated enemy spriteset setting");
 	if ((path = ft_strjoin(string, "wait_")) == NULL)
@@ -62,11 +62,9 @@ void	set_enemies(char *string, t_game *g)
 	if ((path = ft_strjoin(string, "dead_")) == NULL)
 		terminate(g, ERR_PARSE, strerror(errno));
 	load_spriteset(g->imgset[id].dead, 5, path, g);
-	if ((path = ft_strjoin(string, "pain.png")) == NULL)
+	if ((path = ft_strjoin(string, "pain_")) == NULL)
 		terminate(g, ERR_PARSE, strerror(errno));
-	load_texture_file(path, &g->imgset[id].pain[0], "Can't load sprite", g);
-	free(path);
-	g->imgset[id].pain[1] = g->imgset[id].dead[0];
+	load_spriteset(g->imgset[id].pain, 2, path, g);
 //	i = 0;
 //	while (i < 4)
 //	{
@@ -77,6 +75,34 @@ void	set_enemies(char *string, t_game *g)
 //		texture->aspect = texture->size.x / texture->size.y;
 //		i++;
 //	}
+}
+
+void	set_audio(char *string, t_game *game)
+{
+	unsigned	id;
+
+	if (*string == 'M')
+	{
+		if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
+			terminate(game, ERR_PARSE, "Music ID is wrong (Mxx)");
+		if (id >= sizeof(game->audio.music) / sizeof(*game->audio.music))
+			terminate(game, ERR_PARSE, "Music ID out of array range");
+		if (game->audio.music[id].channels[0] != NULL)
+			terminate(game, ERR_PARSE, "Duplicated music setting");
+		if ((game->audio.music[id] = cs_load_wav(string)).channels[0] == NULL)
+			terminate(game, ERR_PARSE, "Failed to load music file");
+	}
+	else if (*string == 'A')
+	{
+		if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
+			terminate(game, ERR_PARSE, "Sound ID is wrong (Axx)");
+		if (id >= sizeof(game->audio.sound) / sizeof(*game->audio.sound))
+			terminate(game, ERR_PARSE, "Sound ID out of array range");
+		if (game->audio.sound[id].channels[0] != NULL)
+			terminate(game, ERR_PARSE, "Duplicated sound setting");
+		if ((game->audio.sound[id] = cs_load_wav(string)).channels[0] == NULL)
+			terminate(game, ERR_PARSE, "Failed to load sound file");
+	}
 }
 
 void	parse_scene(int file_id, char **line, t_game *game)
@@ -99,6 +125,8 @@ void	parse_scene(int file_id, char **line, t_game *game)
 			set_weapons(*line, game);
 		else if (**line == 'E')
 			set_enemies(*line, game);
+		else if (**line == 'M' || **line == 'A')
+			set_audio(*line, game);
 		else if (**line != '#' && **line != '\0')
 			return ;
 		free(*line);
