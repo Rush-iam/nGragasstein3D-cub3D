@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/23 23:48:49 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/24 23:45:17 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,10 +124,9 @@ typedef struct	s_img
 # define TEXTURE_DOOR	10
 # define TEXTURE_DOOR_W	11
 
-enum	e_sounds
+enum	e_sound
 {
-	SND_STEP = 0,
-	SND_USE,
+	SND_NOACTION,
 	SND_DOOR_OPEN,
 	SND_DOOR_CLOSE,
 	SND_PICKUP_AMMO,
@@ -137,10 +136,8 @@ enum	e_sounds
 	SND_PISTOL,
 	SND_RIFLE,
 	SND_ENEMY_ALARM,
-	SND_ENEMY_SHOOT,
-	SND_ENEMY_DEATH_1,
-	SND_ENEMY_DEATH_2,
-	SND_ENEMY_DEATH_3
+	SND_ENEMY_ATTACK,
+	SND_ENEMY_DEATH,
 };
 
 # define VAL_HEALTH_XL	200
@@ -158,15 +155,14 @@ enum	e_sounds
 # define W_RIFLE_MASK	0b100
 
 # define DMG_KNIFE_MIN	1
-# define DMG_KNIFE		16
-# define DMG_SHOT_MIN	13
-# define DMG_SHOT		35
+# define DMG_KNIFE_MAX	16
+# define DMG_SHOT_MIN	11
+# define DMG_SHOT_MAX	35
 
 # define START_HEALTH	100
 # define START_AMMO		8
 # define START_WEAPONS	W_KNIFE_MASK | W_PISTOL_MASK
 
-# define ENEMY_ID_GUARD		0
 # define ENEMY_HEALTH		25
 # define ENEMY_FOV_HALF		M_PI_4 * 1.5
 # define ENEMY_SHOT_DELAY	2
@@ -178,14 +174,18 @@ enum	e_sounds
 # define ANIM_DOOR_TICKS	60
 # define DOOR_TIMER_TICKS	300
 
-typedef struct	s_imgset
+typedef struct	s_set
 {
-	t_img		wait[8];
-//	t_img		walk[4][8];
-	t_img		attack[3];
-	t_img		pain[2];
-	t_img		dead[5];
-}				t_imgset;
+	t_img				wait[8];
+//	t_img				walk[4][8];
+	t_img				attack[3];
+	t_img				pain[2];
+	t_img				death[10];
+	cs_loaded_sound_t	s_alarm;
+	cs_loaded_sound_t	s_attack;
+	cs_loaded_sound_t	s_death[7];
+	unsigned char		s_death_count;
+}				t_set;
 
 typedef struct	s_door
 {
@@ -228,6 +228,10 @@ typedef struct	s_object
 	}			type;
 	struct		s_enemy
 	{
+		enum	e_enemytype
+		{
+			ENEMY_GUARD = 0
+		}		type;
 		bool	alarmed;
 		bool	shot;
 		float	angle;
@@ -244,7 +248,7 @@ typedef struct	s_object
 			ST_WALK,
 			ST_ATTACK,
 			ST_PAIN,
-			ST_DEAD
+			ST_DEATH
 		}		state;
 	}			*e;
 }				t_object;
@@ -257,8 +261,10 @@ typedef struct	s_game
 	struct		s_sound
 	{
 		cs_context_t*		ctx;
+		cs_context_t*		ctx7;
+		cs_context_t*		ctx22;
 		cs_loaded_sound_t	music[1];
-		cs_loaded_sound_t	sound[10];
+		cs_loaded_sound_t	sound[26];
 	}			audio;
 	unsigned	tick;
 	unsigned	tick_diff;
@@ -323,7 +329,7 @@ typedef struct	s_game
 	unsigned	color_floor;
 	t_img		texture[24];
 	t_img		sprite[sizeof(CHAR_OBJECTS) - 1];
-	t_imgset	imgset[1];
+	t_set		enemyset[1];
 	t_list		*doors;
 	t_list		*objects;
 	struct		s_effect
@@ -357,6 +363,8 @@ void			set_colors			(const char *color_string, unsigned *target,
 															t_game *game);
 void			set_weapons			(char *string, t_game *game);
 void			set_textures		(char *string, t_game *game);
+void			load_audioset(t_set *dst, char *path, t_game *game);
+cs_loaded_sound_t	load_audio_file(char *path);
 void			load_spriteset(t_img dst[], int count, char *path, t_game *game);
 void			load_texture_file(char *path, t_img *dst_img, char *err,
 						t_game *game);
@@ -418,8 +426,9 @@ t_door			*door_find(t_game *game, t_upoint cell);
 void			objects				(t_game *g);
 void			object_add(t_game *game, t_list **dst, void *obj);
 void			object_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img);
+void			enemy_audio(t_game *game, t_object *obj, enum e_sound sound_type);
 void			enemy_logic(t_game *game, t_object *obj);
-void			enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state);
+void			enemy_set_state(t_game *g, t_object *obj, t_set *imgset, enum e_objstate state);
 void			enemy_settings(t_game *game, t_object *obj);
 int				objects_sort		(t_object *obj1, t_object *obj2);
 bool			object_pickup(t_game *game, enum e_objtype type);
@@ -432,7 +441,7 @@ void			draw_sprite_scaled(t_img *img, t_object *obj, t_point min, t_point max);
 
 void			weapon(t_game *game, struct s_weapon *weapon);
 void			draw_weapon(t_game *game, struct s_weapon *weapon);
-void			weapon_shoot(t_game *game, t_object *target);
+void			weapon_shoot(t_game *g, t_object *target);
 
 void			draw_effect(t_game *game, struct s_effect *ef);
 void			effect_flash(t_game *game, unsigned color, float power);

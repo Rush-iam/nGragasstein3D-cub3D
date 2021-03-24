@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/23 23:48:12 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/24 23:17:50 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,22 +49,23 @@ void	set_enemies(char *string, t_game *g)
 
 	if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
 		terminate(g, ERR_PARSE, "Enemy ID is wrong (Exx)");
-	if (id >= sizeof(g->imgset) / sizeof(*g->imgset))
+	if (id >= sizeof(g->enemyset) / sizeof(*g->enemyset))
 		terminate(g, ERR_PARSE, "Enemy ID out of array range");
-	if (g->imgset[id].dead[0].ptr != NULL)
+	if (g->enemyset[id].death[0].ptr != NULL)
 		terminate(g, ERR_PARSE, "Duplicated enemy spriteset setting");
 	if ((path = ft_strjoin(string, "wait_")) == NULL)
 		terminate(g, ERR_PARSE, strerror(errno));
-	load_spriteset(g->imgset[id].wait, 8, path, g);
+	load_spriteset(g->enemyset[id].wait, 8, path, g);
 	if ((path = ft_strjoin(string, "attack_")) == NULL)
 		terminate(g, ERR_PARSE, strerror(errno));
-	load_spriteset(g->imgset[id].attack, 3, path, g);
+	load_spriteset(g->enemyset[id].attack, 3, path, g);
 	if ((path = ft_strjoin(string, "dead_")) == NULL)
 		terminate(g, ERR_PARSE, strerror(errno));
-	load_spriteset(g->imgset[id].dead, 5, path, g);
+	load_spriteset(g->enemyset[id].death, 5, path, g);
 	if ((path = ft_strjoin(string, "pain_")) == NULL)
 		terminate(g, ERR_PARSE, strerror(errno));
-	load_spriteset(g->imgset[id].pain, 2, path, g);
+	load_spriteset(g->enemyset[id].pain, 2, path, g);
+	load_audioset(&g->enemyset[id], string, g);
 //	i = 0;
 //	while (i < 4)
 //	{
@@ -89,8 +90,7 @@ void	set_audio(char *string, t_game *game)
 			terminate(game, ERR_PARSE, "Music ID out of array range");
 		if (game->audio.music[id].channels[0] != NULL)
 			terminate(game, ERR_PARSE, "Duplicated music setting");
-		if ((game->audio.music[id] = cs_load_wav(string)).channels[0] == NULL)
-			terminate(game, ERR_PARSE, "Failed to load music file");
+		game->audio.music[id] = load_audio_file(string);
 	}
 	else if (*string == 'A')
 	{
@@ -100,8 +100,7 @@ void	set_audio(char *string, t_game *game)
 			terminate(game, ERR_PARSE, "Sound ID out of array range");
 		if (game->audio.sound[id].channels[0] != NULL)
 			terminate(game, ERR_PARSE, "Duplicated sound setting");
-		if ((game->audio.sound[id] = cs_load_wav(string)).channels[0] == NULL)
-			terminate(game, ERR_PARSE, "Failed to load sound file");
+		game->audio.sound[id] = load_audio_file(string);
 	}
 }
 

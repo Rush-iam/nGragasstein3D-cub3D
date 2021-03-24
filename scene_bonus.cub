@@ -20,8 +20,6 @@ G0 ./resources/weapons/knife_
 G1 ./resources/weapons/pistol_
 G2 ./resources/weapons/rifle_
 
-E0 ./resources/enemies/guard_
-
 S0 ./resources/sprites/lamp.png
 S1 ./resources/sprites/chandelier.png
 S2 ./resources/sprites/lamp_stand.png
@@ -51,9 +49,27 @@ S25 ./resources/sprites/bonus_l.png
 S26 ./resources/sprites/bonus_m.png
 S27 ./resources/sprites/bonus_s.png
 
+E0 ./resources/enemies/guard/
+
 M0 ./resources/music/04 Get Them!.wav
 
-#A0
+A0 ./resources/sounds/player_noaction.wav
+#A1 ./resources/sounds/player_pain.wav
+#A2 ./resources/sounds/player_death.wav
+#A3 ./resources/sounds/door_open.wav
+#A4 ./resources/sounds/door_close.wav
+#A5 ./resources/sounds/weapon_knife.wav
+#A6 ./resources/sounds/weapon_pistol.wav
+#A7 ./resources/sounds/weapon_rifle.wav
+#A8 ./resources/sounds/pickup_ammo.wav
+#A9 ./resources/sounds/pickup_rifle.wav
+#A10 ./resources/sounds/pickup_health_m.wav
+#A11 ./resources/sounds/pickup_health_l.wav
+#A12 ./resources/sounds/pickup_health_xl.wav
+#A13 ./resources/sounds/pickup_bonus_s.wav
+#A14 ./resources/sounds/pickup_bonus_m.wav
+#A15 ./resources/sounds/pickup_bonus_l.wav
+#A16 ./resources/sounds/pickup_bonus_xl.wav
 
                             333433333334333
      666666                 3,...........,3

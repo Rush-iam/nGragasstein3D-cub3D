@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/23 23:48:12 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/24 23:49:05 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,9 @@ int	main(int args, char *av[])
 	game = (t_game){0};
 	if (!(game.mlx = mlx_init()))
 		terminate(&game, ERR_MLX, strerror(errno));
-	game.audio.ctx = cs_make_context(0, 44100, 8192, 5, NULL);
+	game.audio.ctx = cs_make_context(0, 44100, 8192, 1, NULL);
+	game.audio.ctx7 = cs_make_context(0, 7042, 1024, 16, NULL);
+	game.audio.ctx22 = cs_make_context(0, 22050, 2048, 16, NULL);
 	parse(args, av, &game, &screenshot_only);
 	initialize_game(&game, screenshot_only);
 	draw_map_init(&game);
@@ -193,6 +195,8 @@ int	game_loop(t_game *game)
 	draw_weapon(game, &game->p.weapon);
 	draw_map(game);
 	cs_mix(game->audio.ctx);
+	cs_mix(game->audio.ctx7);
+	cs_mix(game->audio.ctx22);
 //	demo_fillrate(game, 1);
 //	demo_cursor(game, 0xFF88FF);
 //	demo_radar(game, 360);

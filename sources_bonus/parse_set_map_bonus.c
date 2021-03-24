@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:49 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/22 22:38:27 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/24 23:02:05 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ void	set_map_object_add(t_game *game, char chr, unsigned type, t_upoint pt)
 			terminate(game, ERR_MEM, "Memory allocation failed (enemy)");
 		obj->e->angle = M_PI_2 * (ft_strchr(dirs, chr) - dirs);
 		obj->e->health = ENEMY_HEALTH;
-		enemy_set_state(obj, &game->imgset[ENEMY_ID_GUARD], ST_WAIT);
+		enemy_set_state(game, obj, &game->enemyset[ENEMY_GUARD], ST_WAIT);
 	}
 	object_add(game, &game->objects, obj);
 }

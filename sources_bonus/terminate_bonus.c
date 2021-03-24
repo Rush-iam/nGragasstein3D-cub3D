@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 23:31:40 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/23 23:48:12 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/24 23:25:14 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,14 +59,14 @@ void	terminate_free(t_game *game)
 	while (++i < sizeof(game->p.weapon_img) / sizeof(*game->p.weapon_img))
 		terminate_free_images(game, game->p.weapon_img[i],
 				sizeof(game->p.weapon_img[i]) / sizeof(*game->p.weapon_img[i]));
-	terminate_free_images(game, game->imgset[0].wait,
-			sizeof(game->imgset[0].wait) / sizeof(*game->imgset[0].wait));
-	terminate_free_images(game, game->imgset[0].attack,
-			sizeof(game->imgset[0].attack) / sizeof(*game->imgset[0].attack));
-	terminate_free_images(game, game->imgset[0].pain,
-			sizeof(game->imgset[0].pain) / sizeof(*game->imgset[0].pain));
-	terminate_free_images(game, game->imgset[0].dead,
-			sizeof(game->imgset[0].dead) / sizeof(*game->imgset[0].dead));
+	terminate_free_images(game, game->enemyset[0].wait,
+						  sizeof(game->enemyset[0].wait) / sizeof(*game->enemyset[0].wait));
+	terminate_free_images(game, game->enemyset[0].attack,
+						  sizeof(game->enemyset[0].attack) / sizeof(*game->enemyset[0].attack));
+	terminate_free_images(game, game->enemyset[0].pain,
+						  sizeof(game->enemyset[0].pain) / sizeof(*game->enemyset[0].pain));
+	terminate_free_images(game, game->enemyset[0].death,
+						  sizeof(game->enemyset[0].death) / sizeof(*game->enemyset[0].death));
 }
 
 void	terminate_free_images(t_game *game, t_img *arr, unsigned count)
@@ -99,4 +99,6 @@ void	terminate_audio(t_game *game)
 	while (i < sizeof(game->audio.sound) / sizeof(*game->audio.sound))
 		cs_free_sound(&game->audio.sound[i++]);
 	cs_shutdown_context(game->audio.ctx);
+	cs_shutdown_context(game->audio.ctx7);
+	cs_shutdown_context(game->audio.ctx22);
 }

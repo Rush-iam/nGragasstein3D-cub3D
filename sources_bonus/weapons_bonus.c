@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/12 16:12:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/17 21:21:46 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/24 23:25:34 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,30 +71,32 @@ void	draw_weapon(t_game *game, struct s_weapon *weapon)
 					game->p.weapon_pos.x, game->p.weapon_pos.y);
 }
 
-void	weapon_shoot(t_game *game, t_object *target)
+void	weapon_shoot(t_game *g, t_object *target)
 {
 	unsigned	damage;
 
-	if (game->p.weapon_cur != W_KNIFE)
-		game->p.ammo--;
+	if (g->p.weapon_cur != W_KNIFE)
+		g->p.ammo--;
 	if (target)
 	{
-		if (game->p.weapon_cur == W_KNIFE && target->distance_real < 1)
-			damage = DMG_KNIFE_MIN + arc4random() % (DMG_KNIFE - DMG_KNIFE_MIN);
-		else if (game->p.weapon_cur != W_KNIFE)
-			damage = DMG_SHOT_MIN + arc4random() % (1 + DMG_SHOT - DMG_SHOT_MIN);
+		if (g->p.weapon_cur == W_KNIFE && target->distance_real < 1)
+			damage = DMG_KNIFE_MIN + arc4random() %
+					(1 + DMG_KNIFE_MAX - DMG_KNIFE_MIN);
+		else if (g->p.weapon_cur != W_KNIFE)
+			damage = DMG_SHOT_MIN + arc4random() %
+					(1 + DMG_SHOT_MAX - DMG_SHOT_MIN);
 		else
 			return ;
 		target->e->health -= damage;
 		if (target->e->health <= 0)
 		{
-			object_drop(game, target->pos, T_AMMO_ENEMY,
-				&game->sprite[sizeof(CHAR_DECOR) - 1 + T_AMMO - 1]);
-			enemy_set_state(target, &game->imgset[ENEMY_ID_GUARD], ST_DEAD);
-			game->p.score += VAL_SCORE_KILL;
+			object_drop(g, target->pos, T_AMMO_ENEMY,
+						&g->sprite[sizeof(CHAR_DECOR) - 1 + T_AMMO - 1]);
+			enemy_set_state(g, target, &g->enemyset[ENEMY_GUARD], ST_DEATH);
+			g->p.score += VAL_SCORE_KILL;
 		}
 		else
-			enemy_set_state(target, &game->imgset[ENEMY_ID_GUARD], ST_PAIN);
-		printf("bam! ammo left: %hd RND damage: %u\n", game->p.ammo, damage);
+			enemy_set_state(g, target, &g->enemyset[ENEMY_GUARD], ST_PAIN);
+		printf("bam! ammo left: %hd RND damage: %u\n", g->p.ammo, damage);
 	}
 }

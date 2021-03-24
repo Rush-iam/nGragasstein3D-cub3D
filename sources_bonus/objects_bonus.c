@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:03 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/23 22:35:09 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/24 23:55:28 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	objects(t_game *g)
 
 void	enemy_settings(t_game *game, t_object *obj)
 {
-	if (obj->e->state != ST_DEAD)
+	if (obj->e->state != ST_DEATH)
 	{
 		if (obj->distance_real < game->column[game->win_center.x].distance &&
 			obj->render.start.x <= (int)game->win_center.x &&
@@ -53,7 +53,7 @@ void	enemy_settings(t_game *game, t_object *obj)
 	else if (obj->e->p_to_angle > M_PI)
 		obj->e->p_to_angle -= PI2;
 	if (obj->e->state == ST_WAIT)
-		obj->e->imgset = &game->imgset[ENEMY_ID_GUARD].
+		obj->e->imgset = &game->enemyset[ENEMY_GUARD].
 				wait[(8 - (int)ceil(obj->e->p_to_angle / M_PI_4 - 0.5)) % 8];
 	enemy_logic(game, obj);
 	obj->sprite = &obj->e->imgset[obj->e->frame];
@@ -76,19 +76,46 @@ void	enemy_shoot(t_game *game, t_object *obj)
 	game->effect = (struct s_effect){30, 15, EF_FLASH, COLOR_RED, damage / 100.};
 }
 
+void	enemy_audio(t_game *game, t_object *obj, enum e_sound sound_type)
+{
+	cs_context_t*		ctx_target;
+	cs_play_sound_def_t	sound;
+
+	sound = (cs_play_sound_def_t){0};
+	ctx_target = NULL;
+	if (sound_type == SND_ENEMY_ALARM)
+		sound = cs_make_def(&game->enemyset[ENEMY_GUARD].s_alarm);
+	else if (sound_type == SND_ENEMY_ATTACK)
+		sound = cs_make_def(&game->enemyset[ENEMY_GUARD].s_attack);
+	else if (sound_type == SND_ENEMY_DEATH)
+		sound = cs_make_def(&game->enemyset[ENEMY_GUARD].s_death[arc4random() %
+							(1 + game->enemyset[ENEMY_GUARD].s_death_count)]);
+	if (game->enemyset[obj->e->type].s_alarm.channels[0] == NULL)
+		return ;
+	if (sound.loaded->sample_rate == 7042)
+		ctx_target = game->audio.ctx7;
+	else if (sound.loaded->sample_rate == 22050)
+		ctx_target = game->audio.ctx22;
+	else
+		ctx_target = game->audio.ctx;
+	cs_play_sound(ctx_target, sound);
+}
+
 void	enemy_logic(t_game *game, t_object *obj)
 {
 	bool	see;
 
-	if (obj->e->state == ST_DEAD && obj->e->tick + 1 >= obj->e->ticks)
+	if (obj->e->state == ST_DEATH && obj->e->tick + 1 >= obj->e->ticks)
 		return ;
 	see = false;
-	if (obj->e->state != ST_DEAD && fabsf(obj->e->p_to_angle) < ENEMY_FOV_HALF)
+	if (obj->e->state != ST_DEATH && fabsf(obj->e->p_to_angle) < ENEMY_FOV_HALF)
 		see = ray_intersect_distance(game, obj->atan_diff) > obj->distance_real;
 	if (obj->e->state == ST_WAIT && see == false)
 		return ;
 	if (see == true)
 	{
+		if (obj->e->alarmed == false)
+			enemy_audio(game, obj, SND_ENEMY_ALARM);
 		obj->e->angle = obj->atan_diff + M_PI;
 		obj->e->alarmed = true;
 	}
@@ -96,21 +123,22 @@ void	enemy_logic(t_game *game, t_object *obj)
 								(obj->e->state == ST_ATTACK && see == false))
 	{
 		if (see == true && (obj->e->state == ST_WAIT || obj->e->state == ST_PAIN))
-			enemy_set_state(obj, &game->imgset[ENEMY_ID_GUARD], ST_ATTACK);
+			enemy_set_state(game, obj, &game->enemyset[ENEMY_GUARD], ST_ATTACK);
 		else
-			enemy_set_state(obj, &game->imgset[ENEMY_ID_GUARD], ST_WAIT);
+			enemy_set_state(game, obj, &game->enemyset[ENEMY_GUARD], ST_WAIT);
 	}
 	if (obj->e->state != ST_WAIT)
 		obj->e->frame = obj->e->frames * obj->e->tick / obj->e->ticks;
 	if (obj->e->state == ST_ATTACK && obj->e->shot == false &&
 											obj->e->frame == SHOT_FRAME_ID)
 	{
+		enemy_audio(game, obj, SND_ENEMY_ATTACK);
 		enemy_shoot(game, obj);
 		obj->e->shot = true;
 	}
 }
 
-void	enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state)
+void	enemy_set_state(t_game *g, t_object *obj, t_set *imgset, enum e_objstate state)
 {
 	obj->e->state = state;
 	if (state == ST_WAIT)
@@ -134,12 +162,12 @@ void	enemy_set_state(t_object *obj, t_imgset *imgset, enum e_objstate state)
 	{
 		obj->e->imgset = &imgset->pain[obj->angle_to_p < 0];
 		obj->e->frames = 1;
-		obj->e->alarmed = true;
 		obj->e->angle = obj->atan_diff + M_PI;
 	}
-	else if (state == ST_DEAD)
+	else if (state == ST_DEATH)
 	{
-		obj->e->imgset = imgset->dead;
+		enemy_audio(g, obj, SND_ENEMY_DEATH);
+		obj->e->imgset = imgset->death;
 		obj->e->frames = 5;
 	}
 	obj->e->tick = 0;

@@ -141,7 +141,7 @@ void	player_control_borders_enemies(t_game *game)
 		diff = (t_fpoint){obj->pos.x - game->p.pos.x, obj->pos.y - game->p.pos.y};
 		obj->distance_real = hypot(diff.x, diff.y);
 		if (obj->distance_real < PL_RADIUS * 2 &&
-			obj->type == T_ENEMY && obj->e->state != ST_DEAD)
+			obj->type == T_ENEMY && obj->e->state != ST_DEATH)
 		{
 			obj->atan_diff = atan2(diff.y, diff.x);
 			obj->distance = game->p.vector.x * diff.x + game->p.vector.y * diff.y;
