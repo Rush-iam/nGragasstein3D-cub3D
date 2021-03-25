@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:55 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/24 23:38:47 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/25 17:00:10 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,46 +108,42 @@ void	set_textures(char *string, t_game *game)
 	}
 }
 
-cs_loaded_sound_t	load_audio_file(char *path)
+void	load_audio_file(t_snd *dst, char *path)
 {
-	cs_loaded_sound_t	audio_file;
-
-	audio_file = cs_load_wav(path);
-	if (audio_file.channels[0] == NULL)
+	dst->file = cs_load_wav(path);
+	if (dst->file.channels[0] == NULL)
 		printf("- Failed to load audio %s:\n%s\n", path, cs_error_reason);
-	return (audio_file);
+	dst->props = cs_make_def(&dst->file);
 }
 
 void	load_audioset(t_set *dst, char *path, t_game *game)
 {
-	unsigned	i;
-	char		*path2;
-	char		*path3;
+	char	*path2;
+	char	*path3;
 
 	if ((path2 = ft_strjoin(path, "alarm.wav")) == NULL)
 		terminate(game, ERR_PARSE, strerror(errno));
-	dst->s_alarm = load_audio_file(path2);
+	load_audio_file(&dst->s_alarm, path2);
 	free(path2);
 	if ((path2 = ft_strjoin(path, "attack.wav")) == NULL)
 		terminate(game, ERR_PARSE, strerror(errno));
-	dst->s_attack = load_audio_file(path2);
+	load_audio_file(&dst->s_attack, path2);
 	free(path2);
 	if ((path2 = ft_strjoin(path, "death_")) == NULL)
 		terminate(game, ERR_PARSE, strerror(errno));
-	i = 0;
-	while (i < sizeof(dst->s_death) / sizeof(*dst->s_death))
+	while (dst->s_death_count < sizeof(dst->s_death) / sizeof(*dst->s_death))
 	{
 		if ((path3 = ft_strjoin(path2,
-							(char []){'0' + i, '.', 'w', 'a', 'v', 0})) == NULL)
+		(char []){'0' + dst->s_death_count, '.', 'w', 'a', 'v', 0})) == NULL)
 			terminate(game, ERR_PARSE, strerror(errno));
-		dst->s_death[i] = cs_load_wav(path3);
+		if (ft_file_exists(path3) == false)
+		{
+			free(path3);
+			break ;
+		}
+		load_audio_file(&dst->s_death[dst->s_death_count++], path3);
 		free(path3);
-		if (dst->s_death[i].channels[0] == NULL)
-			break;
-		i++;
 	}
-	printf("- Found %d valid 'death' sounds. Audioset loaded.\n", i);
-	dst->s_death_count = i;
 	free(path2);
 }
 

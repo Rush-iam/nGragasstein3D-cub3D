@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/24 23:45:17 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/25 23:07:06 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,16 @@
 # include "x_events.h"
 
 # define WIN_TITLE	"nGragasstein 3D"
-# define MAX_WIN	(t_upoint){2559, 1396}
+# define MAX_WIN	(t_upoint){2558, 1396}
 # define MAX_SCR	(t_upoint){20000, 20000}
 # define MIN_RES_X	2
+# define MAX_PLAYING_SOUNDS	12
 
-# define PI2	(2 * M_PI)
+# define T_FPT_NULL	(t_fpoint){0.0f, 0.0f}
+# define M_PI_F		(float)M_PI
+# define M_PI_2_F	(float)M_PI_2
+# define M_PI_4_F	(float)M_PI_4
+# define PI2_F		(2.0f * M_PI_F)
 # define NANSECS_PER_SEC	1000000000
 
 # define ERR_MLX	1
@@ -76,12 +81,12 @@
 # define K_FOV_WIDE		KEY_NUMMINUS
 # define K_FOV_TELE		KEY_NUMPLUS
 # define K_FOV_RESET	KEY_NUMASTERISK
-# define FOV_ZOOMSPEED	1.03
+# define FOV_ZOOMSPEED	1.03f
 
-# define PL_SPEED		0.08
-# define PL_RADIUS		0.4
-# define FLOAT_FIX		0.0000001
-# define MOUSE_SPEED	2000.
+# define PL_SPEED		0.08f
+# define PL_RADIUS		0.4f
+# define FLOAT_FIX		0.00001f
+# define MOUSE_SPEED	2000.f
 # define MAP_SCALE		8
 
 typedef struct	s_point
@@ -98,8 +103,8 @@ typedef struct	s_upoint
 
 typedef struct	s_fpoint
 {
-	double		x;
-	double		y;
+	float		x;
+	float		y;
 }				t_fpoint;
 
 typedef struct	s_img
@@ -107,11 +112,17 @@ typedef struct	s_img
 	void		*ptr;
 	unsigned	*data;
 	t_upoint	size;
-	double		aspect;
+	float		aspect;
 	float		min_x;
 	float		max_x;
 	bool		*alpha_y;
 }				t_img;
+
+typedef struct	s_snd
+{
+	cs_loaded_sound_t	file;
+	cs_play_sound_def_t	props;
+}				t_snd;
 
 # define CHAR_DECOR		"^*$:;,!@%#&|[]{}_~`"
 # define CHAR_PICKUP	"+HhAaZzXx"
@@ -126,15 +137,23 @@ typedef struct	s_img
 
 enum	e_sound
 {
-	SND_NOACTION,
+	SND_PLAYER_NOACTION,
+	SND_PLAYER_PAIN,
+	SND_PLAYER_DEATH,
 	SND_DOOR_OPEN,
 	SND_DOOR_CLOSE,
-	SND_PICKUP_AMMO,
-	SND_PICKUP_HEALTH,
-	SND_PICKUP_BONUS,
 	SND_KNIFE,
 	SND_PISTOL,
 	SND_RIFLE,
+	SND_PICKUP_AMMO,
+	SND_PICKUP_RIFLE,
+	SND_PICKUP_HEALTH_M,
+	SND_PICKUP_HEALTH_L,
+	SND_PICKUP_HEALTH_XL,
+	SND_PICKUP_BONUS_S,
+	SND_PICKUP_BONUS_M,
+	SND_PICKUP_BONUS_L,
+	SND_PICKUP_BONUS_XL,
 	SND_ENEMY_ALARM,
 	SND_ENEMY_ATTACK,
 	SND_ENEMY_DEATH,
@@ -176,20 +195,20 @@ enum	e_sound
 
 typedef struct	s_set
 {
-	t_img				wait[8];
-//	t_img				walk[4][8];
-	t_img				attack[3];
-	t_img				pain[2];
-	t_img				death[10];
-	cs_loaded_sound_t	s_alarm;
-	cs_loaded_sound_t	s_attack;
-	cs_loaded_sound_t	s_death[7];
-	unsigned char		s_death_count;
+	t_img		wait[8];
+//	t_img		walk[4][8];
+	t_img		attack[3];
+	t_img		pain[2];
+	t_img		death[10];
+	t_snd		s_alarm;
+	t_snd		s_attack;
+	t_snd		s_death[10];
+	unsigned	s_death_count;
 }				t_set;
 
 typedef struct	s_door
 {
-	t_upoint	cell;
+	t_point		cell;
 	bool		opening;
 	float		part_opened;
 	time_t		ticks_to_close;
@@ -260,18 +279,23 @@ typedef struct	s_game
 	t_img		img;
 	struct		s_sound
 	{
-		cs_context_t*		ctx;
-		cs_context_t*		ctx7;
-		cs_context_t*		ctx22;
-		cs_loaded_sound_t	music[1];
-		cs_loaded_sound_t	sound[26];
+		cs_context_t*	ctx;
+		cs_context_t*	ctx7;
+		cs_context_t*	ctx22;
+		t_snd			music[1];
+		t_snd			sound[20];
+		struct			s_playing_sound
+		{
+			cs_playing_sound_t	*snd;
+			t_fpoint			sourcepos;
+		}				playing[MAX_PLAYING_SOUNDS];
 	}			audio;
 	unsigned	tick;
 	unsigned	tick_diff;
 	struct		s_player
 	{
 		t_fpoint	pos;
-		double		angle;
+		float		angle;
 		t_fpoint	vector;
 		short		health;
 		short		ammo;
@@ -314,15 +338,15 @@ typedef struct	s_game
 	float		fov;
 	t_upoint	win_center;
 	float		col_center;
-	double		col_step;
-	double		col_scale;
+	float		col_step;
+	float		col_scale;
 	struct		s_column
 	{
-		double		distance;
+		float		distance;
 		unsigned	height;
-		t_fpoint	cell;
+		t_point		cell;
 		unsigned	texture_id;
-		double		texture_pos;
+		float		texture_pos;
 		char		dir;
 	}			*column;
 	unsigned	color_ceil;
@@ -348,7 +372,7 @@ typedef struct	s_game
 }				t_game;
 
 void			initialize_game		(t_game *game, bool screenshot_only);
-void			player_set_fov				(t_game *game, double fov, bool reset);
+void			player_set_fov				(t_game *game, float fov, bool reset);
 
 int				game_loop		(t_game *game);
 
@@ -364,7 +388,7 @@ void			set_colors			(const char *color_string, unsigned *target,
 void			set_weapons			(char *string, t_game *game);
 void			set_textures		(char *string, t_game *game);
 void			load_audioset(t_set *dst, char *path, t_game *game);
-cs_loaded_sound_t	load_audio_file(char *path);
+void			load_audio_file(t_snd *dst, char *path);
 void			load_spriteset(t_img dst[], int count, char *path, t_game *game);
 void			load_texture_file(char *path, t_img *dst_img, char *err,
 						t_game *game);
@@ -386,18 +410,58 @@ void			player_control			(t_game *game);
 void			player_control_rotate	(t_game *game);
 void			player_control_move		(t_game *game);
 void			player_control_weapon(t_game *game);
-void			player_set_fov			(t_game *game, double fov, bool reset);
+void			player_set_fov			(t_game *game, float fov, bool reset);
 void			player_control_toggler	(t_game *g, int key_code);
 void			player_control_extra	(t_game *game);
 void			player_control_borders	(t_game *g);
 void			player_control_borders_diag(t_game *g);
 void			player_set_weapon(t_game *game, enum e_weapon weapon);
 
+void			weapon(t_game *game, struct s_weapon *weapon);
+void			draw_weapon(t_game *game, struct s_weapon *weapon);
+void			weapon_shoot(t_game *g, t_object *target);
+
+void			doors(t_game *game);
+t_door			*door_find(t_game *game, t_point cell);
+
+void			objects				(t_game *g);
+void			object_add(t_game *game, t_list **dst, void *obj);
+int				objects_sort		(t_object *obj1, t_object *obj2);
+
+bool			pickup(t_game *game, enum e_objtype type);
+void			pickup_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img);
+void			pickup_get(t_game *game, enum e_objtype item);
+void			pickup_sound(t_game *game, enum e_objtype item);
+
+void			enemy(t_game *game, t_object *obj);
+void			enemy_logic(t_game *game, t_object *obj);
+void			enemy_shoot(t_game *g, t_object *obj);
+void			enemy_set_state(t_game *g, t_object *obj, t_set *imgset, enum e_objstate state);
+void			enemy_sound(t_game *game, t_object *obj, enum e_sound sound_type);
+
+void			sounds(t_game *game);
+void			sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos);
+void			sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound);
+
 void			ray_cast		(t_game *game);
-struct s_column	ray_intersect	(t_game *game, double cur_angle);
-double			ray_intersect_distance(t_game *game, double cur_angle);
+struct s_column	ray_intersect	(t_game *game, float cur_angle);
+float ray_intersect_distance(t_game *game, float cur_angle);
 t_fpoint		ray_intersect_x	(t_game *game, t_fpoint from, t_fpoint step);
 t_fpoint		ray_intersect_y	(t_game *game, t_fpoint from, t_fpoint step);
+
+void			draw_walls		(t_game *game);
+void			draw_wall_scaled(t_game *g, t_img src, unsigned x, float fade);
+void			draw_wall_solid	(t_game *game, unsigned x, float fade);
+
+void			draw_object_properties(t_game *game, t_object *obj);
+void			draw_objects(t_game *game);
+void			draw_sprite(t_game *game, t_object *obj);
+void			draw_sprite_scaled(t_img *img, t_object *obj, t_point min, t_point max);
+
+void			draw_map_init	(t_game *game);
+void			draw_map		(t_game *game);
+void			draw_map_player	(t_game *game);
+void			draw_map_objects(t_game *game);
 
 void			img_clear				(t_img *img);
 void			img_clear_rgb			(t_img *img, unsigned color);
@@ -410,38 +474,6 @@ void			draw_line	(t_img *img, t_point p1, t_point p2, int color);
 void			draw_square	(t_img *img, t_point center, int size, int color);
 void			draw_square_fill(t_img *img, t_point top_left, int size, int color);
 void			draw_4pts	(t_img *img, t_point *pts, int color);
-
-void			draw_map_init	(t_game *game);
-void			draw_map		(t_game *game);
-void			draw_map_player	(t_game *game);
-void			draw_map_objects(t_game *game);
-
-void			draw_walls		(t_game *game);
-void			draw_wall_scaled(t_game *g, t_img src, unsigned x, float fade);
-void			draw_wall_solid	(t_game *game, unsigned x, float fade);
-
-void			doors(t_game *game);
-t_door			*door_find(t_game *game, t_upoint cell);
-
-void			objects				(t_game *g);
-void			object_add(t_game *game, t_list **dst, void *obj);
-void			object_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img);
-void			enemy_audio(t_game *game, t_object *obj, enum e_sound sound_type);
-void			enemy_logic(t_game *game, t_object *obj);
-void			enemy_set_state(t_game *g, t_object *obj, t_set *imgset, enum e_objstate state);
-void			enemy_settings(t_game *game, t_object *obj);
-int				objects_sort		(t_object *obj1, t_object *obj2);
-bool			object_pickup(t_game *game, enum e_objtype type);
-void			object_pickup_add(t_game *game, enum e_objtype type);
-
-void			draw_object_properties(t_game *game, t_object *obj);
-void			draw_objects(t_game *game);
-void			draw_sprite(t_game *game, t_object *obj);
-void			draw_sprite_scaled(t_img *img, t_object *obj, t_point min, t_point max);
-
-void			weapon(t_game *game, struct s_weapon *weapon);
-void			draw_weapon(t_game *game, struct s_weapon *weapon);
-void			weapon_shoot(t_game *g, t_object *target);
 
 void			draw_effect(t_game *game, struct s_effect *ef);
 void			effect_flash(t_game *game, unsigned color, float power);

@@ -88,4 +88,6 @@ int				ft_max(int a, int b);
 unsigned		ft_umin(unsigned a, unsigned b);
 unsigned		ft_umax(unsigned a, unsigned b);
 
+int				ft_file_exists(char *path);
+
 #endif

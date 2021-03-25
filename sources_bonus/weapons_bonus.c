@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/12 16:12:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/24 23:25:34 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/25 20:57:10 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,21 @@ void	draw_weapon(t_game *game, struct s_weapon *weapon)
 					game->p.weapon_pos.x, game->p.weapon_pos.y);
 }
 
+void	weapon_sound(t_game *game, enum e_weapon weapon)
+{
+	if (weapon == W_KNIFE)
+		sound_play(game, &game->audio.sound[SND_KNIFE], T_FPT_NULL);
+	else if (weapon == W_PISTOL)
+		sound_play(game, &game->audio.sound[SND_PISTOL], T_FPT_NULL);
+	else if (weapon == W_RIFLE)
+		sound_play(game, &game->audio.sound[SND_RIFLE], T_FPT_NULL);
+}
+
 void	weapon_shoot(t_game *g, t_object *target)
 {
 	unsigned	damage;
 
+	weapon_sound(g, g->p.weapon_cur);
 	if (g->p.weapon_cur != W_KNIFE)
 		g->p.ammo--;
 	if (target)
@@ -90,7 +101,7 @@ void	weapon_shoot(t_game *g, t_object *target)
 		target->e->health -= damage;
 		if (target->e->health <= 0)
 		{
-			object_drop(g, target->pos, T_AMMO_ENEMY,
+			pickup_drop(g, target->pos, T_AMMO_ENEMY,
 						&g->sprite[sizeof(CHAR_DECOR) - 1 + T_AMMO - 1]);
 			enemy_set_state(g, target, &g->enemyset[ENEMY_GUARD], ST_DEATH);
 			g->p.score += VAL_SCORE_KILL;

@@ -6,36 +6,26 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:45 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/23 00:00:33 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/25 23:18:15 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
 
-t_door		*door_find(t_game *game, t_upoint cell)
-{
-	t_list	*cur_list;
-	t_door	*door;
-
-	cur_list = game->doors;
-	while (cur_list)
-	{
-		door = (t_door *)cur_list->content;
-		if (door->cell.x == cell.x && door->cell.y == cell.y)
-			return (door);
-		cur_list = cur_list->next;
-	}
-	printf("DOOR ERROR!\n");
-	return (NULL);
-}
-
-void	draw_wall_texture_set(t_game *game, struct s_column *col, t_upoint cell)
+void	draw_wall_texture_set(t_game *game, struct s_column *col, t_point cell)
 {
 	const char	chr = game->map.grid[cell.y][cell.x];
 
 	if ((chr == '>' && (col->dir == 'W' || col->dir == 'E')) ||
 		(chr == 'v' && (col->dir == 'N' || col->dir == 'S')))
+	{
 		col->texture_id = TEXTURE_DOOR;
+		col->texture_pos =
+			fmaxf(0.0f, col->texture_pos - door_find(game, cell)->part_opened);
+	}
+	else if ((chr == 'v' && (col->dir == 'W' || col->dir == 'E')) ||
+		(chr == '>' && (col->dir == 'N' || col->dir == 'S')))
+		col->texture_id = TEXTURE_DOOR_W;
 	else if ((col->dir == 'N' && game->map.grid[cell.y + 1][cell.x] == '>') ||
 		(col->dir == 'S' && game->map.grid[cell.y - 1][cell.x] == '>') ||
 		(col->dir == 'W' && game->map.grid[cell.y][cell.x + 1] == 'v') ||
@@ -48,48 +38,42 @@ void	draw_wall_texture_set(t_game *game, struct s_column *col, t_upoint cell)
 		(col->texture_id == TEXTURE_DOOR_W &&
 										(col->dir == 'N' || col->dir == 'S')))
 		col->texture_id += sizeof(game->texture) / sizeof(*game->texture) / 2;
-	if (chr == '>' || chr == 'v')
-		col->texture_pos -= door_find(game, cell)->part_opened;
-	else if (col->dir == 'S' || col->dir == 'W')
-		col->texture_pos = 1. - col->texture_pos;
+	if (chr != '>' && chr != 'v' && (col->dir == 'S' || col->dir == 'W'))
+		col->texture_pos = 1.0f - col->texture_pos;
 }
 
 void		ray_cast(t_game *game)
 {
 	unsigned	ray;
-	double		angle;
+	float		angle;
 
 	ray = 0;
 	while (ray < game->img.size.x)
 	{
-		angle = game->p.angle + atan(game->col_step * (ray - game->col_center));
-		if (angle < 0)
-			angle += PI2;
-		else if (angle > PI2)
-			angle -= PI2;
+		angle = game->p.angle + atanf(game->col_step * (ray - game->col_center));
+		if (angle < 0.0f)
+			angle += PI2_F;
+		else if (angle > PI2_F)
+			angle -= PI2_F;
 		game->column[ray] = ray_intersect(game, angle);
-		if (game->column[ray].dir == 'N')
-			game->column[ray].cell.y -= FLOAT_FIX;
-		else if (game->column[ray].dir == 'W')
-			game->column[ray].cell.x -= FLOAT_FIX;
-		draw_wall_texture_set(game, &game->column[ray], (t_upoint){
-						(unsigned)game->column[ray].cell.x,
-						(unsigned)game->column[ray].cell.y});
+		if (game->column[ray].cell.x < (int)game->map.size.x &&
+			game->column[ray].cell.y < (int)game->map.size.y)
+			draw_wall_texture_set(game, &game->column[ray], game->column[ray].cell);
 		ray++;
 	}
 }
 
-struct s_column	ray_intersect(t_game *game, double cur_angle)
+struct s_column	ray_intersect(t_game *game, float cur_angle)
 {
-	t_fpoint		x1;
-	t_fpoint		y1;
-	t_fpoint		distance;
-	const double	tan_cur_angle = tan(cur_angle);
+	t_fpoint	x1;
+	t_fpoint	y1;
+	t_fpoint	distance;
+	const float	tan_cur_angle = tanf(cur_angle);
 
-	x1 = (cur_angle <= M_PI_2 || cur_angle > 3 * M_PI_2) ?
+	x1 = (cur_angle <= M_PI_2_F || cur_angle > 3.0f * M_PI_2_F) ?
 		 ray_intersect_x(game, game->p.pos, (t_fpoint){1, tan_cur_angle}) :
 		 ray_intersect_x(game, game->p.pos, (t_fpoint){-1, -tan_cur_angle});
-	y1 = (cur_angle <= M_PI) ?
+	y1 = (cur_angle <= M_PI_F) ?
 		 ray_intersect_y(game, game->p.pos, (t_fpoint){1 / tan_cur_angle, 1}) :
 		 ray_intersect_y(game, game->p.pos, (t_fpoint){-1 / tan_cur_angle, -1});
 	distance.x = game->p.vector.x * (x1.x - game->p.pos.x) +
@@ -97,11 +81,11 @@ struct s_column	ray_intersect(t_game *game, double cur_angle)
 	distance.y = game->p.vector.x * (y1.x - game->p.pos.x) +
 				 game->p.vector.y * (y1.y - game->p.pos.y);
 	if (distance.x < distance.y)
-		return ((struct s_column){distance.x, game->col_scale / distance.x, x1,
-				-1U, x1.y - (int)x1.y, "EW"[x1.x < game->p.pos.x]});
+		return ((struct s_column){distance.x, game->col_scale / distance.x,
+	(t_point){x1.x, x1.y}, -1U, x1.y - (int)x1.y, "EW"[x1.x < game->p.pos.x]});
 	else
-		return ((struct s_column){distance.y, game->col_scale / distance.y, y1,
-				-1U, y1.x - (int)y1.x, "SN"[y1.y < game->p.pos.y]});
+		return ((struct s_column){distance.y, game->col_scale / distance.y,
+	(t_point){y1.x, y1.y}, -1U, y1.x - (int)y1.x, "SN"[y1.y < game->p.pos.y]});
 }
 
 t_fpoint	ray_intersect_x_door(t_game *game, t_fpoint step, t_fpoint check)
@@ -112,7 +96,7 @@ t_fpoint	ray_intersect_x_door(t_game *game, t_fpoint step, t_fpoint check)
 	check_door = (t_fpoint){check.x + step.x / 2, check.y + step.y / 2};
 	position = check_door.y - (unsigned)check.y;
 	if (0 < position &&
-		position < door_find(game, (t_upoint){check.x, check.y})->part_opened)
+		position < door_find(game, (t_point){check.x, check.y})->part_opened)
 		return (ray_intersect_x(game, (t_fpoint){
 				check_door.x + (step.x < 0), check_door.y}, step));
 	return ((t_fpoint){check_door.x + (step.x < 0), check_door.y});
@@ -126,7 +110,7 @@ t_fpoint	ray_intersect_y_door(t_game *game, t_fpoint step, t_fpoint check)
 	check_door = (t_fpoint){check.x + step.x / 2, check.y + step.y / 2};
 	position = check_door.x - (unsigned)check.x;
 	if (0 < position &&
-		position < door_find(game, (t_upoint){check.x, check.y})->part_opened)
+		position < door_find(game, (t_point){check.x, check.y})->part_opened)
 		return (ray_intersect_y(game, (t_fpoint){
 				check_door.x, check_door.y + (step.y < 0)}, step));
 	return ((t_fpoint){check_door.x, check_door.y + (step.y < 0)});
@@ -151,7 +135,8 @@ t_fpoint	ray_intersect_x(t_game *game, t_fpoint from, t_fpoint step)
 			return (ray_intersect_x_door(game, step, check));
 		check = (t_fpoint){check.x + step.x, check.y + step.y};
 	}
-	check.x += (step.x < 0);
+	if (step.x < 0)
+		check.x += (step.x < 0) - FLOAT_FIX;
 	return (check);
 }
 
@@ -174,25 +159,26 @@ t_fpoint	ray_intersect_y(t_game *game, t_fpoint from, t_fpoint step)
 			return (ray_intersect_y_door(game, step, check));
 		check = (t_fpoint){check.x + step.x, check.y + step.y};
 	}
-	check.y += (step.y < 0);
+	if (step.y < 0)
+		check.y += (step.y < 0) - FLOAT_FIX;
 	return (check);
 }
 
-double		ray_intersect_distance(t_game *game, double cur_angle)
+float	ray_intersect_distance(t_game *game, float cur_angle)
 {
-	t_fpoint		x1;
-	t_fpoint		y1;
-	t_fpoint		distance;
-	const double	tan_cur_angle = tan(cur_angle);
+	t_fpoint	x1;
+	t_fpoint	y1;
+	t_fpoint	distance;
+	const float	tan_cur_angle = tanf(cur_angle);
 
-	x1 = (cur_angle < -M_PI_2 || cur_angle >= M_PI_2) ?
+	x1 = (cur_angle < -M_PI_2_F || cur_angle >= M_PI_2_F) ?
 		 ray_intersect_x(game, game->p.pos, (t_fpoint){-1, -tan_cur_angle}) :
 		 ray_intersect_x(game, game->p.pos, (t_fpoint){1, tan_cur_angle});
 	y1 = (cur_angle >= 0) ?
 		 ray_intersect_y(game, game->p.pos, (t_fpoint){1 / tan_cur_angle, 1}) :
 		 ray_intersect_y(game, game->p.pos, (t_fpoint){-1 / tan_cur_angle, -1});
-	distance.x = hypot(x1.x - game->p.pos.x, x1.y - game->p.pos.y);
-	distance.y = hypot(y1.x - game->p.pos.x, y1.y - game->p.pos.y);
+	distance.x = hypotf(x1.x - game->p.pos.x, x1.y - game->p.pos.y);
+	distance.y = hypotf(y1.x - game->p.pos.x, y1.y - game->p.pos.y);
 	return (fmin(distance.x, distance.y));
 }
 

@@ -79,7 +79,7 @@ void	initialize_game_2(t_game *game)
 	}
 }
 
-void	player_set_fov(t_game *game, double fov, bool reset)
+void	player_set_fov(t_game *game, float fov, bool reset)
 {
 	if (reset)
 		fov = ((game->img.aspect >= 1.77) - (game->img.aspect < 1.77)) *

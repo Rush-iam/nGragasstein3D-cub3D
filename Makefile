@@ -6,7 +6,7 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/03/24 22:14:40 by ngragas          ###   ########.fr        #
+#    Updated: 2021/03/25 22:44:13 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,10 @@ SRC_BONUS :=	demo_tools		\
 				draw_fills		\
 				draw_objects	\
 				draw_map		\
+				enemies			\
 				hooks			\
+				pickups			\
+				sounds			\
 				terminate		\
 				weapons
 

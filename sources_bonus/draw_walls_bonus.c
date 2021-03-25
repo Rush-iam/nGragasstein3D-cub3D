@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 23:32:38 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/22 17:04:19 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/25 23:01:12 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,10 @@ void	draw_walls(t_game *game)
 	ray = 0;
 	while (ray < game->img.size.x)
 	{
-		if ((unsigned)game->column[ray].cell.x < game->map.size.x &&
-			(unsigned)game->column[ray].cell.y < game->map.size.y &&
-			game->column[ray].cell.x >= 0 && game->column[ray].cell.y >= 0)
+		if (game->column[ray].texture_id < sizeof(game->texture) /
+												sizeof(*game->texture))
 		{
-			fade = fminf(8.f / (float)game->column[ray].distance, 1.f);
+			fade = fminf(8.0f / (float)game->column[ray].distance, 1.0f);
 			draw_wall_scaled(game, game->texture[game->column[ray].texture_id],
 																	ray, fade);
 //			draw_wall_solid(game, ray, fade);
@@ -36,7 +35,7 @@ void	draw_walls(t_game *game)
 void	draw_wall_scaled(t_game *g, t_img src, unsigned x, float fade)
 {
 	const float		step = (float)src.size.y / g->column[x].height;
-	const unsigned	src_x = g->column[x].texture_pos * src.size.x;
+	const unsigned	src_x = g->column[x].texture_pos * (src.size.x - 1);
 	float			src_y;
 	unsigned		y;
 	const unsigned	half = ft_umin(g->win_center.y, g->column[x].height / 2);

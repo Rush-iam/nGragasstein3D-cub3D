@@ -92,7 +92,7 @@ void	set_map_door_add(t_game *game, t_upoint pt)
 
 	if ((door = ft_calloc(1, sizeof(t_object))) == NULL)
 		terminate(game, ERR_MEM, "Memory allocation failed (door)");
-	door->cell = pt;
+	door->cell = (t_point){pt.x, pt.y};
 	object_add(game, &game->doors, door);
 }
 

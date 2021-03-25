@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 23:31:40 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/24 23:25:14 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/25 17:10:15 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,13 +60,13 @@ void	terminate_free(t_game *game)
 		terminate_free_images(game, game->p.weapon_img[i],
 				sizeof(game->p.weapon_img[i]) / sizeof(*game->p.weapon_img[i]));
 	terminate_free_images(game, game->enemyset[0].wait,
-						  sizeof(game->enemyset[0].wait) / sizeof(*game->enemyset[0].wait));
+			sizeof(game->enemyset[0].wait) / sizeof(*game->enemyset[0].wait));
 	terminate_free_images(game, game->enemyset[0].attack,
-						  sizeof(game->enemyset[0].attack) / sizeof(*game->enemyset[0].attack));
+			sizeof(game->enemyset[0].attack) / sizeof(*game->enemyset[0].attack));
 	terminate_free_images(game, game->enemyset[0].pain,
-						  sizeof(game->enemyset[0].pain) / sizeof(*game->enemyset[0].pain));
+			sizeof(game->enemyset[0].pain) / sizeof(*game->enemyset[0].pain));
 	terminate_free_images(game, game->enemyset[0].death,
-						  sizeof(game->enemyset[0].death) / sizeof(*game->enemyset[0].death));
+			sizeof(game->enemyset[0].death) / sizeof(*game->enemyset[0].death));
 }
 
 void	terminate_free_images(t_game *game, t_img *arr, unsigned count)
@@ -94,10 +94,15 @@ void	terminate_audio(t_game *game)
 
 	i = 0;
 	while (i < sizeof(game->audio.music) / sizeof(*game->audio.music))
-		cs_free_sound(&game->audio.music[i++]);
+		cs_free_sound(&game->audio.music[i++].file);
 	i = 0;
 	while (i < sizeof(game->audio.sound) / sizeof(*game->audio.sound))
-		cs_free_sound(&game->audio.sound[i++]);
+		cs_free_sound(&game->audio.sound[i++].file);
+	i = 0;
+	while (i < game->enemyset[0].s_death_count)
+		cs_free_sound(&game->enemyset[0].s_death[i++].file);
+	cs_free_sound(&game->enemyset[0].s_alarm.file);
+	cs_free_sound(&game->enemyset[0].s_attack.file);
 	cs_shutdown_context(game->audio.ctx);
 	cs_shutdown_context(game->audio.ctx7);
 	cs_shutdown_context(game->audio.ctx22);

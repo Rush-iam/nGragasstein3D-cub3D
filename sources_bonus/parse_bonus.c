@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/24 23:17:50 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/25 16:25:00 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,9 +88,9 @@ void	set_audio(char *string, t_game *game)
 			terminate(game, ERR_PARSE, "Music ID is wrong (Mxx)");
 		if (id >= sizeof(game->audio.music) / sizeof(*game->audio.music))
 			terminate(game, ERR_PARSE, "Music ID out of array range");
-		if (game->audio.music[id].channels[0] != NULL)
+		if (game->audio.music[id].file.channels[0] != NULL)
 			terminate(game, ERR_PARSE, "Duplicated music setting");
-		game->audio.music[id] = load_audio_file(string);
+		 load_audio_file(&game->audio.music[id], string);
 	}
 	else if (*string == 'A')
 	{
@@ -98,9 +98,9 @@ void	set_audio(char *string, t_game *game)
 			terminate(game, ERR_PARSE, "Sound ID is wrong (Axx)");
 		if (id >= sizeof(game->audio.sound) / sizeof(*game->audio.sound))
 			terminate(game, ERR_PARSE, "Sound ID out of array range");
-		if (game->audio.sound[id].channels[0] != NULL)
+		if (game->audio.sound[id].file.channels[0] != NULL)
 			terminate(game, ERR_PARSE, "Duplicated sound setting");
-		game->audio.sound[id] = load_audio_file(string);
+		load_audio_file(&game->audio.sound[id], string);
 	}
 }
 
