@@ -31,8 +31,8 @@ void	draw_objects(t_game *game)
 		obj = (t_object *)cur_list->content;
 		diff = (t_fpoint){obj->pos.x - game->p.pos.x,
 						obj->pos.y - game->p.pos.y};
-		if ((obj->distance = game->p.vector.x * diff.x +
-							 game->p.vector.y * diff.y) > 0.01)
+		if ((obj->distance = game->p.vect.x * diff.x +
+							 game->p.vect.y * diff.y) > 0.01)
 		{
 			angle = atan2(diff.y, diff.x);
 			if (fabs(game->p.angle - angle - PI2) <= M_PI)
@@ -53,7 +53,7 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 
 	obj->size.x = game->col_scale / obj->distance;
 	obj->size.y = obj->size.x * obj->sprite->aspect;
-	start_x = game->col_center + tan(angle) / game->col_step - obj->size.x / 2;
+	start_x = game-> + tan(angle) / game->col_step - obj->size.x / 2;
 	cur_x = start_x;
 	max_x = cur_x + obj->size.x;
 	if (cur_x < 0)

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/25 22:42:11 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/26 19:44:37 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,31 +36,31 @@ void	player_control_rotate(t_game *game)
 		game->p.angle -= PL_SPEED / 3.0f;
 	if (game->key.k[K_TURN_RIGHT])
 		game->p.angle += PL_SPEED / 3.0f;
-	if (game->p.angle >= PI2_F)
+	if (game->p.angle >= M_PI_F)
 		game->p.angle -= PI2_F;
-	else if (game->p.angle < 0.0f)
+	else if (game->p.angle < -M_PI_F)
 		game->p.angle += PI2_F;
-	__sincosf(game->p.angle, &game->p.vector.y, &game->p.vector.x);
+	__sincosf(game->p.angle, &game->p.vect.y, &game->p.vect.x);
 }
 
 void	player_control_move(t_game *game)
 {
 	if (game->key.k[K_MOVE_FORWARD])
 		game->p.pos = (t_fpoint){
-		game->p.pos.x + (game->key.k[K_RUN] + 1) * PL_SPEED * game->p.vector.x,
-		game->p.pos.y + (game->key.k[K_RUN] + 1) * PL_SPEED * game->p.vector.y};
+		game->p.pos.x + (game->key.k[K_RUN] + 1) * PL_SPEED * game->p.vect.x,
+		game->p.pos.y + (game->key.k[K_RUN] + 1) * PL_SPEED * game->p.vect.y};
 	if (game->key.k[K_MOVE_BACK])
 		game->p.pos = (t_fpoint){
-	game->p.pos.x - (game->key.k[K_RUN] + 1) * PL_SPEED / 1.5 * game->p.vector.x,
-	game->p.pos.y - (game->key.k[K_RUN] + 1) * PL_SPEED / 1.5 * game->p.vector.y};
+	game->p.pos.x - (game->key.k[K_RUN] + 1) * PL_SPEED / 1.5 * game->p.vect.x,
+	game->p.pos.y - (game->key.k[K_RUN] + 1) * PL_SPEED / 1.5 * game->p.vect.y};
 	if (game->key.k[K_MOVE_LEFT])
 		game->p.pos = (t_fpoint){
-		game->p.pos.x + (game->key.k[K_RUN] + 1) * PL_SPEED * game->p.vector.y,
-		game->p.pos.y - (game->key.k[K_RUN] + 1) * PL_SPEED * game->p.vector.x};
+		game->p.pos.x + (game->key.k[K_RUN] + 1) * PL_SPEED * game->p.vect.y,
+		game->p.pos.y - (game->key.k[K_RUN] + 1) * PL_SPEED * game->p.vect.x};
 	if (game->key.k[K_MOVE_RIGHT])
 		game->p.pos = (t_fpoint){
-		game->p.pos.x - (game->key.k[K_RUN] + 1) * PL_SPEED * game->p.vector.y,
-		game->p.pos.y + (game->key.k[K_RUN] + 1) * PL_SPEED * game->p.vector.x};
+		game->p.pos.x - (game->key.k[K_RUN] + 1) * PL_SPEED * game->p.vect.y,
+		game->p.pos.y + (game->key.k[K_RUN] + 1) * PL_SPEED * game->p.vect.x};
 }
 
 void	player_control_weapon(t_game *game)
@@ -91,41 +91,19 @@ void	player_set_fov(t_game *game, float fov, bool reset)
 		fov = ((game->img.aspect >= 1.77f) - (game->img.aspect < 1.77f)) *
 		  sqrtf(fabsf(M_PI_4_F * (game->img.aspect - 1.77f) / 2.0f)) + M_PI_2_F;
 	game->col_step = tanf(fov / (game->img.size.x - 1));
-	game->col_center = (float)game->img.size.x / 2.0f;
 	game->col_scale = 1 / game->col_step;
 	if (reset == false)
-		printf("FOV = %.1f\n", 114 * atanf(game->col_step * game->col_center));
+		printf("FOV %.1f\n", 114 * atanf(game->col_step * game->win_center.x));
 	if (reset == true || (M_PI_4_F / 4.0f < fov && fov < PI2_F))
 		game->fov = fov;
 }
 
 void	player_control_toggler(t_game *g, int key_code)
 {
-	t_door	*door;
-
 	if (key_code == K_MAP_TOGGLE && g->key.k[key_code] == false)
 		g->map.show = !g->map.show;
-	if (key_code == K_USE && g->key.k[key_code] == false && ft_memchr(
-			CHAR_DOORS, g->map.grid[(int)(g->p.pos.y + g->p.vector.y)]
-			[(int)(g->p.pos.x + g->p.vector.x)], sizeof(CHAR_DOORS)))
-	{
-		door = door_find(g, (t_point){(int)(g->p.pos.x + g->p.vector.x),
-										(int)(g->p.pos.y + g->p.vector.y)});
-		door->opening ^= true;
-		if (door->opening == true)
-		{
-			if (door->part_opened == 0)
-				sound_play(g, &g->audio.sound[SND_DOOR_OPEN],
-					(t_fpoint){door->cell.x + 0.5f, door->cell.y + 0.5f});
-			door->ticks_to_close = DOOR_TIMER_TICKS;
-		}
-		else
-		{
-			sound_play(g, &g->audio.sound[SND_DOOR_CLOSE],
-					(t_fpoint){door->cell.x + 0.5f, door->cell.y + 0.5f});
-			door->ticks_to_close = 0;
-		}
-	}
+	if (key_code == K_USE && g->key.k[key_code] == false)
+		door_open(g);
 }
 
 void	player_control_extra(t_game *game)
@@ -154,7 +132,7 @@ void	player_control_borders_enemies(t_game *game)
 			obj->type == T_ENEMY && obj->e->state != ST_DEATH)
 		{
 			obj->atan_diff = atan2f(diff.y, diff.x);
-			obj->distance = game->p.vector.x * diff.x + game->p.vector.y * diff.y;
+			obj->distance = game->p.vect.x * diff.x + game->p.vect.y * diff.y;
 			game->p.pos.x = obj->pos.x - PL_RADIUS * 2 * cosf(obj->atan_diff);
 			game->p.pos.y = obj->pos.y - PL_RADIUS * 2 * sinf(obj->atan_diff);
 		}
@@ -170,22 +148,22 @@ void	player_control_borders(t_game *g)
 
 	check = g->map.grid[(int)g->p.pos.y][minus.x];
 	if (ft_isdigit(check) || ft_memchr(CHAR_SOLID, check, sizeof(CHAR_SOLID)) ||
-			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_SOLID)) && door_find(g,
+			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_DOORS)) && door_find(g,
 					(t_point){minus.x, (int)g->p.pos.y})->part_opened < 0.5f))
 		g->p.pos.x = minus.x + 1 + PL_RADIUS + FLOAT_FIX;
 	check = g->map.grid[(int)g->p.pos.y][plus.x];
 	if (ft_isdigit(check) || ft_memchr(CHAR_SOLID, check, sizeof(CHAR_SOLID)) ||
-			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_SOLID)) && door_find(g,
+			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_DOORS)) && door_find(g,
 					(t_point){plus.x, (int)g->p.pos.y})->part_opened < 0.5f))
 		g->p.pos.x = plus.x - PL_RADIUS - FLOAT_FIX;
 	check = g->map.grid[minus.y][(int)g->p.pos.x];
 	if (ft_isdigit(check) || ft_memchr(CHAR_SOLID, check, sizeof(CHAR_SOLID)) ||
-			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_SOLID)) && door_find(g,
+			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_DOORS)) && door_find(g,
 					(t_point){(int)g->p.pos.x, minus.y})->part_opened < 0.5f))
 		g->p.pos.y = minus.y + 1 + PL_RADIUS + FLOAT_FIX;
 	check = g->map.grid[plus.y][(int)g->p.pos.x];
 	if (ft_isdigit(check) || ft_memchr(CHAR_SOLID, check, sizeof(CHAR_SOLID)) ||
-			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_SOLID)) && door_find(g,
+			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_DOORS)) && door_find(g,
 					(t_point){(int)g->p.pos.x, plus.y})->part_opened < 0.5f))
 		g->p.pos.y = plus.y - PL_RADIUS - FLOAT_FIX;
 	player_control_borders_diag(g);

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/09 20:58:32 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/26 17:14:16 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ typedef struct	s_game
 	{
 		t_fpoint	pos;
 		double		angle;
-		t_fpoint	vector;
+		t_fpoint	vect;
 	}			p;
 	bool		key[280];
 	struct		s_map
@@ -145,13 +145,13 @@ int				hook_key_press		(int key_code, t_game *game);
 int				hook_key_release	(int key_code, t_game *game);
 int				hook_exit			(t_game *game);
 
-void			ray_cast		(t_game *game);
+void			ray_cast		(t_game *g);
 void			ray_intersect	(t_game *game, double cur_angle, unsigned ray);
 t_fpoint		ray_intersect_x	(t_game *game, t_fpoint step);
 t_fpoint		ray_intersect_y	(t_game *game, t_fpoint step);
 
 void			img_ceilfloor_fill_rgb	(t_img *img, int ceil, int floor);
-void			draw_walls				(t_game *game);
+void			draw_walls				(t_game *g);
 void			draw_wall_scaled		(t_game *game, t_img *src, unsigned x);
 
 void			draw_objects		(t_game *g);

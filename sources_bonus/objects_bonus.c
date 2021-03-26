@@ -26,7 +26,7 @@ void	objects(t_game *g)
 		next_list = cur_list->next;
 		obj = (t_object *)cur_list->content;
 		diff = (t_fpoint){obj->pos.x - g->p.pos.x, obj->pos.y - g->p.pos.y};
-		obj->distance = g->p.vector.x * diff.x + g->p.vector.y * diff.y;
+		obj->distance = g->p.vect.x * diff.x + g->p.vect.y * diff.y;
 		obj->distance_real = hypotf(diff.x, diff.y);
 		obj->atan_diff = atan2f(diff.y, diff.x);
 		draw_object_properties(g, obj);

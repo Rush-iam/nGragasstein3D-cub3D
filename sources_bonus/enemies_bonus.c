@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:53:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/25 22:00:34 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/26 20:24:30 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	enemy(t_game *game, t_object *obj)
 	obj->e->p_to_angle = obj->atan_diff - (obj->e->angle - M_PI_F);
 	if (obj->e->p_to_angle < -M_PI_F)
 		obj->e->p_to_angle += PI2_F;
-	else if (obj->e->p_to_angle > M_PI_F)
+	else if (obj->e->p_to_angle >= M_PI_F)
 		obj->e->p_to_angle -= PI2_F;
 	if (obj->e->state == ST_WAIT)
 		obj->e->imgset = &game->enemyset[ENEMY_GUARD].
@@ -38,7 +38,7 @@ void	enemy_logic(t_game *game, t_object *obj)
 {
 	bool	see;
 
-	if (obj->e->state == ST_DEATH && obj->e->tick + 1 >= obj->e->ticks)
+	if (obj->e->state == ST_DEATH && obj->e->tick + 1 == obj->e->ticks)
 		return ;
 	see = false;
 	if (obj->e->state != ST_DEATH && fabsf(obj->e->p_to_angle) < ENEMY_FOV_HALF)
@@ -84,6 +84,8 @@ void	enemy_shoot(t_game *g, t_object *obj)
 	damage = ENEMY_DMG_MIN +
 			 arc4random() % (1 + ENEMY_DMG_MAX - ENEMY_DMG_MIN) * power;
 	g->p.health -= damage;
+	if (damage >= (ENEMY_DMG_MIN + ENEMY_DMG_MAX) / 2)
+		sound_play(g, &g->audio.sound[SND_PLAYER_PAIN], T_FPT_NULL);
 	printf("Enemy shot you! -%u HP. Health: %hd\n", damage, g->p.health);
 	g->effect = (struct s_effect){30, 15, EF_FLASH, COLOR_RED, damage / 100.0f};
 }

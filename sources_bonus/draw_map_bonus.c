@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:13 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 21:25:26 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/26 17:51:13 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,12 @@ void	draw_map(t_game *game)
 		while (pt.x < (int)game->map.img.size.x)
 		{
 			draw_line(&game->map.img, pt,
-					(t_point){pt.x + MAP_SCALE, pt.y}, 0x113322);
+					(t_point){pt.x + MAP_SCALE, pt.y}, COLOR_GREEN_FF);
 			draw_line(&game->map.img, pt,
-					(t_point){pt.x, pt.y + MAP_SCALE}, 0x113322);
+					(t_point){pt.x, pt.y + MAP_SCALE}, COLOR_GREEN_FF);
 			if (ft_isdigit(game->map.grid[pt.y / MAP_SCALE][pt.x / MAP_SCALE]))
 				draw_square(&game->map.img, (t_point){pt.x + MAP_SCALE / 2,
-								pt.y + MAP_SCALE / 2}, MAP_SCALE - 4, 0x33AA99);
+						pt.y + MAP_SCALE / 2}, MAP_SCALE - 4, COLOR_CYAN_F);
 			pt.x += MAP_SCALE;
 		}
 		pt.y += MAP_SCALE;
@@ -55,26 +55,33 @@ void	draw_map(t_game *game)
 	mlx_put_image_to_window(game->mlx, game->win, game->map.img.ptr, 0, 0);
 }
 
-void	draw_map_player(t_game *game)
+void	draw_map_player(t_game *g)
 {
-	unsigned	ray;
+	unsigned		ray;
+	struct s_column	col;
+	t_fpoint		pt;
 
-	draw_square(&game->map.img,
-			(t_point){game->p.pos.x * MAP_SCALE,
-						game->p.pos.y * MAP_SCALE}, 6, 0xFFFA80);
+	draw_square(&g->map.img, (t_point){g->p.pos.x * MAP_SCALE,
+									g->p.pos.y * MAP_SCALE}, 6, COLOR_YELLOW);
 	ray = 0;
-	while (ray < game->img.size.x)
+	while (ray < g->img.size.x)
 	{
-		draw_line(&game->map.img,
-				(t_point){game->p.pos.x * MAP_SCALE, game->p.pos.y * MAP_SCALE},
-				(t_point){game->column[ray].cell.x * MAP_SCALE,
-						game->column[ray].cell.y * MAP_SCALE}, 0x888015);
+		col = g->column[ray];
+		if (col.dir == 'S')
+			pt = (t_fpoint){col.cell.x + 1 - col.texture_pos, col.cell.y};
+		else if (col.dir == 'N')
+			pt = (t_fpoint){col.cell.x + col.texture_pos, col.cell.y + 1};
+		else if (col.dir == 'W')
+			pt = (t_fpoint){col.cell.x + 1, col.cell.y + 1 - col.texture_pos};
+		else if (col.dir == 'E')
+			pt = (t_fpoint){col.cell.x, col.cell.y + col.texture_pos};
+		draw_line(&g->map.img, (t_point){g->p.pos.x * MAP_SCALE, g->p.pos.y *
+	MAP_SCALE},	(t_point){pt.x * MAP_SCALE, pt.y * MAP_SCALE}, COLOR_YELLOW_F);
 		ray += 32;
 	}
-	draw_line(&game->map.img, (t_point){game->p.pos.x * MAP_SCALE,
-										game->p.pos.y * MAP_SCALE}, (t_point){
-		game->p.pos.x * MAP_SCALE + MAP_SCALE * cos(game->p.angle),
-		game->p.pos.y * MAP_SCALE + MAP_SCALE * sin(game->p.angle)}, 0xFF4020);
+	draw_line(&g->map.img, (t_point){g->p.pos.x * MAP_SCALE, g->p.pos.y *
+		MAP_SCALE}, (t_point){MAP_SCALE * (g->p.pos.x + cos(g->p.angle)),
+					MAP_SCALE * (g->p.pos.y + sin(g->p.angle))}, COLOR_ORANGE);
 }
 
 void	draw_map_objects(t_game *game)
@@ -90,7 +97,12 @@ void	draw_map_objects(t_game *game)
 		if (obj->type == T_DECOR)
 			color = MAP_COLOR_DECOR;
 		else if (obj->type == T_ENEMY)
-			color = MAP_COLOR_ENEMY;
+		{
+			if (obj->e->state != ST_DEATH)
+				color = MAP_COLOR_ENEMY;
+			else
+				color = MAP_COLOR_DECOR;
+		}
 		else
 			color = MAP_COLOR_PICKUP;
 		draw_square(&game->map.img, (t_point){

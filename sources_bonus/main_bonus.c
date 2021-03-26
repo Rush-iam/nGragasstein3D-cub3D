@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/25 22:41:44 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/26 23:02:29 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ void	initialize_game(t_game *game, bool screenshot_only)
 	}
 	if (!(game->column = ft_calloc(game->img.size.x, sizeof(*game->column))))
 		terminate(game, ERR_MEM, "Memory allocation failed (ray columns)");
-	__sincosf(game->p.angle, &game->p.vector.y, &game->p.vector.x);
+	__sincosf(game->p.angle, &game->p.vect.y, &game->p.vect.x);
 	player_set_fov(game, 0, true);
 	game->p.health = START_HEALTH;
 	game->p.ammo = START_AMMO;
@@ -121,65 +121,24 @@ void	initialize_game(t_game *game, bool screenshot_only)
 	player_set_weapon(game, W_KNIFE);
 	player_set_weapon(game, W_PISTOL);
 	if (game->audio.music[0].file.channels[0])
-		cs_play_sound(game->audio.ctx, game->audio.music[0].props)->looped = true;
+		sound_play(game, &game->audio.music[0], T_FPT_NULL)->looped = true;
 }
 
-void	dead_exit(t_game *game)
+int	dead_exit(t_game *game)
 {
+	game->effect.frame_cur++;
 	if (game->effect.type != EF_FIZZLEFADE)
-		game->effect = (struct s_effect){512, 0, EF_FIZZLEFADE, COLOR_RED, 0};
+	{
+		game->effect = (struct s_effect){384, 0, EF_FIZZLEFADE, COLOR_RED, 0};
+		cs_stop_all_sounds(game->audio.ctx);
+		cs_stop_all_sounds(game->audio.ctx7);
+		cs_stop_all_sounds(game->audio.ctx22);
+		sound_play(game, &game->audio.sound[SND_PLAYER_DEATH], T_FPT_NULL);
+	}
 	draw_effect(game, &game->effect);
 	if (game->effect.frame_cur > game->effect.frames)
-		exit(0);
-}
-
-void	doors(t_game *game)
-{
-	t_list		*cur_list;
-	t_door		*door;
-
-	cur_list = game->doors;
-	while (cur_list)
-	{
-		door = (t_door *)cur_list->content;
-		if (door->opening == true)
-		{
-			if (door->part_opened < 1.0f)
-				door->part_opened = fminf(1.0f,
-									door->part_opened + 1.0f / ANIM_DOOR_TICKS);
-			if (door->ticks_to_close > 0)
-				--door->ticks_to_close;
-			if (door->ticks_to_close == 0 &&
-				((int)game->p.pos.x == door->cell.x &&
-				 (int)game->p.pos.y == door->cell.y) == false)
-			{
-				door->opening = false;
-				sound_play(game, &game->audio.sound[SND_DOOR_CLOSE],
-						(t_fpoint){door->cell.x + 0.5, door->cell.y + 0.5});
-			}
-		}
-		else if (door->opening == false && door->part_opened > 0)
-			door->part_opened = fmaxf(0.0f,
-								door->part_opened - 1.0f / ANIM_DOOR_TICKS);
-		cur_list = cur_list->next;
-	}
-}
-
-t_door		*door_find(t_game *game, t_point cell)
-{
-	t_list	*cur_list;
-	t_door	*door;
-
-	cur_list = game->doors;
-	while (cur_list)
-	{
-		door = (t_door *)cur_list->content;
-		if (door->cell.x == cell.x && door->cell.y == cell.y)
-			return (door);
-		cur_list = cur_list->next;
-	}
-	printf("DOOR ERROR!\n");
-	return (NULL);
+		terminate(game, 0, NULL);
+	return (0);
 }
 
 int	game_loop(t_game *game)
@@ -191,37 +150,32 @@ int	game_loop(t_game *game)
 
 	clock_gettime(CLOCK_MONOTONIC, &time);
 	tick_prev = game->tick;
-	game->tick = 60 * time.tv_sec + 60 * time.tv_nsec / NANSECS_PER_SEC;
+	game->tick = TICKS_PER_SEC * time.tv_sec +
+				TICKS_PER_SEC * time.tv_nsec / NANSECS_PER_SEC;
 	game->tick_diff = game->tick - tick_prev;
-	if (game->p.health < 0)
-	{
-		game->effect.frame_cur++;
-		dead_exit(game);
-		return (0);
-	}
-	if (game->effect.frame_cur < game->effect.frames)
-		game->effect.frame_cur += game->tick_diff;
-	while (game->tick_diff > 0)
-	{
+//	sounds(game);
+//	if (game->p.health < 0)
+//		return dead_exit(game);
+//	if (game->effect.frame_cur < game->effect.frames)
+//		game->effect.frame_cur += game->tick_diff;
+//	while (game->tick_diff > 0)
+//	{
 		doors(game);
 		player_control(game);
-		objects(game);
-		weapon(game, &game->p.weapon);
+//		objects(game);
+//		weapon(game, &game->p.weapon);
+		for (int i = 0; i < 30; ++i)
 		ray_cast(game);
-		game->tick_diff--;
-	}
-//	for (int i = 0; i < 50; ++i)
+//		game->tick_diff--;
+//	}
 	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
 	draw_walls(game);
-	draw_objects(game);
+//	draw_objects(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
-	draw_effect(game, &game->effect);
-	draw_weapon(game, &game->p.weapon);
+//	draw_effect(game, &game->effect);
+//	draw_weapon(game, &game->p.weapon);
 	draw_map(game);
-	sounds(game);
-	cs_mix(game->audio.ctx);
-	cs_mix(game->audio.ctx7);
-	cs_mix(game->audio.ctx22);
+
 //	demo_fillrate(game, 1);
 //	demo_cursor(game, 0xFF88FF);
 //	demo_radar(game, 360);

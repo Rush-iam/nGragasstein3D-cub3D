@@ -19,17 +19,17 @@ void	player_control(t_game *game)
 	if (game->key[K_TURN_RIGHT])
 		game->p.angle += PL_SPEED / 2;
 	if (game->key[K_MOVE_FORWARD])
-		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.vector.x,
-								game->p.pos.y + PL_SPEED * game->p.vector.y};
+		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.vect.x,
+								game->p.pos.y + PL_SPEED * game->p.vect.y};
 	if (game->key[K_MOVE_BACK])
-		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vector.x,
-								game->p.pos.y - PL_SPEED * game->p.vector.y};
+		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vect.x,
+								game->p.pos.y - PL_SPEED * game->p.vect.y};
 	if (game->key[K_MOVE_LEFT])
-		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.vector.y,
-								game->p.pos.y - PL_SPEED * game->p.vector.x};
+		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.vect.y,
+								game->p.pos.y - PL_SPEED * game->p.vect.x};
 	if (game->key[K_MOVE_RIGHT])
-		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vector.y,
-								game->p.pos.y + PL_SPEED * game->p.vector.x};
+		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vect.y,
+								game->p.pos.y + PL_SPEED * game->p.vect.x};
 	if (game->key[K_FOV_WIDE])
 		player_set_fov(game, game->fov * 1.03, false);
 	if (game->key[K_FOV_TELE])
@@ -37,7 +37,7 @@ void	player_control(t_game *game)
 	if (game->key[K_FOV_RESET])
 		player_set_fov(game, 0, true);
 	player_control_borders(game);
-	__sincos(game->p.angle, &game->p.vector.y, &game->p.vector.x);
+	__sincos(game->p.angle, &game->p.vect.y, &game->p.vect.x);
 }
 
 void	player_control_borders(t_game *game)

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 23:32:43 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/25 21:46:06 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/26 18:05:44 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	draw_object_properties(t_game *game, t_object *obj)
 		obj->render.size.y = (unsigned)(game->col_scale / obj->distance) & ~1;
 		obj->render.size.x = (unsigned)
 							(obj->render.size.y * obj->sprite->aspect) & ~1;
-		obj->render.start_0 = game->col_center + tanf(obj->angle_to_p) /
+		obj->render.start_0 = game->win_center.x + tanf(obj->angle_to_p) /
 								game->col_step - obj->render.size.x / 2;
 		obj->render.start.x = obj->render.start_0 +
 									obj->render.size.x * obj->sprite->min_x;

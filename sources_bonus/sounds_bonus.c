@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:30:14 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/25 21:46:06 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/26 16:30:59 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,21 +28,24 @@ void	sounds(t_game *game)
 		}
 		i++;
 	}
+	cs_mix(game->audio.ctx);
+	cs_mix(game->audio.ctx7);
+	cs_mix(game->audio.ctx22);
 }
 
-void	sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos)
+cs_playing_sound_t	*sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos)
 {
 	unsigned		i;
 	cs_context_t	*target_ctx;
 
 	if (sound == NULL || sound->file.channels[0] == NULL)
-		return ;
+		return (NULL);
 	i = 0;
 	while (game->audio.playing[i].snd != NULL &&
 				i < sizeof(game->audio.playing) / sizeof(*game->audio.playing))
 		i++;
 	if (i == sizeof(game->audio.playing) / sizeof(*game->audio.playing))
-		return ;
+		return (NULL);
 	if (sound->file.sample_rate == 7042)
 		target_ctx = game->audio.ctx7;
 	else if (sound->file.sample_rate == 22050)
@@ -53,6 +56,7 @@ void	sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos)
 	game->audio.playing[i].sourcepos = sourcepos;
 	if (sourcepos.x != 0.0f)
 		sound_adjust_pan(&game->p, game->audio.playing[i]);
+	return (game->audio.playing[i].snd);
 }
 
 void	sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound)

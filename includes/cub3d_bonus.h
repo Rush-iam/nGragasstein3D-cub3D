@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/25 23:07:06 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/26 22:58:08 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@
 # define M_PI_4_F	(float)M_PI_4
 # define PI2_F		(2.0f * M_PI_F)
 # define NANSECS_PER_SEC	1000000000
+# define TICKS_PER_SEC		60
 
 # define ERR_MLX	1
 # define ERR_ARGS	2
@@ -57,9 +58,12 @@
 
 # define COLOR_WHITE	0xFFFFFF
 # define COLOR_GREEN	0x7AFF40
+# define COLOR_GREEN_FF	0x113322
+# define COLOR_CYAN_F	0x33AA99
 # define COLOR_RED		0xFF0000
 # define COLOR_ORANGE	0xFF7A40
 # define COLOR_YELLOW	0xFFFF00
+# define COLOR_YELLOW_F	0x888015
 # define COLOR_GREY		0x808080
 
 # define K_KNIFE	KEY_1
@@ -87,7 +91,7 @@
 # define PL_RADIUS		0.4f
 # define FLOAT_FIX		0.00001f
 # define MOUSE_SPEED	2000.f
-# define MAP_SCALE		8
+# define MAP_SCALE		(24 / 2)
 
 typedef struct	s_point
 {
@@ -183,7 +187,7 @@ enum	e_sound
 # define START_WEAPONS	W_KNIFE_MASK | W_PISTOL_MASK
 
 # define ENEMY_HEALTH		25
-# define ENEMY_FOV_HALF		M_PI_4 * 1.5
+# define ENEMY_FOV_HALF		M_PI_4_F * 1.5f
 # define ENEMY_SHOT_DELAY	2
 # define ENEMY_MISS_MAX		60
 # define ENEMY_DMG_MIN		3
@@ -208,10 +212,11 @@ typedef struct	s_set
 
 typedef struct	s_door
 {
-	t_point		cell;
-	bool		opening;
-	float		part_opened;
-	time_t		ticks_to_close;
+	t_point				cell;
+	bool				opening;
+	float				part_opened;
+	time_t				ticks_to_close;
+	cs_playing_sound_t	*sound;
 }				t_door;
 
 typedef struct	s_object
@@ -296,7 +301,7 @@ typedef struct	s_game
 	{
 		t_fpoint	pos;
 		float		angle;
-		t_fpoint	vector;
+		t_fpoint	vect;
 		short		health;
 		short		ammo;
 		short		score;
@@ -337,7 +342,6 @@ typedef struct	s_game
 	}			map;
 	float		fov;
 	t_upoint	win_center;
-	float		col_center;
 	float		col_step;
 	float		col_scale;
 	struct		s_column
@@ -417,12 +421,16 @@ void			player_control_borders	(t_game *g);
 void			player_control_borders_diag(t_game *g);
 void			player_set_weapon(t_game *game, enum e_weapon weapon);
 
-void			weapon(t_game *game, struct s_weapon *weapon);
-void			draw_weapon(t_game *game, struct s_weapon *weapon);
-void			weapon_shoot(t_game *g, t_object *target);
+int				dead_exit(t_game *game);
 
 void			doors(t_game *game);
 t_door			*door_find(t_game *game, t_point cell);
+void			door_open(t_game *g);
+void			door_sound(t_game *game, t_door *door);
+
+void			weapon(t_game *game, struct s_weapon *weapon);
+void			draw_weapon(t_game *game, struct s_weapon *weapon);
+void			weapon_shoot(t_game *g, t_object *target);
 
 void			objects				(t_game *g);
 void			object_add(t_game *game, t_list **dst, void *obj);
@@ -440,17 +448,21 @@ void			enemy_set_state(t_game *g, t_object *obj, t_set *imgset, enum e_objstate 
 void			enemy_sound(t_game *game, t_object *obj, enum e_sound sound_type);
 
 void			sounds(t_game *game);
-void			sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos);
+cs_playing_sound_t *	sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos);
 void			sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound);
 
-void			ray_cast		(t_game *game);
-struct s_column	ray_intersect	(t_game *game, float cur_angle);
-float ray_intersect_distance(t_game *game, float cur_angle);
-t_fpoint		ray_intersect_x	(t_game *game, t_fpoint from, t_fpoint step);
-t_fpoint		ray_intersect_y	(t_game *game, t_fpoint from, t_fpoint step);
+void			ray_cast		(t_game *g);
+struct s_column	ray_intersect	(t_game *game, float angle);
+float			ray_intersect_distance(t_game *game, float cur_angle);
+t_fpoint		ray_intersect_x	(t_game *game, t_fpoint from, int step_x, float step_y);
+t_fpoint		ray_intersect_y(t_game *game, t_fpoint from, float step_x, int step_y);
+t_fpoint		ray_intersect_x_door(t_game *game, t_fpoint check, int step_x, float step_y);
+t_fpoint		ray_intersect_y_door(t_game *game, t_fpoint check, float step_x, int step_y);
 
-void			draw_walls		(t_game *game);
-void			draw_wall_scaled(t_game *g, t_img src, unsigned x, float fade);
+void			draw_wall_texture_set(t_game *game, struct s_column *col, t_point cell);
+void			draw_walls		(t_game *g);
+void			draw_wall_scaled(t_game *g, t_img src, unsigned x);
+void			draw_wall_scaled_f(t_game *g, t_img src, unsigned x, float fade);
 void			draw_wall_solid	(t_game *game, unsigned x, float fade);
 
 void			draw_object_properties(t_game *game, t_object *obj);
@@ -460,7 +472,7 @@ void			draw_sprite_scaled(t_img *img, t_object *obj, t_point min, t_point max);
 
 void			draw_map_init	(t_game *game);
 void			draw_map		(t_game *game);
-void			draw_map_player	(t_game *game);
+void			draw_map_player	(t_game *g);
 void			draw_map_objects(t_game *game);
 
 void			img_clear				(t_img *img);

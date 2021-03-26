@@ -43,10 +43,10 @@ void		ray_intersect(t_game *game, double cur_angle, unsigned ray)
 	y1 = (cur_angle <= M_PI) ?
 		ray_intersect_y(game, (t_fpoint){1 / tan_cur_angle, 1}) :
 		ray_intersect_y(game, (t_fpoint){-1 / tan_cur_angle, -1});
-	distance.x = game->p.vector.x * (x1.x - game->p.pos.x) +
-				 game->p.vector.y * (x1.y - game->p.pos.y);
-	distance.y = game->p.vector.x * (y1.x - game->p.pos.x) +
-				 game->p.vector.y * (y1.y - game->p.pos.y);
+	distance.x = game->p.vect.x * (x1.x - game->p.pos.x) +
+				 game->p.vect.y * (x1.y - game->p.pos.y);
+	distance.y = game->p.vect.x * (y1.x - game->p.pos.x) +
+				 game->p.vect.y * (y1.y - game->p.pos.y);
 	if (distance.x < distance.y)
 		*game->column[ray] = (struct s_column)
 			{distance.x, game->col_scale / distance.x,
