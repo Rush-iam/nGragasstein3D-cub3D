@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:13 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/26 17:51:13 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/27 14:11:56 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,28 +59,22 @@ void	draw_map_player(t_game *g)
 {
 	unsigned		ray;
 	struct s_column	col;
-	t_fpoint		pt;
 
-	draw_square(&g->map.img, (t_point){g->p.pos.x * MAP_SCALE,
-									g->p.pos.y * MAP_SCALE}, 6, COLOR_YELLOW);
+	draw_square(&g->map.img,
+	(t_point){g->p.pos.x * MAP_SCALE, g->p.pos.y * MAP_SCALE}, 6, COLOR_YELLOW);
 	ray = 0;
 	while (ray < g->img.size.x)
 	{
 		col = g->column[ray];
-		if (col.dir == 'S')
-			pt = (t_fpoint){col.cell.x + 1 - col.texture_pos, col.cell.y};
-		else if (col.dir == 'N')
-			pt = (t_fpoint){col.cell.x + col.texture_pos, col.cell.y + 1};
-		else if (col.dir == 'W')
-			pt = (t_fpoint){col.cell.x + 1, col.cell.y + 1 - col.texture_pos};
-		else if (col.dir == 'E')
-			pt = (t_fpoint){col.cell.x, col.cell.y + col.texture_pos};
-		draw_line(&g->map.img, (t_point){g->p.pos.x * MAP_SCALE, g->p.pos.y *
-	MAP_SCALE},	(t_point){pt.x * MAP_SCALE, pt.y * MAP_SCALE}, COLOR_YELLOW_F);
+		draw_line(&g->map.img,
+			(t_point){g->p.pos.x * MAP_SCALE, g->p.pos.y * MAP_SCALE},
+			(t_point){col.pos.x * MAP_SCALE, col.pos.y * MAP_SCALE},
+			COLOR_YELLOW_F);
 		ray += 32;
 	}
-	draw_line(&g->map.img, (t_point){g->p.pos.x * MAP_SCALE, g->p.pos.y *
-		MAP_SCALE}, (t_point){MAP_SCALE * (g->p.pos.x + cos(g->p.angle)),
+	draw_line(&g->map.img,
+		   (t_point){g->p.pos.x * MAP_SCALE, g->p.pos.y * MAP_SCALE},
+		   (t_point){MAP_SCALE * (g->p.pos.x + cos(g->p.angle)),
 					MAP_SCALE * (g->p.pos.y + sin(g->p.angle))}, COLOR_ORANGE);
 }
 

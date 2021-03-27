@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/26 19:44:37 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/27 18:34:23 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,11 +87,20 @@ void	player_control_weapon(t_game *game)
 
 void	player_set_fov(t_game *game, float fov, bool reset)
 {
+	int n;
+
 	if (reset)
 		fov = ((game->img.aspect >= 1.77f) - (game->img.aspect < 1.77f)) *
 		  sqrtf(fabsf(M_PI_4_F * (game->img.aspect - 1.77f) / 2.0f)) + M_PI_2_F;
 	game->col_step = tanf(fov / (game->img.size.x - 1));
 	game->col_scale = 1 / game->col_step;
+	n = 0;
+	while (n < (int)game->img.size.x)
+	{
+		game->angles[n] =
+				atanf(game->col_step * (n - (int)game->win_center.x));
+		n++;
+	}
 	if (reset == false)
 		printf("FOV %.1f\n", 114 * atanf(game->col_step * game->win_center.x));
 	if (reset == true || (M_PI_4_F / 4.0f < fov && fov < PI2_F))

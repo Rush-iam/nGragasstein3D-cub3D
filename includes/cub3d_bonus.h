@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/26 22:58:08 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/27 17:27:51 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,12 @@ typedef struct	s_fpoint
 	float		y;
 }				t_fpoint;
 
+typedef struct	s_ray
+{
+	t_fpoint	pos;
+	t_point		cell;
+}				t_ray;
+
 typedef struct	s_img
 {
 	void		*ptr;
@@ -128,16 +134,27 @@ typedef struct	s_snd
 	cs_play_sound_def_t	props;
 }				t_snd;
 
-# define CHAR_DECOR		"^*$:;,!@%#&|[]{}_~`"
+# define CHAR_DECOR		"^*$:;,!@%#&?[]{}_~`"
 # define CHAR_PICKUP	"+HhAaZzXx"
 # define CHAR_ENEMY		"nswe"
-# define CHAR_SOLID		"$:;,!@%#&|[]"
+# define CHAR_SOLID		"$:;,!@%#&?[]"
 # define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP
-# define CHAR_DOORS		"v>"
+# define CHAR_DOOR_1_H	"-"
+# define CHAR_DOOR_1_V	"|"
+# define CHAR_DOOR_1	CHAR_DOOR_1_H CHAR_DOOR_1_V
+# define CHAR_DOOR_2_H	">"
+# define CHAR_DOOR_2_V	"v"
+# define CHAR_DOOR_2	CHAR_DOOR_2_H CHAR_DOOR_2_V
+# define CHAR_DOORS_H	CHAR_DOOR_1_H CHAR_DOOR_2_H
+# define CHAR_DOORS_V	CHAR_DOOR_1_V CHAR_DOOR_2_V
+# define CHAR_DOORS		CHAR_DOOR_1 CHAR_DOOR_2
 # define CHAR_WALLS		"0123456789" CHAR_DOORS
 # define CHAR_ALLOWED	" .NSWE" CHAR_WALLS CHAR_DOORS CHAR_OBJECTS CHAR_ENEMY
-# define TEXTURE_DOOR	10
-# define TEXTURE_DOOR_W	11
+# define TEXTURE_DOOR_1		10
+# define TEXTURE_DOOR_1_W	11
+# define TEXTURE_DOOR_2		12
+# define TEXTURE_DOOR_2_W	13
+
 
 enum	e_sound
 {
@@ -344,18 +361,21 @@ typedef struct	s_game
 	t_upoint	win_center;
 	float		col_step;
 	float		col_scale;
+	float		*angles;
 	struct		s_column
 	{
 		float		distance;
 		unsigned	height;
+		t_fpoint	pos;
 		t_point		cell;
+		char		chr;
 		unsigned	texture_id;
 		float		texture_pos;
 		char		dir;
 	}			*column;
 	unsigned	color_ceil;
 	unsigned	color_floor;
-	t_img		texture[24];
+	t_img		texture[28];
 	t_img		sprite[sizeof(CHAR_OBJECTS) - 1];
 	t_set		enemyset[1];
 	t_list		*doors;
@@ -452,14 +472,13 @@ cs_playing_sound_t *	sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos);
 void			sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound);
 
 void			ray_cast		(t_game *g);
-struct s_column	ray_intersect	(t_game *game, float angle);
+struct s_column	ray_intersect	(t_game *game, float tan_cur_angle, t_point negative);
 float			ray_intersect_distance(t_game *game, float cur_angle);
-t_fpoint		ray_intersect_x	(t_game *game, t_fpoint from, int step_x, float step_y);
-t_fpoint		ray_intersect_y(t_game *game, t_fpoint from, float step_x, int step_y);
-t_fpoint		ray_intersect_x_door(t_game *game, t_fpoint check, int step_x, float step_y);
-t_fpoint		ray_intersect_y_door(t_game *game, t_fpoint check, float step_x, int step_y);
+t_ray			ray_intersect_x	(t_game *g, int step_x, float step_y);
+t_ray			ray_intersect_y(t_game *g, float step_x, int step_y);
 
-void			draw_wall_texture_set(t_game *game, struct s_column *col, t_point cell);
+void			draw_wall_texture_set(t_game *g, struct s_column *col, t_point pt);
+void			draw_door_texture_set(t_game *game, struct s_column *col);
 void			draw_walls		(t_game *g);
 void			draw_wall_scaled(t_game *g, t_img src, unsigned x);
 void			draw_wall_scaled_f(t_game *g, t_img src, unsigned x, float fade);

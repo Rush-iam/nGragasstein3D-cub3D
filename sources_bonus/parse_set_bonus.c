@@ -88,7 +88,7 @@ void	set_textures(char *string, t_game *game)
 	{
 		if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
 			terminate(game, ERR_PARSE, "Wall ID is wrong");
-		if (id >= sizeof(game->texture) / sizeof(*game->texture))
+		if (id >= sizeof(game->texture) / sizeof(*game->texture) / 2)
 			terminate(game, ERR_PARSE, "Texture ID out of array range");
 		if (game->texture[id].ptr != NULL)
 			terminate(game, ERR_PARSE, "Duplicated texture setting");

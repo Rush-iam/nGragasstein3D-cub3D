@@ -6,38 +6,49 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 23:32:38 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/26 17:59:51 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/27 17:14:26 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
 
-void	draw_wall_texture_set(t_game *game, struct s_column *col, t_point cell)
+void	draw_door_texture_set(t_game *game, struct s_column *col)
 {
-	const char	chr = game->map.grid[cell.y][cell.x];
-
-	if ((chr == '>' && (col->dir == 'W' || col->dir == 'E')) ||
-		(chr == 'v' && (col->dir == 'N' || col->dir == 'S')))
-	{
-		col->texture_id = TEXTURE_DOOR;
-		col->texture_pos =
-			fmaxf(0.0f, col->texture_pos - door_find(game, cell)->part_opened);
-	}
-	else if ((chr == 'v' && (col->dir == 'W' || col->dir == 'E')) ||
-			 (chr == '>' && (col->dir == 'N' || col->dir == 'S')))
-		col->texture_id = TEXTURE_DOOR_W;
-	else if ((col->dir == 'N' && game->map.grid[cell.y + 1][cell.x] == '>') ||
-			 (col->dir == 'S' && game->map.grid[cell.y - 1][cell.x] == '>') ||
-			 (col->dir == 'W' && game->map.grid[cell.y][cell.x + 1] == 'v') ||
-			 (col->dir == 'E' && game->map.grid[cell.y][cell.x - 1] == 'v'))
-		col->texture_id = TEXTURE_DOOR_W;
-	else
-		col->texture_id = chr - '0';
-	if (((col->dir == 'W' || col->dir == 'E') && col->texture_id !=
-			TEXTURE_DOOR_W) || (col->texture_id == TEXTURE_DOOR_W &&
-								(col->dir == 'N' || col->dir == 'S')))
+	if (col->chr == CHAR_DOOR_1[0] || col->chr == CHAR_DOOR_1[1])
+		col->texture_id = TEXTURE_DOOR_1;
+	else if (col->chr == CHAR_DOOR_2[0] || col->chr == CHAR_DOOR_2[1])
+		col->texture_id = TEXTURE_DOOR_2;
+	col->texture_pos =
+		fmaxf(0.0f, col->texture_pos - door_find(game, col->cell)->part_opened);
+	if (col->dir == 'W' || col->dir == 'E')
 		col->texture_id += sizeof(game->texture) / sizeof(*game->texture) / 2;
-	if (chr != '>' && chr != 'v' && (col->dir == 'S' || col->dir == 'W'))
+}
+
+void	draw_wall_texture_set(t_game *g, struct s_column *col, t_point pt)
+{
+	const int	textures = sizeof(g->texture) / sizeof(*g->texture) / 2;
+
+	if (col->dir == 'N' && g->map.grid[pt.y + 1][pt.x] == CHAR_DOORS_V[0])
+		col->texture_id = TEXTURE_DOOR_1_W + textures;
+	else if (col->dir == 'N' && g->map.grid[pt.y + 1][pt.x] == CHAR_DOORS_V[1])
+		col->texture_id = TEXTURE_DOOR_2_W + textures;
+	else if (col->dir == 'S' && g->map.grid[pt.y - 1][pt.x] == CHAR_DOORS_V[0])
+		col->texture_id = TEXTURE_DOOR_1_W + textures;
+	else if (col->dir == 'S' && g->map.grid[pt.y - 1][pt.x] == CHAR_DOORS_V[1])
+		col->texture_id = TEXTURE_DOOR_2_W + textures;
+	else if (col->dir == 'W' && g->map.grid[pt.y][pt.x + 1] == CHAR_DOORS_H[0])
+		col->texture_id = TEXTURE_DOOR_1_W;
+	else if (col->dir == 'W' && g->map.grid[pt.y][pt.x + 1] == CHAR_DOORS_H[1])
+		col->texture_id = TEXTURE_DOOR_2_W;
+	else if (col->dir == 'E' && g->map.grid[pt.y][pt.x - 1] == CHAR_DOORS_H[0])
+		col->texture_id = TEXTURE_DOOR_1_W;
+	else if (col->dir == 'E' && g->map.grid[pt.y][pt.x - 1] == CHAR_DOORS_H[1])
+		col->texture_id = TEXTURE_DOOR_2_W;
+	else if (col->dir == 'W' || col->dir == 'E')
+		col->texture_id = col->chr - '0' + textures;
+	else
+		col->texture_id = col->chr - '0';
+	if (col->dir == 'S' || col->dir == 'W')
 		col->texture_pos = 1.0f - col->texture_pos;
 }
 

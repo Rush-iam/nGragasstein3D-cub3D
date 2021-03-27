@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/26 23:02:29 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/27 18:18:49 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,8 @@ void	initialize_weapons_scale(t_game *game)
 
 void	initialize_game(t_game *game, bool screenshot_only)
 {
-	unsigned		n;
-	const unsigned	n_tex = sizeof(game->texture) / sizeof(*game->texture) / 2;
+	int			n;
+	const int	n_tex = sizeof(game->texture) / sizeof(*game->texture) / 2;
 
 	initialize_game_images(game, screenshot_only);
 	initialize_weapons_scale(game);
@@ -113,6 +113,8 @@ void	initialize_game(t_game *game, bool screenshot_only)
 	}
 	if (!(game->column = ft_calloc(game->img.size.x, sizeof(*game->column))))
 		terminate(game, ERR_MEM, "Memory allocation failed (ray columns)");
+	if (!(game->angles = malloc(game->img.size.x * sizeof(*game->angles))))
+		terminate(game, ERR_MEM, "Memory allocation failed (ray angles)");
 	__sincosf(game->p.angle, &game->p.vect.y, &game->p.vect.x);
 	player_set_fov(game, 0, true);
 	game->p.health = START_HEALTH;

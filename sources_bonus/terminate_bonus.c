@@ -47,6 +47,7 @@ void	terminate_free(t_game *game)
 
 	ft_lstclear(&game->objects, terminate_free_object);
 	free(game->column);
+	free(game->angles);
 	if (game->map.grid && (i = 0) == 0)
 		while (i < game->map.size.y)
 			free(game->map.grid[i++]);
