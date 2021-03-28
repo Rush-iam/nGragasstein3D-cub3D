@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 NAME = libft.a
-CFLAGS = -Wall -Wextra -Werror -g -O2
+CFLAGS = -Wall -Wextra -Werror -g -Ofast
 HEADER = libft.h
 SRCS =	ft_isalpha.c	ft_isdigit.c	ft_isalnum.c	ft_isprint.c	\
 		ft_isascii.c	ft_toupper.c	ft_tolower.c	ft_strmapi.c	\

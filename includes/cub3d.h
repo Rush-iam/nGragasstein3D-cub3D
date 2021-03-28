@@ -145,7 +145,7 @@ int				hook_key_press		(int key_code, t_game *game);
 int				hook_key_release	(int key_code, t_game *game);
 int				hook_exit			(t_game *game);
 
-void			ray_cast		(t_game *g);
+void			ray_cast		(t_game *game);
 void			ray_intersect	(t_game *game, double cur_angle, unsigned ray);
 t_fpoint		ray_intersect_x	(t_game *game, t_fpoint step);
 t_fpoint		ray_intersect_y	(t_game *game, t_fpoint step);

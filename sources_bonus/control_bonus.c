@@ -22,7 +22,7 @@ void	player_control(t_game *game)
 	game->p.pos.y = fmax(game->p.pos.y, 1);
 	game->p.pos.x = fmin(game->p.pos.x, game->map.size.x - 1);
 	game->p.pos.y = fmin(game->p.pos.y, game->map.size.y - 1);
-//	player_control_borders(game);
+	player_control_borders(game);
 }
 
 void	player_control_rotate(t_game *game)

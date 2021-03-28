@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/27 17:27:51 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/28 18:54:04 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,7 +220,7 @@ typedef struct	s_set
 //	t_img		walk[4][8];
 	t_img		attack[3];
 	t_img		pain[2];
-	t_img		death[10];
+	t_img		death[5];
 	t_snd		s_alarm;
 	t_snd		s_attack;
 	t_snd		s_death[10];
@@ -365,13 +365,12 @@ typedef struct	s_game
 	struct		s_column
 	{
 		float		distance;
-		unsigned	height;
 		t_fpoint	pos;
 		t_point		cell;
-		char		chr;
+		char		dir;
+		unsigned	height;
 		unsigned	texture_id;
 		float		texture_pos;
-		char		dir;
 	}			*column;
 	unsigned	color_ceil;
 	unsigned	color_floor;
@@ -471,14 +470,14 @@ void			sounds(t_game *game);
 cs_playing_sound_t *	sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos);
 void			sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound);
 
-void			ray_cast		(t_game *g);
-struct s_column	ray_intersect	(t_game *game, float tan_cur_angle, t_point negative);
+void			ray_cast		(t_game *game);
+struct s_column	ray_intersect	(t_game *g, float tan_angle, t_point negative);
 float			ray_intersect_distance(t_game *game, float cur_angle);
 t_ray			ray_intersect_x	(t_game *g, int step_x, float step_y);
 t_ray			ray_intersect_y(t_game *g, float step_x, int step_y);
 
 void			draw_wall_texture_set(t_game *g, struct s_column *col, t_point pt);
-void			draw_door_texture_set(t_game *game, struct s_column *col);
+void			draw_door_texture_set(t_game *game, struct s_column *col, char chr);
 void			draw_walls		(t_game *g);
 void			draw_wall_scaled(t_game *g, t_img src, unsigned x);
 void			draw_wall_scaled_f(t_game *g, t_img src, unsigned x, float fade);

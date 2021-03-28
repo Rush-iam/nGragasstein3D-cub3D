@@ -15,12 +15,33 @@ W9 ./resources/walls/wall_9.png
 
 W10 ./resources/walls/door_0.png
 W11 ./resources/walls/door_1.png
+W12 ./resources/walls/door_2.png
+W13 ./resources/walls/door_1.png
 
 G0 ./resources/weapons/knife_
 G1 ./resources/weapons/pistol_
 G2 ./resources/weapons/rifle_
 
-E0 ./resources/enemies/guard_
+M0 ./resources/music/04 Get Them!.wav
+E0 ./resources/enemies/guard/
+
+A0 ./resources/sounds/player_noaction.wav
+A1 ./resources/sounds/player_pain.wav
+A2 ./resources/sounds/player_death.wav
+A3 ./resources/sounds/door_open.wav
+A4 ./resources/sounds/door_close.wav
+A5 ./resources/sounds/weapon_knife.wav
+A6 ./resources/sounds/weapon_pistol.wav
+A7 ./resources/sounds/weapon_rifle.wav
+A8 ./resources/sounds/pickup_ammo.wav
+A9 ./resources/sounds/pickup_rifle.wav
+A10 ./resources/sounds/pickup_health_m.wav
+A11 ./resources/sounds/pickup_health_l.wav
+A12 ./resources/sounds/pickup_health_xl.wav
+A13 ./resources/sounds/pickup_bonus_s.wav
+A14 ./resources/sounds/pickup_bonus_m.wav
+A15 ./resources/sounds/pickup_bonus_l.wav
+A16 ./resources/sounds/pickup_bonus_xl.wav
 
 S0 ./resources/sprites/lamp.png
 S1 ./resources/sprites/chandelier.png
@@ -52,8 +73,8 @@ S26 ./resources/sprites/bonus_m.png
 S27 ./resources/sprites/bonus_s.png
 
 # W0-W9   = 0123456789			- стены
-# W10-W11 = v>					- двери
-# S0-S18  = ^*$:;,!@%#&|[]{}_<`	- декорации
+# W10-W11 = -|>v				- двери
+# S0-S18  = ^*$:;,!@%#&?[]{}_~`	- декорации
 # S19-S27 = +HhAaZzXx			- предметы
 # E0		nswe				- враги (направление взгляда)
 
@@ -61,33 +82,25 @@ S27 ./resources/sprites/bonus_s.png
 # Пока что непроходимые вот эти спрайты: (задаётся в коде)
 # S2-S13  = $:;,!@%#&|[]
 
-  0000000000000000001234567890
-  0^*$:;,!@%#&|{}_~`...n.....>0
-  0+HhAaZzXx.................0v000000000000000000000
+  00000000000000000012345678900000
+  0^*$:;,!@%#&?[]{}_~`.......v.|.0
+  0+HhAaZzXx.................0>0-0000000000000000000
   0............nswe................................0
-000................................................000
-0..................................................000
-0.........................S..........................0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
-0.nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.0
+000..........................0-0...................000
+0....N.......................|.|...................000
+0............................0-0.....................0
+0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
+0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
+0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
+0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
+0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
+0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
+0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
+0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
+0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
+0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
+0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
+0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
+0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
 0....................................................0
 000000000000000000000000000000000000000000000000000000

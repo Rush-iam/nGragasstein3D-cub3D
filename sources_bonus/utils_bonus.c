@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:41 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/18 23:25:19 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/28 18:51:39 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,8 @@ t_img	img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres)
 		dst_pix.y++;
 	}
 	mlx_destroy_image(mlx_ptr, src_img->ptr);
+	free(src_img->alpha_y);
+	dst_img.alpha_y = NULL;
 	return (dst_img);
 }
 
@@ -76,6 +78,7 @@ t_img	img_faded_copy(void *mlx_ptr, t_img *img)
 	img_faded.data = (unsigned *)mlx_get_data_addr(img_faded.ptr, &i, &i, &i);
 	img_faded.size = img->size;
 	img_faded.aspect = img->aspect;
+	img_faded.alpha_y = NULL;
 	i = 0;
 	while (i < (int)(img->size.x * img->size.y))
 	{

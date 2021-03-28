@@ -78,7 +78,10 @@ void	terminate_free_images(t_game *game, t_img *arr, unsigned count)
 	while (i < count)
 	{
 		if (arr[i].ptr)
+		{
 			mlx_destroy_image(game->mlx, arr[i].ptr);
+			free(arr[i].alpha_y);
+		}
 		i++;
 	}
 }

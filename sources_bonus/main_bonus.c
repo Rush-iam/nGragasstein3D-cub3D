@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/27 18:18:49 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/03/28 20:44:21 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,27 +155,27 @@ int	game_loop(t_game *game)
 	game->tick = TICKS_PER_SEC * time.tv_sec +
 				TICKS_PER_SEC * time.tv_nsec / NANSECS_PER_SEC;
 	game->tick_diff = game->tick - tick_prev;
-//	sounds(game);
-//	if (game->p.health < 0)
-//		return dead_exit(game);
-//	if (game->effect.frame_cur < game->effect.frames)
-//		game->effect.frame_cur += game->tick_diff;
-//	while (game->tick_diff > 0)
-//	{
+	sounds(game);
+	if (game->p.health < 0)
+		return dead_exit(game);
+	if (game->effect.frame_cur < game->effect.frames)
+		game->effect.frame_cur += game->tick_diff;
+	while (game->tick_diff > 0)
+	{
 		doors(game);
 		player_control(game);
-//		objects(game);
-//		weapon(game, &game->p.weapon);
-		for (int i = 0; i < 30; ++i)
+		objects(game);
+		weapon(game, &game->p.weapon);
+//		for (int i = 0; i < 100; ++i)
 		ray_cast(game);
-//		game->tick_diff--;
-//	}
+		game->tick_diff--;
+	}
 	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
 	draw_walls(game);
-//	draw_objects(game);
+	draw_objects(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
-//	draw_effect(game, &game->effect);
-//	draw_weapon(game, &game->p.weapon);
+	draw_effect(game, &game->effect);
+	draw_weapon(game, &game->p.weapon);
 	draw_map(game);
 
 //	demo_fillrate(game, 1);
