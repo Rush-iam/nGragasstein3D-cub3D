@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:10 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/05 16:09:01 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/05 16:09:21 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ int	hook_key_press(int key_code, t_game *game)
 		terminate(game, EXIT_SUCCESS, NULL);
 	player_control_toggler(game, key_code);
 	game->key.k[key_code] = true;
-	printf("%d", key_code);
 	return (0);
 }
 

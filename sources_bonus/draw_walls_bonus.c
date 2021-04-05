@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 23:32:38 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/28 20:22:30 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/05 19:18:39 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,6 @@ void	draw_wall_texture_set(t_game *g, struct s_column *col, t_point pt)
 void	draw_walls(t_game *g)
 {
 	unsigned	ray;
-	float		fade;
 	char		chr;
 
 	ray = 0;
@@ -80,13 +79,12 @@ void	draw_walls(t_game *g)
 				draw_wall_texture_set(g, &g->column[ray], g->column[ray].cell);
 			else if (ft_memchr(CHAR_DOORS, chr, sizeof(CHAR_DOORS)))
 				draw_door_texture_set(g, &g->column[ray], chr);
-			fade = fminf(1.0f, 8.0f / (float)g->column[ray].distance);
 			g->column[ray].height = g->col_scale / g->column[ray].distance;
-			if (fade == 1.0f)
+			if (g->column[ray].distance < g->fade_distance)
 				draw_wall_scaled(g, g->texture[g->column[ray].texture_id], ray);
 			else
 				draw_wall_scaled_f(g, g->texture[g->column[ray].texture_id],
-																	ray, fade);
+						ray, g->fade_distance / g->column[ray].distance);
 //			draw_wall_solid(game, ray, fade);
 		}
 		ray++;

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 23:32:43 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/26 18:05:44 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/05 19:18:39 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,10 @@ void	draw_sprite(t_game *game, t_object *obj)
 	obj->render.step = (t_fpoint){
 		(float)obj->sprite->size.x / obj->render.size.x,
 		(float)obj->sprite->size.y / obj->render.size.y};
-	draw_sprite_scaled(&game->img, obj, min, max);
+	if (obj->distance < 1.5f * game->fade_distance)
+		draw_sprite_scaled(&game->img, obj, min, max);
+	else
+		draw_sprite_scaled_f(game, obj, min, max);
 }
 
 void	draw_sprite_scaled(t_img *img, t_object *obj, t_point min, t_point max)
@@ -92,6 +95,36 @@ void	draw_sprite_scaled(t_img *img, t_object *obj, t_point min, t_point max)
 				if (((src_pixel = obj->sprite->data[(unsigned)cur_src.y *
 						obj->sprite->size.x + (unsigned)cur_src.x]) >> 24) == 0)
 					img->data[cur.y * img->size.x + cur.x] = src_pixel;
+				cur_src.x += obj->render.step.x;
+				cur.x++;
+			}
+		cur_src.y += obj->render.step.y;
+		cur.y++;
+	}
+}
+
+void	draw_sprite_scaled_f(t_game *g, t_object *obj, t_point min, t_point max)
+{
+	const float	x_src = obj->render.step.x * (min.x - obj->render.start_0);
+	t_point 	cur;
+	t_fpoint	cur_src;
+	int			src_pixel;
+	const float	fade = 1.5f * g->fade_distance / obj->distance;
+
+	cur_src.y = 0;
+	if (obj->render.size.y > g->img.size.y)
+		cur_src.y = obj->render.step.y * (obj->render.size.y - g->img.size.y) / 2;
+	cur.y = min.y;
+	while (cur.y < max.y)
+	{
+		cur.x = min.x;
+		cur_src.x = x_src;
+		if (obj->sprite->alpha_y[(unsigned)cur_src.y] == false)
+			while (cur.x < max.x)
+			{
+				if (((src_pixel = obj->sprite->data[(unsigned)cur_src.y *
+						obj->sprite->size.x + (unsigned)cur_src.x]) >> 24) == 0)
+		g->img.data[cur.y * g->img.size.x + cur.x] = pixel_fade(src_pixel, fade);
 				cur_src.x += obj->render.step.x;
 				cur.x++;
 			}

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:45 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/05 15:55:18 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/05 15:58:13 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ t_ray	ray_intersect_x(t_game *g, int step_x, float step_y)
 	while ((unsigned)y < g->map.size.y && (unsigned)x < g->map.size.x)
 	{
 		chr = g->map.grid[(unsigned)y][x];
-		if (chr == '.')
+		if (chr == '.' || chr == CHAR_SOLID_MAP)
 			;
 		else if (ft_isdigit(chr))
 			break ;
@@ -94,7 +94,7 @@ t_ray	ray_intersect_y(t_game *g, float step_x, int step_y)
 	while ((unsigned)y < g->map.size.y && (unsigned)x < g->map.size.x)
 	{
 		chr = g->map.grid[y][(unsigned)x];
-		if (chr == '.')
+		if (chr == '.' || chr == CHAR_SOLID_MAP)
 			;
 		else if (ft_isdigit(chr))
 			break ;

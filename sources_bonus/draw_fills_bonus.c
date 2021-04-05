@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/12 15:31:09 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/05 20:45:07 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,28 @@ void	img_ceilfloor_rgb(t_img *img, unsigned ceil, unsigned floor)
 		img->data[i++] = ceil;
 	while (i < full_screen)
 		img->data[i++] = floor;
+}
+
+void	img_ceilfloor_rgb_faded(t_img *img, unsigned ceil, unsigned floor, unsigned fade_distance)
+{
+	const unsigned	full_screen = img->size.x * img->size.y;
+	const unsigned	half_screen = full_screen / 2;
+	unsigned		i;
+
+	i = 0;
+	while (i < half_screen)
+	{
+		img->data[i] = pixel_fade(ceil, 1.0f -
+			((i / img->size.x) / (img->size.y / 2.0f) / sqrtf(fade_distance)));
+		i++;
+	}
+	while (i < full_screen)
+	{
+		img->data[i] = pixel_fade(floor, 1.0f -
+			((full_screen - i) /
+					img->size.x) / (img->size.y / 2.0f) / sqrtf(fade_distance));
+		i++;
+	}
 }
 
 /*

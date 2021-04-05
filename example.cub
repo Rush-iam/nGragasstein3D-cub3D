@@ -1,6 +1,7 @@
 R 2560 1296
 C 56,56,56
 F 112,112,112
+D 1
 
 W0 ./resources/walls/wall_0.png
 W1 ./resources/walls/wall_1.png
@@ -23,7 +24,7 @@ G1 ./resources/weapons/pistol_
 G2 ./resources/weapons/rifle_
 
 M0 ./resources/music/04 Get Them!.wav
-E0 ./resources/enemies/guard/
+E0 ./resources/enemies/mutant/
 
 A0 ./resources/sounds/player_noaction.wav
 A1 ./resources/sounds/player_pain.wav
@@ -83,8 +84,8 @@ S27 ./resources/sprites/bonus_s.png
 # Пока что непроходимые вот эти спрайты: (задаётся в коде)
 # S2-S13  = $:;,!@%#&|[]
 
-# Кнопка Backspace - включить/отключить мышку
-# Кнопка M - отключить/включить карту
+# Кнопка Backspace - вкл/откл мышку
+# Кнопка M - откл/вкл карту
 
   00000000000000000012345678900000
   0^*$:;,!@%#&?[]{}_~`.......v.|.0

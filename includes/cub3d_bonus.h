@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/05 16:07:15 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/05 19:49:21 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -302,6 +302,7 @@ typedef struct	s_game
 	void		*mlx;
 	void		*win;
 	t_img		img;
+	t_img		img_bg;
 	struct		s_sound
 	{
 		cs_context_t*	ctx;
@@ -378,6 +379,7 @@ typedef struct	s_game
 	}			*column;
 	unsigned	color_ceil;
 	unsigned	color_floor;
+	unsigned	fade_distance;
 	t_img		texture[28];
 	t_img		sprite[sizeof(CHAR_OBJECTS) - 1];
 	t_set		enemyset[1];
@@ -410,6 +412,7 @@ void			validate_settings(t_game *game);
 
 void			set_resolution		(const char *res_string, t_upoint *res,
 															t_game *game);
+void			set_value(const char *res_string, unsigned *target, t_game *game);
 void			set_colors			(const char *color_string, unsigned *target,
 															t_game *game);
 void			set_weapons			(char *string, t_game *game);
@@ -491,6 +494,7 @@ void			draw_object_properties(t_game *game, t_object *obj);
 void			draw_objects(t_game *game);
 void			draw_sprite(t_game *game, t_object *obj);
 void			draw_sprite_scaled(t_img *img, t_object *obj, t_point min, t_point max);
+void			draw_sprite_scaled_f(t_game *g, t_object *obj, t_point min, t_point max);
 
 void			draw_map_init	(t_game *game);
 void			draw_map		(t_game *game);
@@ -500,6 +504,7 @@ void			draw_map_objects(t_game *game);
 void			img_clear				(t_img *img);
 void			img_clear_rgb			(t_img *img, unsigned color);
 void			img_ceilfloor_rgb	(t_img *img, unsigned ceil, unsigned floor);
+void			img_ceilfloor_rgb_faded(t_img *img, unsigned ceil, unsigned floor, unsigned fade_distance);
 
 void			pixel_put	(t_img *img, unsigned x, unsigned y, int color);
 int				pixel_fade	(int color, float fade);

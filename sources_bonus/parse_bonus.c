@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/25 16:25:00 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/05 19:09:06 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,6 +126,8 @@ void	parse_scene(int file_id, char **line, t_game *game)
 			set_enemies(*line, game);
 		else if (**line == 'M' || **line == 'A')
 			set_audio(*line, game);
+		else if (**line == 'D')
+			atoi_limited(&game->fade_distance, *line + 1, UINT_MAX);
 		else if (**line != '#' && **line != '\0')
 			return ;
 		free(*line);

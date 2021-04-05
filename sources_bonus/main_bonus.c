@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/05 17:47:31 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/05 19:54:16 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ int	main(int args, char *av[])
 	static struct timespec	time;
 
 	game = (t_game){0};
+	game.fade_distance = 8;
 	if (!(game.mlx = mlx_init()))
 		terminate(&game, ERR_MLX, strerror(errno));
 	game.audio.ctx = cs_make_context(0, 44100, 8192, 2, NULL);
@@ -70,6 +71,14 @@ void	initialize_game_images(t_game *game, bool screenshot_only)
 	game->effect_img.data = (unsigned *)mlx_get_data_addr(game->effect_img.ptr,
 														  &n, &n, &n);
 	game->effect_img.size = game->img.size;
+	if (!(game->img_bg.ptr = mlx_new_image(
+			game->mlx, game->img.size.x, game->img.size.y)))
+		terminate(game, ERR_MLX, strerror(errno));
+	game->img_bg.data = (unsigned *)mlx_get_data_addr(game->img_bg.ptr,
+																&n, &n, &n);
+	game->img_bg.size = game->img.size;
+	img_ceilfloor_rgb_faded(&game->img_bg, game->color_ceil, game->color_floor,
+						 								game->fade_distance);
 }
 
 void	initialize_weapons_scale(t_game *game)
@@ -171,7 +180,9 @@ int	game_loop(t_game *game)
 		ray_cast(game);
 		game->tick_diff--;
 	}
-	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
+//	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
+	mlx_put_image_to_window(game->mlx, game->win, game->img_bg.ptr, 0, 0);
+	img_clear_rgb(&game->img, -1U);
 	draw_walls(game);
 	draw_objects(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
