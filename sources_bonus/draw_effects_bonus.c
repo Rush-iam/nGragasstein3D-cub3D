@@ -18,11 +18,9 @@ void	draw_effect(t_game *game, struct s_effect *ef)
 
 	if (ef->frame_cur < ef->frames)
 	{
-		if (ef->frame_cur >= ef->frames)
-			ef->frame_cur = ef->frames - 1;
-		power = (float)ef->frame_cur / (ef->frames / 2.);
-		if (power > 1)
-			power = 2 - power;
+		power = (float)ef->frame_cur / (ef->frames / 2.0f);
+		if (power > 1.0f)
+			power = 2.0f - power;
 		if (ef->type == EF_FLASH)
 			effect_flash(game, game->effect.color, power * ef->max_power);
 		else if (ef->type == EF_FIZZLEFADE)
@@ -32,7 +30,7 @@ void	draw_effect(t_game *game, struct s_effect *ef)
 
 void	effect_flash(t_game *game, unsigned color, float power)
 {
-	img_clear_rgb(&game->effect_img, color | ((int)(255 - 255. * power) << 24));
+	img_clear_rgb(&game->effect_img, color | ((int)(255 - 255 * power) << 24));
 	mlx_put_image_to_window(game->mlx, game->win, game->effect_img.ptr, 0, 0);
 }
 

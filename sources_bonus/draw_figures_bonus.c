@@ -29,6 +29,11 @@ int		pixel_fade(int color, float fade)
 			(int)((color & 0xFF) * fade));
 }
 
+int		pixel_alpha(int color, float alpha)
+{
+	return ((int)(alpha * 255) << 24 | color);
+}
+
 int		pixel_fade_contrast(int color, float fade)
 {
 	int r, g, b;

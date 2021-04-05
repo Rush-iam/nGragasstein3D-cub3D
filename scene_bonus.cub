@@ -1,6 +1,7 @@
 R 2558 1296
 C 56,56,56
 F 112,112,112
+T E1M1
 
 W0 ./resources/walls/wall_0.png
 W1 ./resources/walls/wall_1.png
