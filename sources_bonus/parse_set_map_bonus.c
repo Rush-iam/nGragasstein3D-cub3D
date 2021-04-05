@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:49 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/24 23:02:05 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/05 17:29:46 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,10 @@ void	set_map_object_add(t_game *game, char chr, unsigned type, t_upoint pt)
 		obj->e->health = ENEMY_HEALTH;
 		enemy_set_state(game, obj, &game->enemyset[ENEMY_GUARD], ST_WAIT);
 	}
+	if (ft_strchr(CHAR_SOLID, chr))
+		game->map.grid[pt.y][pt.x] = CHAR_SOLID_MAP;
+	else
+		game->map.grid[pt.y][pt.x] = '.';
 	object_add(game, &game->objects, obj);
 }
 

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/27 18:34:23 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/05 17:49:49 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,14 @@ void	player_control(t_game *game)
 
 void	player_control_rotate(t_game *game)
 {
-	mlx_mouse_get_pos(game->win, &game->key.mpos.x, &game->key.mpos.y);
-	mlx_mouse_move(game->win, game->win_center.x, game->win_center.y);
-	game->key.mdir.x = game->key.mdir.x / 2 + game->key.mpos.x -
-					   game->win_center.x;
-	game->p.angle += game->key.mdir.x / MOUSE_SPEED;
+	if (game->key.mouse == true)
+	{
+		mlx_mouse_get_pos(game->win, &game->key.mpos.x, &game->key.mpos.y);
+		game->key.mdir.x = game->key.mdir.x / 2 + game->key.mpos.x -
+						   game->win_center.x;
+		mlx_mouse_move(game->win, game->win_center.x, game->win_center.y);
+		game->p.angle += game->key.mdir.x / MOUSE_SPEED;
+	}
 	if (game->key.k[K_TURN_LEFT])
 		game->p.angle -= PL_SPEED / 3.0f;
 	if (game->key.k[K_TURN_RIGHT])
@@ -109,6 +112,17 @@ void	player_set_fov(t_game *game, float fov, bool reset)
 
 void	player_control_toggler(t_game *g, int key_code)
 {
+	if (key_code == K_MOUSE_TOGGLE && g->key.k[key_code] == false)
+	{
+		if (g->key.mouse == true)
+			mlx_mouse_show();
+		if (g->key.mouse == false)
+		{
+			mlx_mouse_move(g->win, g->win_center.x, g->win_center.y);
+			mlx_mouse_hide();
+		}
+		g->key.mouse = !g->key.mouse;
+	}
 	if (key_code == K_MAP_TOGGLE && g->key.k[key_code] == false)
 		g->map.show = !g->map.show;
 	if (key_code == K_USE && g->key.k[key_code] == false)
@@ -156,22 +170,22 @@ void	player_control_borders(t_game *g)
 	char			check;
 
 	check = g->map.grid[(int)g->p.pos.y][minus.x];
-	if (ft_isdigit(check) || ft_memchr(CHAR_SOLID, check, sizeof(CHAR_SOLID)) ||
+	if (ft_isdigit(check) || check == CHAR_SOLID_MAP ||
 			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_DOORS)) && door_find(g,
 					(t_point){minus.x, (int)g->p.pos.y})->part_opened < 0.5f))
 		g->p.pos.x = minus.x + 1 + PL_RADIUS + FLOAT_FIX;
 	check = g->map.grid[(int)g->p.pos.y][plus.x];
-	if (ft_isdigit(check) || ft_memchr(CHAR_SOLID, check, sizeof(CHAR_SOLID)) ||
+	if (ft_isdigit(check) || check == CHAR_SOLID_MAP ||
 			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_DOORS)) && door_find(g,
 					(t_point){plus.x, (int)g->p.pos.y})->part_opened < 0.5f))
 		g->p.pos.x = plus.x - PL_RADIUS - FLOAT_FIX;
 	check = g->map.grid[minus.y][(int)g->p.pos.x];
-	if (ft_isdigit(check) || ft_memchr(CHAR_SOLID, check, sizeof(CHAR_SOLID)) ||
+	if (ft_isdigit(check) || check == CHAR_SOLID_MAP ||
 			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_DOORS)) && door_find(g,
 					(t_point){(int)g->p.pos.x, minus.y})->part_opened < 0.5f))
 		g->p.pos.y = minus.y + 1 + PL_RADIUS + FLOAT_FIX;
 	check = g->map.grid[plus.y][(int)g->p.pos.x];
-	if (ft_isdigit(check) || ft_memchr(CHAR_SOLID, check, sizeof(CHAR_SOLID)) ||
+	if (ft_isdigit(check) || check == CHAR_SOLID_MAP ||
 			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_DOORS)) && door_find(g,
 					(t_point){(int)g->p.pos.x, plus.y})->part_opened < 0.5f))
 		g->p.pos.y = plus.y - PL_RADIUS - FLOAT_FIX;
@@ -184,23 +198,23 @@ void	player_control_borders_diag(t_game *g)
 	const t_upoint	plus = {g->p.pos.x + PL_RADIUS, g->p.pos.y + PL_RADIUS};
 	const t_upoint	minus = {g->p.pos.x - PL_RADIUS, g->p.pos.y - PL_RADIUS};
 
-	if (ft_isdigit(g->map.grid[minus.y][minus.x]) || ft_memchr(
-			CHAR_SOLID, g->map.grid[minus.y][minus.x], sizeof(CHAR_SOLID)))
+	if (ft_isdigit(g->map.grid[minus.y][minus.x]) ||
+			g->map.grid[minus.y][minus.x] == CHAR_SOLID_MAP)
 		(g->p.pos.x - (int)g->p.pos.x > g->p.pos.y - (int)g->p.pos.y) ?
 		(g->p.pos.x = minus.x + 1 + PL_RADIUS) :
 		(g->p.pos.y = minus.y + 1 + PL_RADIUS);
-	if (ft_isdigit(g->map.grid[plus.y][plus.x]) || ft_memchr(
-			CHAR_SOLID, g->map.grid[plus.y][plus.x], sizeof(CHAR_SOLID)))
+	if (ft_isdigit(g->map.grid[plus.y][plus.x]) ||
+			g->map.grid[plus.y][plus.x] == CHAR_SOLID_MAP)
 		(g->p.pos.x - (int)g->p.pos.x < g->p.pos.y - (int)g->p.pos.y) ?
 		(g->p.pos.x = plus.x - PL_RADIUS) :
 		(g->p.pos.y = plus.y - PL_RADIUS);
-	if (ft_isdigit(g->map.grid[minus.y][plus.x]) || ft_memchr(
-			CHAR_SOLID, g->map.grid[minus.y][plus.x], sizeof(CHAR_SOLID)))
+	if (ft_isdigit(g->map.grid[minus.y][plus.x]) ||
+			g->map.grid[minus.y][plus.x] == CHAR_SOLID_MAP)
 		(1.f - (g->p.pos.x - (int)g->p.pos.x) > g->p.pos.y - (int)g->p.pos.y) ?
 		(g->p.pos.x = plus.x - PL_RADIUS) :
 		(g->p.pos.y = minus.y + 1 + PL_RADIUS);
-	if (ft_isdigit(g->map.grid[plus.y][minus.x]) || ft_memchr(
-			CHAR_SOLID, g->map.grid[plus.y][minus.x], sizeof(CHAR_SOLID)))
+	if (ft_isdigit(g->map.grid[plus.y][minus.x]) ||
+			g->map.grid[plus.y][minus.x] == CHAR_SOLID_MAP)
 		(g->p.pos.x - (int)g->p.pos.x > 1.f - (g->p.pos.y - (int)g->p.pos.y)) ?
 		(g->p.pos.x = minus.x + 1 + PL_RADIUS) :
 		(g->p.pos.y = plus.y - PL_RADIUS);

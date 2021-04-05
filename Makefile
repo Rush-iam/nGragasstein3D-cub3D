@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 NAME 	= 	cub3D
-CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g3 #-Ofast -march=native #-fsanitize=address
+CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g -Ofast -march=native #-fsanitize=address
 SRC    :=		main			\
 				control			\
 				draw_walls		\

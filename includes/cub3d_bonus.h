@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/28 18:54:04 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/05 16:07:15 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,17 @@
 # define K_RUN			KEY_SHIFT_LEFT
 # define K_USE			KEY_E
 
+# define K_KNIFE	KEY_1
+# define K_PISTOL	KEY_2
+# define K_RIFLE	KEY_3
+# define M_SHOOT	MOUSE_LEFT
+
+# define K_MAP_TOGGLE	KEY_M
+# define K_MOUSE_TOGGLE	KEY_BACKSPACE
+# define K_FOV_WIDE		KEY_NUMMINUS
+# define K_FOV_TELE		KEY_NUMPLUS
+# define K_FOV_RESET	KEY_NUMASTERISK
+
 # define COLOR_WHITE	0xFFFFFF
 # define COLOR_GREEN	0x7AFF40
 # define COLOR_GREEN_FF	0x113322
@@ -66,25 +77,16 @@
 # define COLOR_YELLOW_F	0x888015
 # define COLOR_GREY		0x808080
 
-# define K_KNIFE	KEY_1
-# define K_PISTOL	KEY_2
-# define K_RIFLE	KEY_3
-# define M_SHOOT	MOUSE_LEFT
-
 # define SHOT_FRAME_ID	2
 # define ANIM_TICKS		5
 # define ANIM_KNIFE		(char []){0, 1, 2, 3, 2, 1}
 # define ANIM_PISTOL	(char []){0, 1, 2, 3, 1}
 # define ANIM_RIFLE		(char []){0, 1, 2, 1, 3}
 
-# define K_MAP_TOGGLE		KEY_M
 # define MAP_COLOR_DECOR	COLOR_GREY
 # define MAP_COLOR_ENEMY	COLOR_ORANGE
 # define MAP_COLOR_PICKUP	COLOR_GREEN
 
-# define K_FOV_WIDE		KEY_NUMMINUS
-# define K_FOV_TELE		KEY_NUMPLUS
-# define K_FOV_RESET	KEY_NUMASTERISK
 # define FOV_ZOOMSPEED	1.03f
 
 # define PL_SPEED		0.08f
@@ -138,6 +140,7 @@ typedef struct	s_snd
 # define CHAR_PICKUP	"+HhAaZzXx"
 # define CHAR_ENEMY		"nswe"
 # define CHAR_SOLID		"$:;,!@%#&?[]"
+# define CHAR_SOLID_MAP	'"'
 # define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP
 # define CHAR_DOOR_1_H	"-"
 # define CHAR_DOOR_1_V	"|"
@@ -349,6 +352,7 @@ typedef struct	s_game
 		bool		m[10];
 		t_point		mpos;
 		t_point		mdir;
+		bool		mouse;
 	}			key;
 	struct		s_map
 	{
@@ -472,7 +476,7 @@ void			sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound);
 
 void			ray_cast		(t_game *game);
 struct s_column	ray_intersect	(t_game *g, float tan_angle, t_point negative);
-float			ray_intersect_distance(t_game *game, float cur_angle);
+float			ray_intersect_distance(t_game *game, float angle);
 t_ray			ray_intersect_x	(t_game *g, int step_x, float step_y);
 t_ray			ray_intersect_y(t_game *g, float step_x, int step_y);
 

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/28 20:44:21 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/05 17:47:31 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,7 @@ void	initialize_game(t_game *game, bool screenshot_only)
 		terminate(game, ERR_MEM, "Memory allocation failed (ray angles)");
 	__sincosf(game->p.angle, &game->p.vect.y, &game->p.vect.x);
 	player_set_fov(game, 0, true);
+	game->key.mouse = true;
 	game->p.health = START_HEALTH;
 	game->p.ammo = START_AMMO;
 	game->p.weapons_mask = START_WEAPONS;

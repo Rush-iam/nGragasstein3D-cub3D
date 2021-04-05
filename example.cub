@@ -62,6 +62,7 @@ S15 ./resources/sprites/bones.png
 S16 ./resources/sprites/puddle.png
 S17 ./resources/sprites/pot.png
 S18 ./resources/sprites/guard_dead.png
+
 S19 ./resources/sprites/health_xl.png
 S20 ./resources/sprites/health_l.png
 S21 ./resources/sprites/health_m.png
@@ -82,13 +83,16 @@ S27 ./resources/sprites/bonus_s.png
 # Пока что непроходимые вот эти спрайты: (задаётся в коде)
 # S2-S13  = $:;,!@%#&|[]
 
+# Кнопка Backspace - включить/отключить мышку
+# Кнопка M - отключить/включить карту
+
   00000000000000000012345678900000
   0^*$:;,!@%#&?[]{}_~`.......v.|.0
   0+HhAaZzXx.................0>0-0000000000000000000
   0............nswe................................0
 000..........................0-0...................000
-0....N.......................|.|...................000
-0............................0-0.....................0
+0............................|.|...................000
+0................N...........0-0.....................0
 0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
 0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
 0.ssssssssssssssssssssssssssssssssssssssssssssssssss.0
