@@ -6,11 +6,10 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/05 19:54:16 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/05 23:29:18 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#define CUTE_SOUND_IMPLEMENTATION
 #include "cub3d_bonus.h"
 
 int	main(int args, char *av[])
@@ -44,113 +43,43 @@ int	main(int args, char *av[])
 	mlx_loop(game.mlx);
 }
 
-void	initialize_game_images(t_game *game, bool screenshot_only)
+void	draw_string(t_game *g, struct s_string *s)
 {
-	const t_upoint	max_res = (screenshot_only == true) ? MAX_SCR : MAX_WIN;
-	int				n;
+	float	fade;
 
-	game->img.size.x = ft_umax(game->img.size.x & ~1U, MIN_RES_X);
-	game->img.size.x = ft_umin(game->img.size.x & ~1U, max_res.x);
-	game->img.size.y = ft_umin(game->img.size.y & ~1U, max_res.y);
-	game->img.aspect = (float)game->img.size.x / game->img.size.y;
-	game->win_center = (t_upoint){game->img.size.x / 2, game->img.size.y / 2};
-	if (screenshot_only == false)
+	if (s->text)
 	{
-		if (!(game->win = mlx_new_window(
-				game->mlx, game->img.size.x, game->img.size.y, WIN_TITLE)))
-			terminate(game, ERR_MLX, strerror(errno));
-		mlx_mouse_move(game->win, game->win_center.x, game->win_center.y);
-	}
-	if (!(game->img.ptr = mlx_new_image(
-			game->mlx, game->img.size.x, game->img.size.y)))
-		terminate(game, ERR_MLX, strerror(errno));
-	game->img.data = (void *)mlx_get_data_addr(game->img.ptr, &n, &n, &n);
-	if (!(game->effect_img.ptr = mlx_new_image(
-			game->mlx, game->img.size.x, game->img.size.y)))
-		terminate(game, ERR_MLX, strerror(errno));
-	game->effect_img.data = (unsigned *)mlx_get_data_addr(game->effect_img.ptr,
-														  &n, &n, &n);
-	game->effect_img.size = game->img.size;
-	if (!(game->img_bg.ptr = mlx_new_image(
-			game->mlx, game->img.size.x, game->img.size.y)))
-		terminate(game, ERR_MLX, strerror(errno));
-	game->img_bg.data = (unsigned *)mlx_get_data_addr(game->img_bg.ptr,
-																&n, &n, &n);
-	game->img_bg.size = game->img.size;
-	img_ceilfloor_rgb_faded(&game->img_bg, game->color_ceil, game->color_floor,
-						 								game->fade_distance);
-}
-
-void	initialize_weapons_scale(t_game *game)
-{
-	unsigned	i;
-	unsigned	n;
-	t_upoint	weapon_size;
-
-	i = 0;
-	while (i < sizeof(game->p.weapon_img) / sizeof(*game->p.weapon_img))
-	{
-		n = 0;
-		while (n < 4)
+		if (s->frame_cur < s->frames)
 		{
-			weapon_size.y = game->img.size.y * 2 / 3;
-			weapon_size.x = weapon_size.y * game->p.weapon_img[i][n].aspect;
-			game->p.weapon_img[i][n] = img_resize(game->mlx,
-						&game->p.weapon_img[i][n], weapon_size);
-			if (game->p.weapon_img[i][n].ptr == NULL)
-				terminate(game, ERR_MLX, strerror(errno));
-			n++;
+			fade = 1.0f;
+			if (s->fade == true)
+			{
+				if (s->frame_cur < TICKS_PER_SEC)
+					fade = (float)s->frame_cur / TICKS_PER_SEC;
+				else if (s->frames - s->frame_cur < TICKS_PER_SEC)
+					fade = (float)(s->frames - s->frame_cur) / TICKS_PER_SEC;
+			}
+			mlx_string_put(g->mlx, g->win, s->pos.x, s->pos.y,
+						   pixel_fade(s->color, fade), s->text);
 		}
-		i++;
+		else
+		{
+			free(s->text);
+			s->text = NULL;
+		}
 	}
 }
 
-void	initialize_game(t_game *game, bool screenshot_only)
+void	string_add(t_game *g, char *string, int timer, unsigned color)
 {
-	int			n;
-	const int	n_tex = sizeof(game->texture) / sizeof(*game->texture) / 2;
-
-	initialize_game_images(game, screenshot_only);
-	initialize_weapons_scale(game);
-	n = 0;
-	while (n < n_tex)
-	{
-		game->texture[n + n_tex] = img_faded_copy(game->mlx, &game->texture[n]);
-		if (game->texture[n + n_tex].ptr == NULL)
-			terminate(game, ERR_MLX, strerror(errno));
-		n++;
-	}
-	if (!(game->column = ft_calloc(game->img.size.x, sizeof(*game->column))))
-		terminate(game, ERR_MEM, "Memory allocation failed (ray columns)");
-	if (!(game->angles = malloc(game->img.size.x * sizeof(*game->angles))))
-		terminate(game, ERR_MEM, "Memory allocation failed (ray angles)");
-	__sincosf(game->p.angle, &game->p.vect.y, &game->p.vect.x);
-	player_set_fov(game, 0, true);
-	game->key.mouse = true;
-	game->p.health = START_HEALTH;
-	game->p.ammo = START_AMMO;
-	game->p.weapons_mask = START_WEAPONS;
-	player_set_weapon(game, W_KNIFE);
-	player_set_weapon(game, W_PISTOL);
-	if (game->audio.music[0].file.channels[0])
-		sound_play(game, &game->audio.music[0], T_FPT_NULL)->looped = true;
-}
-
-int	dead_exit(t_game *game)
-{
-	game->effect.frame_cur++;
-	if (game->effect.type != EF_FIZZLEFADE)
-	{
-		game->effect = (struct s_effect){384, 0, EF_FIZZLEFADE, COLOR_RED, 0};
-		cs_stop_all_sounds(game->audio.ctx);
-		cs_stop_all_sounds(game->audio.ctx7);
-		cs_stop_all_sounds(game->audio.ctx22);
-		sound_play(game, &game->audio.sound[SND_PLAYER_DEATH], T_FPT_NULL);
-	}
-	draw_effect(game, &game->effect);
-	if (game->effect.frame_cur > game->effect.frames)
-		terminate(game, 0, NULL);
-	return (0);
+	free(g->string.text);
+	g->string.text = string;
+	g->string.pos.x = g->img.size.x / 2 - ft_strlen(string) * 7;
+	g->string.pos.y = g->img.size.y / 2 + 14;
+	g->string.frame_cur = 0;
+	g->string.frames = timer * TICKS_PER_SEC;
+	g->string.fade = (timer >= 3);
+	g->string.color = color;
 }
 
 int	game_loop(t_game *game)
@@ -170,6 +99,8 @@ int	game_loop(t_game *game)
 		return dead_exit(game);
 	if (game->effect.frame_cur < game->effect.frames)
 		game->effect.frame_cur += game->tick_diff;
+	if (game->string.frame_cur < game->string.frames)
+		game->string.frame_cur += game->tick_diff;
 	while (game->tick_diff > 0)
 	{
 		doors(game);
@@ -189,13 +120,31 @@ int	game_loop(t_game *game)
 	draw_effect(game, &game->effect);
 	draw_weapon(game, &game->p.weapon);
 	draw_map(game);
+	draw_string(game, &game->string);
 
 //	demo_fillrate(game, 1);
 //	demo_cursor(game, 0xFF88FF);
 //	demo_radar(game, 360);
 	fps = CLOCKS_PER_SEC / (clock() - clock_cur);
 	clock_cur = clock();
-	mlx_string_put(game->mlx, game->win, 0, 10, COLOR_WHITE,
+	mlx_string_put(game->mlx, game->win, 0, 20, COLOR_WHITE,
 		(char []){'0' + fps/100, '0' + fps / 10 % 10, '0' + fps % 10, '\0'});
+	return (0);
+}
+
+int	dead_exit(t_game *game)
+{
+	game->effect.frame_cur++;
+	if (game->effect.type != EF_FIZZLEFADE)
+	{
+		game->effect = (struct s_effect){384, 0, EF_FIZZLEFADE, COLOR_RED, 0};
+		cs_stop_all_sounds(game->audio.ctx);
+		cs_stop_all_sounds(game->audio.ctx7);
+		cs_stop_all_sounds(game->audio.ctx22);
+		sound_play(game, &game->audio.sound[SND_PLAYER_DEATH], T_FPT_NULL);
+	}
+	draw_effect(game, &game->effect);
+	if (game->effect.frame_cur > game->effect.frames)
+		terminate(game, 0, NULL);
 	return (0);
 }

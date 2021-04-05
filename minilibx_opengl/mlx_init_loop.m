@@ -8,7 +8,8 @@
 #include "mlx_int.h"
 #include "mlx_new_window.h"
 
-#include "font.c"
+//#include "font.c"
+#include "font_2x2.c"
 
 
 void	do_loop_hook2(CFRunLoopTimerRef observer, void * info)
@@ -69,9 +70,9 @@ void *mlx_init()
   [[NSRunningApplication currentApplication] activateWithOptions:NSApplicationActivateIgnoringOtherApps];
 
   // load font
-  new_mlx->font = mlx_new_image(new_mlx, (FONT_WIDTH+2)*95, FONT_HEIGHT);
+  new_mlx->font = mlx_new_image(new_mlx, (FONT_WIDTH+FONT_WIDTH/5)*95, FONT_HEIGHT);
   i = 0;
-  while (i < 4*(FONT_WIDTH+2)*95*FONT_HEIGHT)
+  while (i < 4*(FONT_WIDTH+FONT_WIDTH/5)*95*FONT_HEIGHT)
     {
       new_mlx->font->buffer[i+0] = font_atlas.pixel_data[i+2];
       new_mlx->font->buffer[i+1] = font_atlas.pixel_data[i+1];

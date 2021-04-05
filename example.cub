@@ -2,6 +2,7 @@ R 2560 1296
 C 56,56,56
 F 112,112,112
 D 1
+T Hello and welcome to Peer Unit Test. Try to survive!
 
 W0 ./resources/walls/wall_0.png
 W1 ./resources/walls/wall_1.png

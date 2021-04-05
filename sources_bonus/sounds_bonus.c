@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#define CUTE_SOUND_IMPLEMENTATION
 #include "cub3d_bonus.h"
 
 void	sounds(t_game *game)

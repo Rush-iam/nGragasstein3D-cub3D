@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/05 19:56:30 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/05 23:11:08 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,8 +245,8 @@ typedef struct	s_object
 {
 	t_img		*sprite;
 	t_fpoint	pos;
-	double		distance;
-	double		distance_real;
+	float		distance;
+	float		distance_real;
 	float		atan_diff;
 	float		angle_to_p;
 	struct		s_render
@@ -389,8 +389,8 @@ typedef struct	s_game
 	t_list		*objects;
 	struct		s_effect
 	{
-		unsigned	frames;
 		unsigned	frame_cur;
+		unsigned	frames;
 		enum		e_effect
 		{
 			EF_FLASH = 0,
@@ -399,13 +399,24 @@ typedef struct	s_game
 		unsigned	color;
 		float		max_power;
 	}			effect;
+	struct		s_string
+	{
+		char		*text;
+		t_upoint	pos;
+		unsigned	frame_cur;
+		unsigned	frames;
+		bool		fade;
+		unsigned	color;
+	}			string;
 	t_img		effect_img;
 }				t_game;
 
 void			initialize_game		(t_game *game, bool screenshot_only);
-void			player_set_fov				(t_game *game, float fov, bool reset);
+void			initialize_game_images(t_game *game, bool screenshot_only);
+void			initialize_weapons_scale(t_game *game);
 
 int				game_loop		(t_game *game);
+int				dead_exit(t_game *game);
 
 void			parse(int args, char **av, t_game *game, bool *screenshot_only);
 void			parse_scene		(int file_id, char **line, t_game *game);
@@ -510,6 +521,7 @@ void			img_ceilfloor_rgb_faded(t_img *img, unsigned ceil, unsigned floor, unsign
 
 void			pixel_put	(t_img *img, unsigned x, unsigned y, int color);
 int				pixel_fade	(int color, float fade);
+int				pixel_alpha(int color, float alpha);
 int				pixel_fade_contrast(int color, float fade);
 void			draw_line	(t_img *img, t_point p1, t_point p2, int color);
 void			draw_square	(t_img *img, t_point center, int size, int color);
@@ -519,6 +531,9 @@ void			draw_4pts	(t_img *img, t_point *pts, int color);
 void			draw_effect(t_game *game, struct s_effect *ef);
 void			effect_flash(t_game *game, unsigned color, float power);
 void			effect_fizzlefade(t_game *game, unsigned color);
+
+void			draw_string(t_game *g, struct s_string *s);
+void			string_add(t_game *g, char *string, int timer, unsigned color);
 
 char			*atoi_limited	(unsigned *dst_int, const char *src_string,
 															unsigned limit);
