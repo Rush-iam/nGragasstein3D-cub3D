@@ -1,9 +1,7 @@
 R 2560 1296
 C 56,56,56
 F 112,112,112
-D 10
-T 
-
+D 1
 W0 ./resources/walls/wall_black.png
 W1 resources/walls/wall_black_jail.png
 W2 ./resources/walls/wall_black_bones.png
@@ -85,28 +83,66 @@ S27 ./resources/sprites/bonus_s.png
 # Пока что непроходимые вот эти спрайты: (задаётся в коде)
 # S2-S13  = $:;,!@%#&|[]
 
-# Кнопка Backspace - вкл/откл мышку
-# Кнопка M - откл/вкл карту
+# Кнопка Backspace - включить/отключить мышку
+# Кнопка M - отключить/включить карту
 
-  00000000000000000012345678900000
-  0^*$:;,!@%#&?[]{}_~`.......v.|.0
-  0+HhAaZzXx.................0>0-0000000000000000000
-  0................................................0
-000..........................0-0...................000
-0............................|.|...nsew............000
-0......................N.....0-0.....................0
-0.sssssssssssssssssssss..sssssssssssssssssssssssssss.0
-0.sssssssssssssssssssss..sssssssssssssssssssssssssss.0
-0.sssssssssssssssssssss..sssssssssssssssssssssssssss.0
-0.sssssssssssssssssssss..sssssssssssssssssssssssssss.0
-0.sssssssssssssssssssss..sssssssssssssssssssssssssss.0
-0.sssssssssssssssssssss..sssssssssssssssssssssssssss.0
-0.sssssssssssssssssssss..sssssssssssssssssssssssssss.0
-0.sssssssssssssssssssss..sssssssssssssssssssssssssss.0
-0.sssssssssssssssssssss..sssssssssssssssssssssssssss.0
-0.sssssssssssssssssssss..sssssssssssssssssssssssssss.0
-0.sssssssssssssssssssss..sssssssssssssssssssssssssss.0
-0.sssssssssssssssssssss..sssssssssssssssssssssssssss.0
-0.sssssssssssssssssssss..sssssssssssssssssssssssssss.0
-0....................................................0
-000000000000000000000000000000000000000000000000000000
+#     ^ lamp.png
+#     * chandelier.png
+#     $ lamp_stand.png
+#     : plant_green.png
+#     ; plant_dry.png
+#     , vase.png
+#     ! flag.png
+#     @ barrel_brown.png
+#     % barrel_green.png
+#     # table.png
+#     & table_chairs.png
+#     ? statue.png
+#     [ well_empty.png
+#     ] well_full.png
+#     { skeleton.png
+#     } bones.png
+#     _ puddle.png
+#     ~ pot.png
+#     ` guard_dead.png
+
+0000000000000000000000000000000000
+000000000.a00000000000000000000000
+0.......0..00.^+aa^..|.^hh^.0....0
+0.......0S.00.^Aaa^..0.^hh^.|....0
+0..000000..00000000000000000000..0
+0..0....0....:...;...:...:...:0..0
+0..0....0}....n......w.......}0..0
+0..0..0000000000000000000000-00..0
+0..0...........00..........0..0..0
+0..0...........00..........0.a0..0
+0..0.....00000000..000000..0.00..0
+0..0..0..00000000..000000..0..0..0
+0..0..0..00....00.......0..0.}0..0
+0..0..0..00....00.......0..0.00..0
+0..0..0..00....00.......0..0.w0..0
+0..0..0..00....00.......0..0.a0..0
+0..0..0..00..000000000..0..0.00..0
+0..0..0.............00..0..0.{0..0
+0..0..0.............00..0..0.}0..0
+0..|..0..0000000000.00..0..0-00..0
+0..0..0..0033333333-30..0..0.{0..0
+0..0..0..03.........30..0..0..0..0
+0..00000003.........30..0..0.00..0
+0..00000003.........30..0..0.[0..0
+0..0.....03-3333333330..0..0.`0..0
+0..0.....00.0000000000..0..0.00..0
+0..0.....00.............0..0.;0..0
+0..0.....00.............0..0.:0..0
+0..0..00-0000000000000000..0.00..0
+0..0..00.0000000000000000..0.{0..0
+0..0..00...................0..0..0
+0..0..00...................0..0..0
+0..0..0000000000000000000000..0..0
+0..00-0020102010201010102010..0..0
+0..0.............%...........w0..0
+0..0.......%...........%.....w0..0
+0..0110201102011020110201102100..0
+0................................0
+0........................0-0.....0
+0000000000000000000000000000000000
