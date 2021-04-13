@@ -103,11 +103,11 @@ void	weapon_shoot(t_game *g, t_object *target)
 		{
 			pickup_drop(g, target->pos, T_AMMO_ENEMY,
 						&g->sprite[sizeof(CHAR_DECOR) - 1 + T_AMMO - 1]);
-			enemy_set_state(g, target, &g->enemyset[ENEMY_GUARD], ST_DEATH);
+			enemy_set_state(g, target, ST_DEATH);
 			g->p.score += VAL_SCORE_KILL;
 		}
 		else
-			enemy_set_state(g, target, &g->enemyset[ENEMY_GUARD], ST_PAIN);
+			enemy_set_state(g, target, ST_PAIN);
 		printf("bam! ammo left: %hd RND damage: %u\n", g->p.ammo, damage);
 	}
 }

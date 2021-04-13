@@ -6,11 +6,16 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:41 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/28 18:51:39 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/13 18:50:51 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
+
+float	distance(t_fpoint from, t_fpoint to)
+{
+	return (hypotf(from.x - to.x, from.y - to.y));
+}
 
 char	*atoi_limited(unsigned *dst_int, const char *src_string, unsigned limit)
 {

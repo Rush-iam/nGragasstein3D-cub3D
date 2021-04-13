@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/13 17:36:39 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/13 22:40:20 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,11 +210,12 @@ enum	e_sound
 # define ENEMY_FOV_HALF		M_PI_4_F * 1.5f
 # define ENEMY_SHOT_DELAY	2
 # define ENEMY_MISS_MAX		60
-//# define ENEMY_DMG_MIN		3
-//# define ENEMY_DMG_MAX		30
-# define ENEMY_DMG_MIN		1
-# define ENEMY_DMG_MAX		1
+# define ENEMY_DMG_MIN		3
+# define ENEMY_DMG_MAX		30
+//# define ENEMY_DMG_MIN		1
+//# define ENEMY_DMG_MAX		1
 # define ANIM_ENEMY_TICKS	10
+# define ANIM_ENEMY_WALK_FRAMES	4
 
 # define ANIM_DOOR_TICKS	60
 # define DOOR_TIMER_TICKS	300
@@ -222,7 +223,7 @@ enum	e_sound
 typedef struct	s_set
 {
 	t_img		wait[8];
-//	t_img		walk[4][8];
+	t_img		walk[8][4];
 	t_img		attack[3];
 	t_img		pain[2];
 	t_img		death[5];
@@ -274,28 +275,33 @@ typedef struct	s_object
 	}			type;
 	struct		s_enemy
 	{
-		enum	e_enemytype
+		enum		e_enemytype
 		{
 			ENEMY_GUARD = 0
-		}		type;
-		bool	alarmed;
-		bool	shot;
-		float	angle;
-		float	p_to_angle;
-		short	health;
-		t_img	*imgset;
-		short	frame;
-		short	frames;
-		time_t	tick;
-		time_t	ticks;
-		enum	e_objstate
+		}			type;
+		bool		alarmed;
+		bool		shot;
+		float		angle;
+		float		p_to_angle;
+		short		health;
+		t_fpoint	target;
+		float		target_distance;
+		t_upoint	*path;
+		unsigned	path_i;
+		unsigned	path_len;
+		t_img		*imgset;
+		short		frame;
+		short		frames;
+		time_t		tick;
+		time_t		ticks;
+		enum		e_objstate
 		{
 			ST_WAIT = 0,
 			ST_WALK,
 			ST_ATTACK,
 			ST_PAIN,
 			ST_DEATH
-		}		state;
+		}			state;
 	}			*e;
 }				t_object;
 
@@ -362,6 +368,7 @@ typedef struct	s_game
 		t_img		img;
 		t_upoint	size;
 		char		**grid;
+		unsigned	**grid_bfs;
 		bool		show;
 	}			map;
 	float		fov;
@@ -414,6 +421,7 @@ typedef struct	s_game
 void			initialize_game		(t_game *game, bool screenshot_only);
 void			initialize_game_images(t_game *game, bool screenshot_only);
 void			initialize_weapons_scale(t_game *game);
+void			initialize_bfs_grid(t_game *g);
 
 int				game_loop		(t_game *game);
 int				dead_exit(t_game *game);
@@ -482,9 +490,11 @@ void			pickup_sound(t_game *game, enum e_objtype item);
 
 void			enemy(t_game *game, t_object *obj);
 void			enemy_logic(t_game *game, t_object *obj);
+void			enemy_sprite(t_game *game, t_object *obj);
 void			enemy_shoot(t_game *g, t_object *obj);
-void			enemy_set_state(t_game *g, t_object *obj, t_set *imgset, enum e_objstate state);
+void			enemy_set_state(t_game *g, t_object *obj, enum e_objstate state);
 void			enemy_sound(t_game *game, t_object *obj, enum e_sound sound_type);
+t_upoint		*pathfind(t_game *g, t_object *obj);
 
 void			sounds(t_game *game);
 cs_playing_sound_t *	sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos);
@@ -535,6 +545,7 @@ void			effect_fizzlefade(t_game *game, unsigned color);
 void			draw_string(t_game *g, struct s_string *s);
 void			string_add(t_game *g, char *string, int timer, unsigned color);
 
+float			distance(t_fpoint from, t_fpoint to);
 char			*atoi_limited	(unsigned *dst_int, const char *src_string,
 															unsigned limit);
 t_img			img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres);
