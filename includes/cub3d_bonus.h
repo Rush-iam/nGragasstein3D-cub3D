@@ -210,10 +210,10 @@ enum	e_sound
 # define ENEMY_FOV_HALF		M_PI_4_F * 1.5f
 # define ENEMY_SHOT_DELAY	2
 # define ENEMY_MISS_MAX		60
-//# define ENEMY_DMG_MIN		3
-//# define ENEMY_DMG_MAX		30
-# define ENEMY_DMG_MIN		1
-# define ENEMY_DMG_MAX		1
+# define ENEMY_DMG_MIN		3
+# define ENEMY_DMG_MAX		30
+//# define ENEMY_DMG_MIN		1
+//# define ENEMY_DMG_MAX		1
 # define ANIM_ENEMY_TICKS	10
 
 # define ANIM_DOOR_TICKS	60
