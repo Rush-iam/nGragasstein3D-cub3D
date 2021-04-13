@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/05 19:09:06 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/13 17:57:08 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	parse(int args, char **av, t_game *game, bool *screenshot_only)
 void	set_enemies(char *string, t_game *g)
 {
 	unsigned	id;
-//	int			i;
+	int			i;
 	char		*path;
 
 	if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
@@ -66,16 +66,15 @@ void	set_enemies(char *string, t_game *g)
 		terminate(g, ERR_PARSE, strerror(errno));
 	load_spriteset(g->enemyset[id].pain, 2, path, g);
 	load_audioset(&g->enemyset[id], string, g);
-//	i = 0;
-//	while (i < 4)
-//	{
-//		if (!(texture->ptr = mlx_png_file_to_image(game->mlx, path,
-//							(int *)&texture->size.x, (int *)&texture->size.y)))
-//			terminate(game, ERR_PARSE, "Can't load weapon texture file");
-//		texture->data = (unsigned *)mlx_get_data_addr(texture->ptr, &n, &n, &n);
-//		texture->aspect = texture->size.x / texture->size.y;
-//		i++;
-//	}
+	i = 0;
+	while (i < 8)
+	{
+		if ((path = ft_strjoin(string,
+					(char []){'w', 'a', 'l', 'k', '_', '0' + i, '\0'})) == NULL)
+			terminate(g, ERR_PARSE, strerror(errno));
+		load_spriteset(g->enemyset[id].walk[i], 4, path, g);
+		i++;
+	}
 }
 
 void	set_audio(char *string, t_game *game)

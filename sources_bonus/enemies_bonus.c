@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:53:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/26 20:24:30 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/13 22:40:28 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,23 @@ void	enemy(t_game *game, t_object *obj)
 		obj->e->p_to_angle += PI2_F;
 	else if (obj->e->p_to_angle >= M_PI_F)
 		obj->e->p_to_angle -= PI2_F;
-	if (obj->e->state == ST_WAIT)
-		obj->e->imgset = &game->enemyset[ENEMY_GUARD].
-				wait[(8 - (int)ceil(obj->e->p_to_angle / M_PI_4_F - 0.5f)) % 8];
 	enemy_logic(game, obj);
+	enemy_sprite(game, obj);
+}
+
+void	enemy_sprite(t_game *game, t_object *obj)
+{
+	if (obj->e->state == ST_WAIT)
+		obj->e->frame = (8 - (int)ceil(obj->e->p_to_angle / M_PI_4_F - 0.5f)) % 8;
+	else if (obj->e->state == ST_WALK)
+	{
+		obj->e->frame = obj->e->frames * obj->e->tick / obj->e->ticks %
+														ANIM_ENEMY_WALK_FRAMES;
+		obj->e->imgset = game->enemyset[ENEMY_GUARD].
+				walk[(8 - (int)ceil(obj->e->p_to_angle / M_PI_4_F - 0.5f)) % 8];
+	}
+	else
+		obj->e->frame = obj->e->frames * obj->e->tick / obj->e->ticks;
 	obj->sprite = &obj->e->imgset[obj->e->frame];
 }
 
@@ -51,19 +64,31 @@ void	enemy_logic(t_game *game, t_object *obj)
 			enemy_sound(game, obj, SND_ENEMY_ALARM);
 		obj->e->angle = obj->atan_diff + M_PI;
 		obj->e->alarmed = true;
+		obj->e->target = game->p.pos;
 	}
+	obj->e->target_distance = distance(obj->pos, obj->e->target);
 	if (++obj->e->tick >= obj->e->ticks ||
 		(obj->e->state == ST_ATTACK && see == false))
 	{
-		if (see == true && (obj->e->state == ST_WAIT || obj->e->state == ST_PAIN))
-			enemy_set_state(game, obj, &game->enemyset[ENEMY_GUARD], ST_ATTACK);
+		if (see == true && (obj->e->state == ST_WAIT ||
+						obj->e->state == ST_PAIN || obj->e->state == ST_WALK))
+			enemy_set_state(game, obj, ST_ATTACK);
+		else if (see == true && obj->e->state == ST_ATTACK &&
+											obj->e->target_distance < 2.0f)
+			enemy_set_state(game, obj, ST_ATTACK);
+		else if (see == true && obj->e->state == ST_ATTACK)
+			enemy_set_state(game, obj,
+			(enum e_objstate[]){ST_ATTACK, ST_WALK, ST_WALK}[arc4random() % 3]);
+		else if (see == false && obj->e->state == ST_ATTACK)
+			enemy_set_state(game, obj, ST_WALK);
+		else if (see == false && obj->e->state == ST_WALK &&
+									obj->e->target_distance > 0.1f)
+			enemy_set_state(game, obj, ST_WALK);
 		else
-			enemy_set_state(game, obj, &game->enemyset[ENEMY_GUARD], ST_WAIT);
+			enemy_set_state(game, obj, ST_WAIT);
 	}
-	if (obj->e->state != ST_WAIT)
-		obj->e->frame = obj->e->frames * obj->e->tick / obj->e->ticks;
 	if (obj->e->state == ST_ATTACK && obj->e->shot == false &&
-		obj->e->frame == SHOT_FRAME_ID)
+			obj->e->frame == SHOT_FRAME_ID)
 	{
 		enemy_sound(game, obj, SND_ENEMY_ATTACK);
 		enemy_shoot(game, obj);
@@ -90,36 +115,40 @@ void	enemy_shoot(t_game *g, t_object *obj)
 	g->effect = (struct s_effect){15, 30, EF_FLASH, COLOR_RED, damage / 100.0f};
 }
 
-void	enemy_set_state(t_game *g, t_object *obj, t_set *imgset, enum e_objstate state)
+void	enemy_set_state(t_game *g, t_object *obj, enum e_objstate state)
 {
 	obj->e->state = state;
 	if (state == ST_WAIT)
 	{
-		obj->e->imgset = imgset->wait;
-		obj->e->frames = 2;
+		obj->e->imgset = g->enemyset[obj->e->type].wait;
+		obj->e->frames = 3;
 	}
-//	else if (state == ST_WALK)
-//	{
-//		obj->e->imgset = imgset->walk[0];
-//		obj->e->frames = 4;
-//	}
+	else if (state == ST_WALK)
+	{
+		obj->e->imgset = g->enemyset[obj->e->type].walk[0];
+		obj->e->frames = 4 + arc4random() % (int)obj->distance_real & ~1;
+		if (obj->e->path == NULL ||
+		obj->e->path[obj->e->path_len - 1].x != (unsigned)obj->e->target.x ||
+		obj->e->path[obj->e->path_len - 1].y != (unsigned)obj->e->target.y)
+			obj->e->path = pathfind(g, obj);
+	}
 	else if (state == ST_ATTACK)
 	{
-		obj->e->imgset = imgset->attack;
+		obj->e->imgset = g->enemyset[obj->e->type].attack;
 		obj->e->frames = 3;
 		obj->e->ticks *= ENEMY_SHOT_DELAY;
 		obj->e->shot = false;
 	}
 	else if (state == ST_PAIN)
 	{
-		obj->e->imgset = &imgset->pain[obj->angle_to_p < 0];
+		obj->e->imgset = &g->enemyset[obj->e->type].pain[obj->angle_to_p < 0];
 		obj->e->frames = 1;
 		obj->e->angle = obj->atan_diff + M_PI_F;
 	}
 	else if (state == ST_DEATH)
 	{
 		enemy_sound(g, obj, SND_ENEMY_DEATH);
-		obj->e->imgset = imgset->death;
+		obj->e->imgset = g->enemyset[obj->e->type].death;
 		obj->e->frames = 5;
 	}
 	obj->e->tick = 0;

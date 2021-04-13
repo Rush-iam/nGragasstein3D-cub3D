@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/05 22:37:16 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/05 22:38:35 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/13 21:59:27 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ void	initialize_game(t_game *game, bool screenshot_only)
 
 	initialize_game_images(game, screenshot_only);
 	initialize_weapons_scale(game);
+	initialize_bfs_grid(game);
 	n = 0;
 	while (n < n_tex)
 	{
@@ -42,6 +43,7 @@ void	initialize_game(t_game *game, bool screenshot_only)
 	player_set_weapon(game, W_PISTOL);
 	if (game->audio.music[0].file.channels[0])
 		sound_play(game, &game->audio.music[0], T_FPT_NULL)->looped = true;
+
 }
 
 void	initialize_game_images(t_game *game, bool screenshot_only)
