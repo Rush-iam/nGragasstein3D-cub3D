@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/05 23:11:08 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/13 17:36:39 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,10 +210,10 @@ enum	e_sound
 # define ENEMY_FOV_HALF		M_PI_4_F * 1.5f
 # define ENEMY_SHOT_DELAY	2
 # define ENEMY_MISS_MAX		60
-# define ENEMY_DMG_MIN		3
-# define ENEMY_DMG_MAX		30
-//# define ENEMY_DMG_MIN		1
-//# define ENEMY_DMG_MAX		1
+//# define ENEMY_DMG_MIN		3
+//# define ENEMY_DMG_MAX		30
+# define ENEMY_DMG_MIN		1
+# define ENEMY_DMG_MAX		1
 # define ANIM_ENEMY_TICKS	10
 
 # define ANIM_DOOR_TICKS	60
