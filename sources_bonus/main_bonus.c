@@ -137,7 +137,7 @@ int	dead_exit(t_game *game)
 	game->effect.frame_cur++;
 	if (game->effect.type != EF_FIZZLEFADE)
 	{
-		game->effect = (struct s_effect){384, 0, EF_FIZZLEFADE, COLOR_RED, 0};
+		game->effect = (struct s_effect){0, 384, EF_FIZZLEFADE, COLOR_RED, 0};
 		cs_stop_all_sounds(game->audio.ctx);
 		cs_stop_all_sounds(game->audio.ctx7);
 		cs_stop_all_sounds(game->audio.ctx22);

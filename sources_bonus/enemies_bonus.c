@@ -87,7 +87,7 @@ void	enemy_shoot(t_game *g, t_object *obj)
 	if (damage >= (ENEMY_DMG_MIN + ENEMY_DMG_MAX) / 2)
 		sound_play(g, &g->audio.sound[SND_PLAYER_PAIN], T_FPT_NULL);
 	printf("Enemy shot you! -%u HP. Health: %hd\n", damage, g->p.health);
-	g->effect = (struct s_effect){30, 15, EF_FLASH, COLOR_RED, damage / 100.0f};
+	g->effect = (struct s_effect){15, 30, EF_FLASH, COLOR_RED, damage / 100.0f};
 }
 
 void	enemy_set_state(t_game *g, t_object *obj, t_set *imgset, enum e_objstate state)

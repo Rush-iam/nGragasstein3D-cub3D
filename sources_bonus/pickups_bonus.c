@@ -36,7 +36,7 @@ bool	pickup(t_game *game, enum e_objtype type)
 		game->p.health = 100;
 	printf("PICK UP! Health = %hd; Ammo = %hd; Score = %hd\n",
 		   game->p.health, game->p.ammo, game->p.score);
-	game->effect = (struct s_effect){30, 15, EF_FLASH, COLOR_YELLOW, .2};
+	game->effect = (struct s_effect){15, 30, EF_FLASH, COLOR_YELLOW, .2};
 	pickup_sound(game, type);
 	return (true);
 }
