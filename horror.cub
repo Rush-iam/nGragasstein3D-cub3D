@@ -23,7 +23,8 @@ G1 ./resources/weapons/pistol_
 G2 ./resources/weapons/rifle_
 
 M0 ./resources/music/04 Get Them!.wav
-E0 ./resources/enemies/mutant/
+#E0 ./resources/enemies/mutant/
+E0 ./resources/enemies/guard/
 
 A0 ./resources/sounds/player_noaction.wav
 A1 ./resources/sounds/player_pain.wav

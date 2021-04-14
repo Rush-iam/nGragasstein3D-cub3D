@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/13 21:33:27 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/14 18:38:28 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,18 @@ int	main(int args, char *av[])
 	mlx_loop_hook(game.mlx, game_loop, &game);
 	clock_gettime(CLOCK_MONOTONIC, &time);
 	game.tick = 60 * time.tv_sec + 60 * time.tv_nsec / NANSECS_PER_SEC;
+
+//	for (int y = 0; y < (int)game.map.size.y; ++y)
+//	{
+//		for (int x = 0; x < (int)game.map.size.x; ++x)
+//		{
+//			if (game.map.grid_bfs[y][x] == -1U)
+//				printf(" ");
+//			else
+//				printf("%u", game.map.grid_bfs[y][x]);
+//		}
+//		printf("\n");
+//	}
 	mlx_loop(game.mlx);
 }
 
