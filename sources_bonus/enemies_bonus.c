@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:53:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/13 22:40:28 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/14 23:41:24 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,18 +33,62 @@ void	enemy(t_game *game, t_object *obj)
 
 void	enemy_sprite(t_game *game, t_object *obj)
 {
+	float	angle;
+
 	if (obj->e->state == ST_WAIT)
-		obj->e->frame = (8 - (int)ceil(obj->e->p_to_angle / M_PI_4_F - 0.5f)) % 8;
+		obj->e->frame =
+				(8 - (int)ceil(obj->e->p_to_angle / M_PI_4_F - 0.5f)) % 8;
 	else if (obj->e->state == ST_WALK)
 	{
+		angle = obj->atan_diff - (obj->e->path_angle - M_PI_F);
+		if (angle < -M_PI_F)
+			angle += PI2_F;
+		else if (angle >= M_PI_F)
+			angle -= PI2_F;
 		obj->e->frame = obj->e->frames * obj->e->tick / obj->e->ticks %
 														ANIM_ENEMY_WALK_FRAMES;
 		obj->e->imgset = game->enemyset[ENEMY_GUARD].
-				walk[(8 - (int)ceil(obj->e->p_to_angle / M_PI_4_F - 0.5f)) % 8];
+						walk[(8 - (int)ceil(angle / M_PI_4_F - 0.5f)) % 8];
 	}
 	else
 		obj->e->frame = obj->e->frames * obj->e->tick / obj->e->ticks;
 	obj->sprite = &obj->e->imgset[obj->e->frame];
+}
+
+void	enemy_move(t_game *game, t_object *obj)
+{
+	t_point		move_int;
+	t_fpoint	move_float;
+	t_list		*next;
+	t_door		*door;
+
+	if (obj->e->path == NULL)
+		return ;
+	move_int = *((t_point *)obj->e->path->content);
+	move_float = (t_fpoint){move_int.x + 0.5f, move_int.y + 0.5f};
+	if (fabsf(obj->pos.x - move_float.x) < 0.3f &&
+		fabsf(obj->pos.y - move_float.y) < 0.3f)
+	{
+		next = obj->e->path->next;
+		ft_lstdelone(obj->e->path, free);
+		obj->e->path = next;
+		enemy_move(game, obj);
+		return ;
+	}
+	obj->e->path_angle = atan2f(move_float.y - obj->pos.y,
+								move_float.x - obj->pos.x);
+	obj->pos.x += cosf(obj->e->path_angle) * ENEMY_SPEED;
+	obj->pos.y += sinf(obj->e->path_angle) * ENEMY_SPEED;
+	if (game->map.grid[move_int.y][move_int.x] != '.' && ft_memchr(CHAR_DOORS,
+			game->map.grid[move_int.y][move_int.x], sizeof(CHAR_DOORS) - 1))
+	{
+		door = door_find(game, move_int);
+		if (door->opening == false)
+		{
+			door->opening = true;
+			door_sound(game, door);
+		}
+	}
 }
 
 void	enemy_logic(t_game *game, t_object *obj)
@@ -66,7 +110,8 @@ void	enemy_logic(t_game *game, t_object *obj)
 		obj->e->alarmed = true;
 		obj->e->target = game->p.pos;
 	}
-	obj->e->target_distance = distance(obj->pos, obj->e->target);
+	if (obj->e->state == ST_WALK)
+		enemy_move(game, obj);
 	if (++obj->e->tick >= obj->e->ticks ||
 		(obj->e->state == ST_ATTACK && see == false))
 	{
@@ -74,16 +119,23 @@ void	enemy_logic(t_game *game, t_object *obj)
 						obj->e->state == ST_PAIN || obj->e->state == ST_WALK))
 			enemy_set_state(game, obj, ST_ATTACK);
 		else if (see == true && obj->e->state == ST_ATTACK &&
-											obj->e->target_distance < 2.0f)
+											obj->distance_real < 2.0f)
 			enemy_set_state(game, obj, ST_ATTACK);
 		else if (see == true && obj->e->state == ST_ATTACK)
 			enemy_set_state(game, obj,
 			(enum e_objstate[]){ST_ATTACK, ST_WALK, ST_WALK}[arc4random() % 3]);
 		else if (see == false && obj->e->state == ST_ATTACK)
 			enemy_set_state(game, obj, ST_WALK);
-		else if (see == false && obj->e->state == ST_WALK &&
-									obj->e->target_distance > 0.1f)
+		else if (see == false && obj->e->state == ST_WALK && obj->e->path)
 			enemy_set_state(game, obj, ST_WALK);
+		else if ((int)obj->pos.x != (int)obj->e->location.x ||
+				(int)obj->pos.y != (int)obj->e->location.y)
+		{
+			obj->e->target = obj->e->location;
+			obj->e->angle = obj->e->path_angle + M_PI;
+			enemy_set_state(game, obj, ST_WALK);
+			obj->e->alarmed = false;
+		}
 		else
 			enemy_set_state(game, obj, ST_WAIT);
 	}
@@ -122,15 +174,19 @@ void	enemy_set_state(t_game *g, t_object *obj, enum e_objstate state)
 	{
 		obj->e->imgset = g->enemyset[obj->e->type].wait;
 		obj->e->frames = 3;
+		obj->e->angle = obj->e->location_angle;
 	}
 	else if (state == ST_WALK)
 	{
 		obj->e->imgset = g->enemyset[obj->e->type].walk[0];
 		obj->e->frames = 4 + arc4random() % (int)obj->distance_real & ~1;
-		if (obj->e->path == NULL ||
-		obj->e->path[obj->e->path_len - 1].x != (unsigned)obj->e->target.x ||
-		obj->e->path[obj->e->path_len - 1].y != (unsigned)obj->e->target.y)
-			obj->e->path = pathfind(g, obj);
+		if (!obj->e->path || (obj->e->path_target.x != (int)obj->e->target.x ||
+								obj->e->path_target.y != (int)obj->e->target.y))
+		{
+			pathfind(&obj->e->path, (t_point){obj->pos.x, obj->pos.y},
+						(t_point){obj->e->target.x, obj->e->target.y}, &g->map);
+			obj->e->path_target = (t_point){obj->e->target.x, obj->e->target.y};
+		}
 	}
 	else if (state == ST_ATTACK)
 	{

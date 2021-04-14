@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:49 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/13 20:43:01 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/14 23:15:49 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,8 @@ void	set_map_object_add(t_game *game, char chr, unsigned type, t_upoint pt)
 		obj->e->angle = M_PI_2 * (ft_strchr(dirs, chr) - dirs);
 		obj->e->health = ENEMY_HEALTH;
 		obj->e->type = ENEMY_GUARD;
+		obj->e->location = obj->pos;
+		obj->e->location_angle = obj->e->angle;
 		enemy_set_state(game, obj, ST_WAIT);
 	}
 	if (ft_strchr(CHAR_SOLID, chr))

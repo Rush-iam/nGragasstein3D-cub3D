@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/13 22:40:20 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/14 23:07:03 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,10 +210,11 @@ enum	e_sound
 # define ENEMY_FOV_HALF		M_PI_4_F * 1.5f
 # define ENEMY_SHOT_DELAY	2
 # define ENEMY_MISS_MAX		60
-# define ENEMY_DMG_MIN		3
-# define ENEMY_DMG_MAX		30
-//# define ENEMY_DMG_MIN		1
-//# define ENEMY_DMG_MAX		1
+//# define ENEMY_DMG_MIN		3
+//# define ENEMY_DMG_MAX		30
+# define ENEMY_DMG_MIN		1
+# define ENEMY_DMG_MAX		1
+# define ENEMY_SPEED		0.02f
 # define ANIM_ENEMY_TICKS	10
 # define ANIM_ENEMY_WALK_FRAMES	4
 
@@ -284,11 +285,12 @@ typedef struct	s_object
 		float		angle;
 		float		p_to_angle;
 		short		health;
+		t_fpoint	location;
+		float		location_angle;
 		t_fpoint	target;
-		float		target_distance;
-		t_upoint	*path;
-		unsigned	path_i;
-		unsigned	path_len;
+		t_list		*path;
+		t_point		path_target;
+		float		path_angle;
 		t_img		*imgset;
 		short		frame;
 		short		frames;
@@ -494,7 +496,7 @@ void			enemy_sprite(t_game *game, t_object *obj);
 void			enemy_shoot(t_game *g, t_object *obj);
 void			enemy_set_state(t_game *g, t_object *obj, enum e_objstate state);
 void			enemy_sound(t_game *game, t_object *obj, enum e_sound sound_type);
-t_upoint		*pathfind(t_game *g, t_object *obj);
+void			*pathfind(t_list **path, t_point from, t_point to, struct s_map *map);
 
 void			sounds(t_game *game);
 cs_playing_sound_t *	sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos);

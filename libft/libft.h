@@ -14,6 +14,7 @@
 # define LIBFT_H
 # include <stdlib.h>
 # include <unistd.h>
+# include <stdbool.h>
 
 typedef struct	s_list
 {
@@ -45,6 +46,8 @@ void			*ft_memcpy(void *dst, const void *src, size_t n);
 void			*ft_memccpy(void *dst, const void *src, int c, size_t n);
 void			*ft_memmove(void *dst, const void *src, size_t len);
 
+void			*ft_malloc_ptr(void **ptr, size_t size);
+void			*ft_free_ptr(void *ptr);
 void			*ft_calloc(size_t count, size_t size);
 void			ft_bzero(void *s, size_t n);
 void			*ft_memset(void *b, int c, size_t len);
@@ -74,6 +77,7 @@ void			ft_lstremoveif(t_list **begin, void *data_ref, int (*cmp)(),
 void			ft_lstsort(t_list **lst, int (*cmp)());
 int				ft_lstsize(t_list *lst);
 t_list			*ft_lstlast(t_list *lst);
+void			ft_lstreverse(t_list **begin_list);
 void			ft_lstdelone(t_list *lst, void (*del)(void*));
 void			ft_lstclear(t_list **lst, void (*del)(void*));
 void			ft_lstiter(t_list *lst, void (*f)(void *));
