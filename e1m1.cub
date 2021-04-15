@@ -2,7 +2,7 @@ R 2558 1296
 C 56,56,56
 F 112,112,112
 I Get Psyched!
-O Well done! Your next levelname: "neon"
+O Well done! Your next level: "neon.cub"
 
 W0 ./resources/walls/wall_0.png
 W1 ./resources/walls/wall_1.png
@@ -80,7 +80,7 @@ A16 ./resources/sounds/pickup_bonus_xl.wav
      6aazx66     6..........3.............3xxX3
      6aazz76     6.^....^...|......*.....s|.wx4
      6aaz..6     6..........3.............3XXX3
-     66966.66966 6...66686665.............53333
+     66966>66966 6...66686665.............53333
      6.xX:.:X..6 6...6      3.............3
      8.$...x.$s866...666    3334333-3334333
      6..e......6...n...6         3...3

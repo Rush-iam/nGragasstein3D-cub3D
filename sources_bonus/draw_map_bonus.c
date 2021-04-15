@@ -16,7 +16,7 @@ void	draw_map_init(t_game *game)
 {
 	int	null;
 
-	game->map.show = true;
+	game->map.show = false;
 	game->map.img.size = (t_upoint){game->map.size.x * MAP_SCALE,
 									game->map.size.y * MAP_SCALE};
 	if (!(game->map.img.ptr = mlx_new_image(game->mlx, game->map.img.size.x,

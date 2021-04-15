@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/12 16:12:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/15 16:20:33 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/16 00:20:01 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,6 @@ void	weapon_shoot(t_game *g, t_object *target)
 		}
 		else
 			enemy_set_state(g, target, ST_PAIN);
-		printf("bam! ammo left: %hd RND damage: %u\n", g->p.ammo, damage);
+//		printf("bam! ammo left: %hd RND damage: %u\n", g->p.ammo, damage);
 	}
 }
