@@ -1,9 +1,9 @@
-R 2560 1296
+R 2558 1296
 C 56,56,56
 F 60,56,66
 D 1
 I A horrible chill goes down your spine...
-O Well done! Your next levelname: "exit"
+O Well done! Your next level: "exit.cub"
 
 W0 ./resources/walls/wall_black.png
 W1 ./resources/walls/wall_black_jail.png
@@ -75,19 +75,6 @@ S24 ./resources/sprites/bonus_xl.png
 S25 ./resources/sprites/bonus_l.png
 S26 ./resources/sprites/bonus_m.png
 S27 ./resources/sprites/bonus_s.png
-
-# W0-W9   = 0123456789			- стены
-# W10-W11 = -|>v				- двери
-# S0-S18  = ^*$:;,!@%#&?[]{}_~`	- декорации
-# S19-S27 = +HhAaZzXx			- предметы
-# E0		nswe				- враги (направление взгляда)
-
-# Символы NSWE - стартовая точка игрока.
-# Пока что непроходимые вот эти спрайты: (задаётся в коде)
-# S2-S13  = $:;,!@%#&|[]
-
-# Кнопка Backspace - включить/отключить мышку
-# Кнопка M - отключить/включить карту
 
 #     ^ lamp.png
 #     * chandelier.png

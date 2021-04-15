@@ -123,8 +123,8 @@ void	player_control_toggler(t_game *g, int key_code)
 		}
 		g->key.mouse = !g->key.mouse;
 	}
-	if (key_code == K_MAP_TOGGLE && g->key.k[key_code] == false)
-		g->map.show = !g->map.show;
+//	if (key_code == K_MAP_TOGGLE && g->key.k[key_code] == false)
+//		g->map.show = !g->map.show;
 	if (key_code == K_USE && g->key.k[key_code] == false)
 		door_open(g);
 }

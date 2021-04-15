@@ -1,0 +1,94 @@
+R 2558 1296
+C 56,56,56
+F 112,112,112
+D 3
+I Be quiet!
+O Do you hear it?
+
+W0 ./resources/walls/wall_stone_neon.png
+W1 ./resources/walls/wall_42_neon.png
+W2 ./resources/walls/wall_2.png
+W3 ./resources/walls/wall_wood_dark.png
+W4 ./resources/walls/wall_stone_alpaca.png
+W5 ./resources/walls/wall_stone_kapibara.png
+W6 ./resources/walls/wall_stone_medoed.png
+W7 ./resources/walls/wall_metal_1.png
+W8 ./resources/walls/wall_metal_2.png
+W9 ./resources/walls/wall_stone_salamandra.png
+
+W10 ./resources/walls/door_neon_0.png
+W11 ./resources/walls/door_neon_1.png
+W12 ./resources/walls/door_neon_2.png
+W13 ./resources/walls/door_neon_1.png
+
+G0 ./resources/weapons/knife_neon_
+G1 ./resources/weapons/pistol_neon_
+G2 ./resources/weapons/rifle_
+
+S0 ./resources/sprites/lamp.png
+S1 ./resources/sprites/chandelier.png
+S2 ./resources/sprites/lamp_stand.png
+S3 ./resources/sprites/plant_green.png
+S4 ./resources/sprites/plant_dry.png
+S5 ./resources/sprites/vase.png
+S6 ./resources/sprites/flag.png
+S7 ./resources/sprites/barrel_brown.png
+S8 ./resources/sprites/barrel_green.png
+S9 ./resources/sprites/table.png
+S10 ./resources/sprites/table_chairs.png
+S11 ./resources/sprites/statue.png
+S12 ./resources/sprites/well_empty.png
+S13 ./resources/sprites/well_full.png
+S14 ./resources/sprites/skeleton.png
+S15 ./resources/sprites/bones.png
+S16 ./resources/sprites/puddle.png
+S17 ./resources/sprites/pot.png
+S18 ./resources/sprites/guard_dead.png
+S19 ./resources/sprites/health_xl.png
+S20 ./resources/sprites/health_l.png
+S21 ./resources/sprites/health_m.png
+S22 ./resources/sprites/gun_rifle.png
+S23 ./resources/sprites/ammo.png
+S24 ./resources/sprites/bonus_xl.png
+S25 ./resources/sprites/bonus_l.png
+S26 ./resources/sprites/bonus_m.png
+S27 ./resources/sprites/bonus_s.png
+
+M0 ./resources/music/01 Around the Corner!.wav
+E0 ./resources/enemies/mutant/
+
+A0 ./resources/sounds/player_noaction.wav
+A1 ./resources/sounds/player_pain.wav
+A2 ./resources/sounds/player_death.wav
+A3 ./resources/sounds/door_open.wav
+A4 ./resources/sounds/door_close.wav
+A5 ./resources/sounds/weapon_knife.wav
+A6 ./resources/sounds/weapon_pistol.wav
+A7 ./resources/sounds/weapon_rifle.wav
+A8 ./resources/sounds/pickup_ammo.wav
+A9 ./resources/sounds/pickup_rifle.wav
+A10 ./resources/sounds/pickup_health_m.wav
+A11 ./resources/sounds/pickup_health_l.wav
+A12 ./resources/sounds/pickup_health_xl.wav
+A13 ./resources/sounds/pickup_bonus_s.wav
+A14 ./resources/sounds/pickup_bonus_m.wav
+A15 ./resources/sounds/pickup_bonus_l.wav
+A16 ./resources/sounds/pickup_bonus_xl.wav
+
+                                    0000000000001000000000000
+              7787877               0.......................0
+              7..}..7               0..*........*........*..0
+  7777777777777..^..7               0....40000:...:005>5....0
+  7nnnnnnnnnnn7.....7               0....v..10..#..01..0....0
+  7nnnnnnnnnnn777>7777777777777777700....4.^.0$...$0.^.0....0
+087nnnnnnnnnnn7....;7nnnnnnnnnnnnnn70....01.80..#..08~10....0
+8Ev...^...^...v..^..v...............v....00400..*..00500....0
+087sssssssssss7.....7sssssssssss7.770..*........+........*..0
+  7sssssssssss7....;7sssssssssss7.e70....00600..*..00900....0
+  7sssssssssss777>777sssssssssss7.e70....01.80..#..08.10....0
+  7777777777777.....7sssssssssss7ne70....0.^.0$...$0.^.9....0
+              7..^..77777777777777770....0..10..#..01..v....0
+              7__.a@7               0....6>600:...:00009....0
+              7787877               0..*........*........*..0
+                                    0.......................0
+                                    0000000000001000000000000

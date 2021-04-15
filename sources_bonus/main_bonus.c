@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/15 16:12:47 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/16 00:19:21 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,10 +84,10 @@ void	string_add(t_game *g, char *string, int timer, unsigned color)
 
 int	game_loop(t_game *game)
 {
-	static clock_t			clock_cur;
+//	static clock_t			clock_cur;
 	static struct timespec	time;
 	static unsigned			tick_prev;
-	int						fps;
+//	int						fps;
 
 	clock_gettime(CLOCK_MONOTONIC, &time);
 	tick_prev = game->tick;
@@ -125,10 +125,10 @@ int	game_loop(t_game *game)
 //	demo_fillrate(game, 1);
 //	demo_cursor(game, 0xFF88FF);
 //	demo_radar(game, 360);
-	fps = CLOCKS_PER_SEC / (clock() - clock_cur);
-	clock_cur = clock();
-	mlx_string_put(game->mlx, game->win, 0, 20, COLOR_WHITE,
-		(char []){'0' + fps/100, '0' + fps / 10 % 10, '0' + fps % 10, '\0'});
+//	fps = CLOCKS_PER_SEC / (clock() - clock_cur);
+//	clock_cur = clock();
+//	mlx_string_put(game->mlx, game->win, 0, 20, COLOR_WHITE,
+//		(char []){'0' + fps/100, '0' + fps / 10 % 10, '0' + fps % 10, '\0'});
 	return (0);
 }
 

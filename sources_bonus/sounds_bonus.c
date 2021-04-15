@@ -6,12 +6,28 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:30:14 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/26 16:30:59 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/16 00:09:57 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #define CUTE_SOUND_IMPLEMENTATION
 #include "cub3d_bonus.h"
+
+void	sound_adjust_pan_special(struct s_player *pl, struct s_playing_sound sound)
+{
+	float	distance;
+	float	angle;
+
+	distance = fabsf(sound.sourcepos.x - pl->pos.x) +
+			   fabsf(sound.sourcepos.y - pl->pos.y);
+	angle = atan2f(sound.sourcepos.y - pl->pos.y,
+				   sound.sourcepos.x - pl->pos.x) - pl->angle;
+	if (angle < -M_PI_F)
+		angle += PI2_F;
+	cs_set_pan(sound.snd, 0.5f + sinf(angle) / 2.0f);
+	sound.snd->volume0 = fmaxf(0.5f - 0.2f * distance, 0.0f);
+	sound.snd->volume1 = sound.snd->volume0;
+}
 
 void	sounds(t_game *game)
 {
@@ -24,6 +40,11 @@ void	sounds(t_game *game)
 		{
 			if (game->audio.playing[i].snd->active == false)
 				game->audio.playing[i].snd = NULL;
+
+			else if (game->audio.playing[i].sourcepos.x != 0.0 &&
+						game->audio.playing[i].snd->looped)
+				sound_adjust_pan_special(&game->p, game->audio.playing[i]);
+
 			else if (game->audio.playing[i].sourcepos.x != 0.0)
 				sound_adjust_pan(&game->p, game->audio.playing[i]);
 		}

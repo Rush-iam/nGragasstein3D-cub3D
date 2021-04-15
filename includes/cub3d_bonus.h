@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/15 18:00:15 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/15 22:59:25 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,6 +178,7 @@ enum	e_sound
 	SND_PICKUP_BONUS_M,
 	SND_PICKUP_BONUS_L,
 	SND_PICKUP_BONUS_XL,
+	SND_EMITSOUND,
 	SND_ENEMY_ALARM,
 	SND_ENEMY_ATTACK,
 	SND_ENEMY_DEATH,
@@ -420,6 +421,7 @@ typedef struct	s_game
 	}			string;
 	t_img		effect_img;
 	char		*endleveltext;
+	bool		lastlevel;
 }				t_game;
 
 void			initialize_game		(t_game *game, bool screenshot_only);
