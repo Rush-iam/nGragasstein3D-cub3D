@@ -2,7 +2,7 @@ R 2560 1296
 C 56,56,56
 F 112,112,112
 D 10
-T 
+I
 
 W0 ./resources/walls/wall_black.png
 W1 resources/walls/wall_black_jail.png

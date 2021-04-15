@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:53:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/14 23:41:24 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/15 16:21:40 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,8 @@ void	enemy_logic(t_game *game, t_object *obj)
 	if (obj->e->state == ST_DEATH && obj->e->tick + 1 == obj->e->ticks)
 		return ;
 	see = false;
-	if (obj->e->state != ST_DEATH && fabsf(obj->e->p_to_angle) < ENEMY_FOV_HALF)
+	if (obj->e->state != ST_DEATH && (fabsf(obj->e->p_to_angle) < ENEMY_FOV_HALF
+										|| game->p.weapon_noise == true))
 		see = ray_intersect_distance(game, obj->atan_diff) > obj->distance_real;
 	if (obj->e->state == ST_WAIT && see == false)
 		return ;

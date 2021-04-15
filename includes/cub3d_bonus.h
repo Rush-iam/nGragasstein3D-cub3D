@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/14 23:07:03 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/15 18:00:15 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@
 # define MAX_WIN	(t_upoint){2558, 1396}
 # define MAX_SCR	(t_upoint){20000, 20000}
 # define MIN_RES_X	2
-# define MAX_PLAYING_SOUNDS	12
+# define MAX_PLAYING_SOUNDS	24
 
 # define T_FPT_NULL	(t_fpoint){0.0f, 0.0f}
 # define M_PI_F		(float)M_PI
@@ -203,17 +203,17 @@ enum	e_sound
 # define DMG_SHOT_MAX	35
 
 # define START_HEALTH	100
-# define START_AMMO		8
+# define START_AMMO		0
 # define START_WEAPONS	W_KNIFE_MASK | W_PISTOL_MASK
 
 # define ENEMY_HEALTH		25
-# define ENEMY_FOV_HALF		M_PI_4_F * 1.5f
+# define ENEMY_FOV_HALF		M_PI_2_F
 # define ENEMY_SHOT_DELAY	2
 # define ENEMY_MISS_MAX		60
-//# define ENEMY_DMG_MIN		3
-//# define ENEMY_DMG_MAX		30
-# define ENEMY_DMG_MIN		1
-# define ENEMY_DMG_MAX		1
+# define ENEMY_DMG_MIN		3
+# define ENEMY_DMG_MAX		30
+//# define ENEMY_DMG_MIN		1
+//# define ENEMY_DMG_MAX		1
 # define ENEMY_SPEED		0.02f
 # define ANIM_ENEMY_TICKS	10
 # define ANIM_ENEMY_WALK_FRAMES	4
@@ -354,6 +354,7 @@ typedef struct	s_game
 			bool			lock;
 		}			weapon;
 		bool		weapon_shot;
+		bool		weapon_noise;
 		t_img		weapon_img[3][4];
 		t_upoint	weapon_pos;
 	}			p;
@@ -418,6 +419,7 @@ typedef struct	s_game
 		unsigned	color;
 	}			string;
 	t_img		effect_img;
+	char		*endleveltext;
 }				t_game;
 
 void			initialize_game		(t_game *game, bool screenshot_only);

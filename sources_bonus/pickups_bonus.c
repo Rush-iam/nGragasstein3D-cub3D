@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:52:01 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/25 20:52:19 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/15 18:30:17 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,10 @@ void	pickup_get(t_game *game, enum e_objtype item)
 	else if (item == T_HEALTH_M)
 		game->p.health += VAL_HEALTH_M;
 	else if (item == T_HEALTH_XL)
+	{
+		string_add(game, ft_strdup(game->endleveltext), 60, COLOR_GREEN);
 		game->p.health = VAL_HEALTH_XL;
+	}
 	else if (item == T_AMMO)
 		game->p.ammo += VAL_AMMO_M;
 	else if (item == T_AMMO_ENEMY)
