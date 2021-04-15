@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/12 16:12:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/25 20:57:10 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/15 16:20:33 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ void	weapon(t_game *game, struct s_weapon *weapon)
 		{
 			weapon_shoot(game, game->p.target);
 			game->p.weapon_shot = true;
+			if (game->p.weapon_cur != W_KNIFE)
+				game->p.weapon_noise = true;
 		}
 		else if (weapon->frame == 3)
 			game->p.weapon_shot = false;

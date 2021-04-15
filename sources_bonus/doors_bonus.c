@@ -83,7 +83,8 @@ void	door_sound(t_game *game, t_door *door)
 	{
 		door->sound = sound_play(game, &game->audio.sound[SND_DOOR_OPEN],
 						(t_fpoint){door->cell.x + 0.5f, door->cell.y + 0.5f});
-		door->sound->sample_index = (float)ANIM_DOOR_TICKS / TICKS_PER_SEC *
+		if (door->sound)
+			door->sound->sample_index = (float)ANIM_DOOR_TICKS / TICKS_PER_SEC *
 					door->part_opened * door->sound->loaded_sound->sample_rate;
 		door->ticks_to_close = DOOR_TIMER_TICKS;
 	}

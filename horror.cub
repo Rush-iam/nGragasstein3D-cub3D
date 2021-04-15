@@ -1,11 +1,14 @@
 R 2560 1296
 C 56,56,56
-F 112,112,112
-D 2
+F 60,56,66
+D 1
+I A horrible chill goes down your spine...
+O Well done! Your next levelname: "exit"
+
 W0 ./resources/walls/wall_black.png
-W1 resources/walls/wall_black_jail.png
+W1 ./resources/walls/wall_black_jail.png
 W2 ./resources/walls/wall_black_bones.png
-W3 ./resources/walls/wall_3.png
+W3 ./resources/walls/wall_wood.png
 W4 ./resources/walls/wall_alpaca.png
 W5 ./resources/walls/wall_kapibara.png
 W6 ./resources/walls/wall_42.png
@@ -22,9 +25,8 @@ G0 ./resources/weapons/knife_
 G1 ./resources/weapons/pistol_
 G2 ./resources/weapons/rifle_
 
-M0 ./resources/music/04 Get Them!.wav
-#E0 ./resources/enemies/mutant/
-E0 ./resources/enemies/guard/
+M0 ./resources/music/ES_Stress Zone - Alan Carlson-Green (low).wav
+E0 ./resources/enemies/mutant/
 
 A0 ./resources/sounds/player_noaction.wav
 A1 ./resources/sounds/player_pain.wav
@@ -46,18 +48,18 @@ A16 ./resources/sounds/pickup_bonus_xl.wav
 
 S0 ./resources/sprites/lamp.png
 S1 ./resources/sprites/chandelier.png
-S2 ./resources/sprites/lamp_stand.png
+S2 ./resources/sprites/skulls.png
 S3 ./resources/sprites/plant_green.png
 S4 ./resources/sprites/plant_dry.png
 S5 ./resources/sprites/vase.png
 S6 ./resources/sprites/flag.png
 S7 ./resources/sprites/barrel_brown.png
 S8 ./resources/sprites/barrel_green.png
-S9 ./resources/sprites/table.png
+S9 ./resources/sprites/jail_skeletons.png
 S10 ./resources/sprites/table_chairs.png
-S11 ./resources/sprites/statue.png
+S11 ./resources/sprites/statue_demon.png
 S12 ./resources/sprites/well_empty.png
-S13 ./resources/sprites/well_full.png
+S13 ./resources/sprites/well_blood.png
 S14 ./resources/sprites/skeleton.png
 S15 ./resources/sprites/bones.png
 S16 ./resources/sprites/puddle.png
@@ -89,61 +91,76 @@ S27 ./resources/sprites/bonus_s.png
 
 #     ^ lamp.png
 #     * chandelier.png
-#     $ lamp_stand.png
+#     $ skulls.png
 #     : plant_green.png
 #     ; plant_dry.png
 #     , vase.png
 #     ! flag.png
 #     @ barrel_brown.png
 #     % barrel_green.png
-#     # table.png
+#     # jail_skeletons.png
 #     & table_chairs.png
-#     ? statue.png
+#     ? statue_demon.png
 #     [ well_empty.png
-#     ] well_full.png
+#     ] well_blood.png
 #     { skeleton.png
 #     } bones.png
 #     _ puddle.png
 #     ~ pot.png
 #     ` guard_dead.png
 
-0000000000000000000000000000000000
-000000000.a00000000000000000000000
-0.^|.^ha0..00^^+aa^^.|^^hh^.0...}0
-0..0.^aA0S.00^^Aaa^^.0^^hh^.|^...0
-0.s000000..00000000000000000000}.0
-0s.0}..}0....:...;...:...:...:0}.0
-0^s0..^a0}....w.^....w^.....^}0..0
-0..0@.0000000000000000000000-00..0
-0.00....}0eeeee00}{}.{}..{{0..0.00
-0.}0.....|.eeee00..........0.a0.00
+000000000000000000000000000000000000
+000000000...|.........?0000000000000
+0.^|.^hH0.00000.^.h.^.?0?Zhz^.0...}0
+0..0.^aA0....00.......?0?Zhz^.|^..}0
+0.s00000000..0000000000000000000}..0
+0s.0}..}0Ev....;...;000;...;..}0}..0
+0^s0..^a000.......^.....^....^}0..00
+0..0@.0000000000000000000000-00..000
+0.00....}0eeeee00}{}.{}.H{{0..0.00
+0.}0.....|.eeee00..........0..0.00
 0.^0.^...00000000^.0000000-0.00^00
-0..0..0..00000000-0000000..0..0.00
-00.0..0@.00.aa.00.....}}0.a0.}0.00
+0..0..0..003333000-0000000.0..0.00
+00.0..0@.00as..00.....}}0..0.}0.00
 0}.0^.0..00^^^^00.^.n.^.0.00.00..0
-0^.0n.0.@00..ss00.^..n^.0..0.w00.0
-0..0..0..00}..{00{......0}.0.a00.0
+0^.0n.0.@00..s.00.^..n^.0..0.w00.0
+0..0..0..00}..{00{......0}.0..00.0
 0{.0.^0@.000-0000112110-00.0.000^0
-00-0.n0.....^..^..^}00..0..0.{00.0
-0{.0..0}.......`....00}.0.}0}.00.0
+00-0.n0....e^..^..^}00..0..0.{00.0
+0{.0..0}...e...`....00}.0.}0}.00.0
 0..|^.00-0000000000.00`.0.000-0..0
-0.}0..0a^0033333333-300.0..0{.0.00
-0-00}}0;;03:^.^h^.^.60..0`.0..0.00
-0..01200003..*&*&*..90..00.00.0^00
-0..00000003.^.^h^.^.60.`0..0[.0.00
-0^.0^}~}^03-3333333330.00.}0`.0.00
-0.n0....w00.0000000000.}0.000.0..0
-0.n0....s00^...^..e^...}0s.0;.00.0
-0.^0^...^00..^e..^.....}0.s0:.00.0
-0.%0..00-0000000000000000..00.00^0
-0..0..00.0000000000000000..0{.00.0
-0^.0^.00........0.}0{....._0}.00.0
-0@.0..00}^w.^w.^|.....0a..]00.0..0
-0..0{.0000000000000000000000..0.00
+0.}0..0a^0034373835-300.0..0{.0.00
+0-00}}0..03:^.^h^.^.60..0`.0..0.00
+0.00}}0;.03:^&*h*&^.60^.0`.0..|^00
+0.a01200-03..*&*&*..90..00.00.0}00
+0-00}^|.^03:^&*h*&^w60n.0`.0..0200 00000000000
+0..01200003.^.^h^.^w60^`0..0[.0h0000^.....^..0
+0^.0^}~}^03-7343538330.00.}0`.0..|...0000000^0
+0.n0....w00s0000000000.}0.000.00000000}..Z?0.0
+0.n0....s00^...^..e^...}0s.0;.|.^.w^.|.*zH?0^0
+0.^0^...^00e.^e..^.e...}0.s0..00000000}..Z?0.0
+0.%0..00-0000000000000000..00.00.|...0000000^0
+0..0..00.0000000000000000.$0{.00.000^.....^..0
+0^.0^.00........0.}0{.....]0}.00.0 0000000000
+0%.0..00}^w.^w.^|.....0...$00-0..0
+0n.0{s0000000000000000000000..0.00
 0.^00-0020102010201010102010..0.00
 0.%0}............%..........w.0^00
-0..0.......%..........e%....w}0.00
-0..0110201102011020110201102100.00
+0..0.......%...........%....w}|.00
+0.n0110201102011020110201102100000
 0...%..e....e...................}0
-0}.....en...w.....@.....}0-0.....0
-0000110211011102110211011000000000
+0}.....ee...e0-0.%.0-0..}0-0.....0
+00001102110111.21022.10116+6000000
+             0.0   0.0   666
+             0^0   0^0
+             0.0   0.0
+             0.0   0.0
+             0^0   0^0
+             0.0   0.0
+             0-00000-0
+     000000000...0...000000000
+     0$ZZ##]##...0...##]##ZZ$0
+     00$.........0.........$00
+     000$.....nn.|......w.$000
+     0000$.......0..n....$0000
+     0212121211210121212121212

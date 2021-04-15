@@ -1,0 +1,148 @@
+R 2560 1296
+C 26,26,26
+F 52,60,52
+D 8
+I Are you here?
+O Well done! Your next levelname: "horr"
+
+W0 ./resources/walls/wall_black.png
+W1 ./resources/walls/wall_black_jail.png
+W2 ./resources/walls/wall_black_bones.png
+W3 ./resources/walls/wall_stone_neon.png
+W4 ./resources/walls/wall_stone_alpaca.png
+W5 ./resources/walls/wall_stone_kapibara.png
+W6 ./resources/walls/wall_42_neon.png
+W7 ./resources/walls/wall_stone_medoed.png
+W8 ./resources/walls/wall_stone_salamandra.png
+W9 ./resources/walls/wall_fire.png
+
+W10 ./resources/walls/door_neon_0.png
+W11 ./resources/walls/door_neon_1.png
+W12 ./resources/walls/door_neon_2.png
+W13 ./resources/walls/door_neon_1.png
+
+G0 ./resources/weapons/knife_neon_
+G1 ./resources/weapons/pistol_neon_
+G2 ./resources/weapons/rifle_
+
+M0 ./resources/music/04 Get Them!.wav
+E0 ./resources/enemies/ss/
+
+A0 ./resources/sounds/player_noaction.wav
+A1 ./resources/sounds/player_pain.wav
+A2 ./resources/sounds/player_death.wav
+A3 ./resources/sounds/door_open.wav
+A4 ./resources/sounds/door_close.wav
+A5 ./resources/sounds/weapon_knife.wav
+A6 ./resources/sounds/weapon_pistol.wav
+A7 ./resources/sounds/weapon_rifle.wav
+A8 ./resources/sounds/pickup_ammo.wav
+A9 ./resources/sounds/pickup_rifle.wav
+A10 ./resources/sounds/pickup_health_m.wav
+A11 ./resources/sounds/pickup_health_l.wav
+A12 ./resources/sounds/pickup_health_xl.wav
+A13 ./resources/sounds/pickup_bonus_s.wav
+A14 ./resources/sounds/pickup_bonus_m.wav
+A15 ./resources/sounds/pickup_bonus_l.wav
+A16 ./resources/sounds/pickup_bonus_xl.wav
+
+S0 ./resources/sprites/lamp.png
+S1 ./resources/sprites/chandelier.png
+S2 ./resources/sprites/lamp_stand.png
+S3 ./resources/sprites/plant_green.png
+S4 ./resources/sprites/plant_dry.png
+S5 ./resources/sprites/vase.png
+S6 ./resources/sprites/flag.png
+S7 ./resources/sprites/barrel_brown.png
+S8 ./resources/sprites/barrel_green.png
+S9 ./resources/sprites/table.png
+S10 ./resources/sprites/table_chairs.png
+S11 ./resources/sprites/statue.png
+S12 ./resources/sprites/well_empty.png
+S13 ./resources/sprites/well_full.png
+S14 ./resources/sprites/skeleton.png
+S15 ./resources/sprites/bones.png
+S16 ./resources/sprites/puddle.png
+S17 ./resources/sprites/pot.png
+S18 ./resources/sprites/guard_dead.png
+
+S19 ./resources/sprites/health_xl.png
+S20 ./resources/sprites/health_l.png
+S21 ./resources/sprites/health_m.png
+S22 ./resources/sprites/gun_rifle.png
+S23 ./resources/sprites/ammo.png
+S24 ./resources/sprites/bonus_xl.png
+S25 ./resources/sprites/bonus_l.png
+S26 ./resources/sprites/bonus_m.png
+S27 ./resources/sprites/bonus_s.png
+
+# W0-W9   = 0123456789			- стены
+# W10-W11 = -|>v				- двери
+# S0-S18  = ^*$:;,!@%#&?[]{}_~`	- декорации
+# S19-S27 = +HhAaZzXx			- предметы
+# E0		nswe				- враги (направление взгляда)
+
+# Символы NSWE - стартовая точка игрока.
+# Пока что непроходимые вот эти спрайты: (задаётся в коде)
+# S2-S13  = $:;,!@%#&|[]
+
+# Кнопка Backspace - вкл/откл мышку
+# Кнопка M - откл/вкл карту
+
+          333343333333433343333433333334333      333333
+     666666e.!....vssa*a..sH3,......s....,3      3XaXx3
+     3?axx6......333333383334...&.s&..&...43333  3xX333
+333333aAzx66.s...6a...3..3..3....4...4....3xxX3  3ss3
+3.XX.3aazz76.....6.^....^...|....4.*.4...s|.wx4  3..33
+3.ss.3aaz..6n....66...3..3..3...433s334...3XXX3  3**3
+3....36966.66966.6...33383335.............53333333..3333
+3....3.xX:.:X..6.66..6......3.&.........&.3.ss.3....s..333333
+6........8.x..e..$s866...3333334333-3334333....|.....sss..h.3
+3.a.a.a..|...4...$.6...s...3333333...3.........333333...33333
+3...z....6...&.s...|...^...3.A.663.s.33333333333.s..........3
+3z..z...n3!.n......6.....n.33...65.^.|......^...............3
+3333333338z$e....$.83339333.....63...33333333333...!..@.....3
+3.H@33zz.......33333Zz66.ss.666663...3.h.....w..............3
+3a^.333933-33933Z..6.6.....6333333...333.*.33333......3.3...3
+3...3...3...6z.66..6^6.s6..634.vs..^..?3.......w.....@3^3.s.3
+33-33...8.^.8.^.6..6.6.....63a.333...3333333333333...33.3...3
+3...33333...66..6..6.6..6a.63aH3 3...3.w......a3h.....3.3...33
+3.^.3..h3...3..33.^6^6^666663AH3 3...3........3333...........3
+3.s...^w8.^.8...33.6.6.6...63333 4.^.4.&......Z........_...s.3
+3...3..X3.n.3....3.6.6.6.666666663...3333333333333333..3....a3
+3...333333-33333.3^6^6^6^6..^..h634-43................0000000000
+8.^.83s........6...3.6.6...666686;...;686666...@......0h..._@@@0
+3...336;.....;.8.....6.....6;.............;6..........|.....w.@0
+3...33..^...^..6]..........696666..a...66666900000000000.......0
+3....36..686...63333{....3336...............0...@.....0........0
+3.^..|.w..*....8,..........|..*....*...w*...|.........|...8...@1
+3....36..676..66.........?Z6................0...s.....0........0
+3...33..^...^..6....33383339..666..?..666..9000....0000..#h.#.w0
+3...336;.....;68,..........6;.............;6..00..00..0........0
+3...33.......n.6666........667666.....667666...0s.0...0......h.0
+7.^.766666-66666,.....6646666...000-000....0...0..0.A.000]00[000
+6...6w.s6...6......6.............0..0.....0...0..0.aaa.0000000
+4...66666...6000000000000000000000.^0.0000000.0..0.a..?.x.as0
+6...6s.%6...z...^....a^.....^...Z...|.....s...0.s0.00000-0000
+5.....^.8.^.8000000000000000000000..0...000.ax00-000.0.0.0h00
+6...6h..6...6666866686668666866660..00000000000.a.0........a0
+7.^.66666...6.Haa.zzxa.......6..60.^0         0...|.e......@1
+6...66766.n.66866866696668...6..60..00000000000.s.0.....h..~0
+8.......6........6.....w86.....660..0.{x.000000.0.0..0{000000
+6.n...^...n...^..|...w..v6...6..60.s0.^^.0w.......00-0000000
+666...66.........6.....w8....66.60.^0....0000........0
+6876-6676876666666>66966666.....60..0?...we.v...@....0
+6h........a8..66...H6h^.....0000000-000000000000000000
+7..n.n.n.n.6v..6..6666666...0}h..0...0....0
+6...n.n.n..8.....666w.......0....|.^.|.{..0
+8....e.e....66.646867..656760....0...0....0
+6...e.e.e...5..7!.........!60a...0...0....0
+4.....^....h46+8...........5000000,..000000
+6h...!?!...!6565?...n.n.n..?6....0...0....0
+5........w..w..w.....^.....60...`|.^.|h..}0
+66!.....w..w..w...n.n.n.n..40....0...0....0
+ 7..w....w.*w..w.......!..!6000000...000000
+ 6......w..w?.w.......!648660......N......0
+ 8!a.....w..w..w..!..s.5    0..^...^...^.a0
+ 66!......w..w.......786    0......h......0
+  66664656768646567686      010010020010010

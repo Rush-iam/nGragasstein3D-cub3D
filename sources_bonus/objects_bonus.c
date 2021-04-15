@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:03 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/05 17:20:20 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/15 16:22:11 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,10 @@ void	objects(t_game *g)
 		draw_object_properties(g, obj);
 		if (obj->type == T_ENEMY)
 			enemy(g, obj);
-		if (obj->distance_real < 0.5 && pickup(g, obj->type))
+		if (obj->distance_real < 0.5f && pickup(g, obj->type))
 			ft_lstremove(&g->objects, cur_list);
 	}
+	g->p.weapon_noise = false;
 }
 
 void	object_add(t_game *game, t_list **dst, void *obj)

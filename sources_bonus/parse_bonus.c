@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/13 17:57:08 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/15 18:24:49 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	set_enemies(char *string, t_game *g)
 	if ((path = ft_strjoin(string, "attack_")) == NULL)
 		terminate(g, ERR_PARSE, strerror(errno));
 	load_spriteset(g->enemyset[id].attack, 3, path, g);
-	if ((path = ft_strjoin(string, "dead_")) == NULL)
+	if ((path = ft_strjoin(string, "death_")) == NULL)
 		terminate(g, ERR_PARSE, strerror(errno));
 	load_spriteset(g->enemyset[id].death, 5, path, g);
 	if ((path = ft_strjoin(string, "pain_")) == NULL)
@@ -127,8 +127,10 @@ void	parse_scene(int file_id, char **line, t_game *game)
 			set_audio(*line, game);
 		else if (**line == 'D')
 			atoi_limited(&game->fade_distance, *line + 1, UINT_MAX);
-		else if (**line == 'T' && game->string.text == NULL)
+		else if (**line == 'I' && game->string.text == NULL)
 			string_add(game, ft_strdup(*line + 2), 5, COLOR_WHITE);
+		else if (**line == 'O' && game->endleveltext == NULL)
+			game->endleveltext = ft_strdup(*line + 2);
 		else if (**line != '#' && **line != '\0')
 			return ;
 		free(*line);
