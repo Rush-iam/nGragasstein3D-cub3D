@@ -25,7 +25,7 @@ G0 ./resources/weapons/knife_
 G1 ./resources/weapons/pistol_
 G2 ./resources/weapons/rifle_
 
-M0 ./resources/music/ES_Stress Zone - Alan Carlson-Green (low).wav
+M0 ./resources/music/ES_Stress Zone - Alan Carlson-Green.wav
 E0 ./resources/enemies/mutant/
 
 A0 ./resources/sounds/player_noaction.wav

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:52:01 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/15 22:53:01 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/16 13:41:21 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ bool	pickup(t_game *game, enum e_objtype type)
 	game->p.ammo = ft_min(game->p.ammo, 99);
 	if ((type == T_HEALTH_L || type == T_HEALTH_M) && game->p.health > 100)
 		game->p.health = 100;
-	printf("STATUS: Health = %hd; Ammo = %hd; Score = %hd\n",
-		   game->p.health, game->p.ammo, game->p.score);
+//	printf("STATUS: Health = %hd; Ammo = %hd; Score = %hd\n",
+//		   game->p.health, game->p.ammo, game->p.score);
 	game->effect = (struct s_effect){15, 30, EF_FLASH, COLOR_YELLOW, .2};
 	pickup_sound(game, type);
 	return (true);
@@ -64,6 +64,7 @@ void	pickup_get(t_game *game, enum e_objtype item)
 		game->p.health += VAL_HEALTH_M;
 	else if (item == T_HEALTH_XL)
 	{
+		// TODO:
 		if (game->endleveltext)
 			string_add(game, ft_strdup(game->endleveltext), 60, COLOR_GREEN);
 		game->p.health = VAL_HEALTH_XL;

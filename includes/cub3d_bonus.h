@@ -28,8 +28,8 @@
 # include "x_events.h"
 
 # define WIN_TITLE	"nGragasstein 3D"
-# define MAX_WIN	(t_upoint){2558, 1396}
-# define MAX_SCR	(t_upoint){20000, 20000}
+# define MAX_WIN	(t_point){2558, 1396}
+# define MAX_SCR	(t_point){20000, 20000}
 # define MIN_RES_X	2
 # define MAX_PLAYING_SOUNDS	24
 

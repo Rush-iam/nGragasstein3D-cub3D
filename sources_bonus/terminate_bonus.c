@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 23:31:40 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/25 17:10:15 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/16 13:41:21 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 
 int		terminate(t_game *game, int return_value, char *message)
 {
+	// TODO:
+	open("resources/.tmp", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+
 	if (return_value)
 	{
 		ft_putendl_fd("Error", 2);
