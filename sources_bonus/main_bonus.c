@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/16 00:19:21 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/16 14:34:09 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,12 @@ int	game_loop(t_game *game)
 	draw_map(game);
 	draw_string(game, &game->string);
 
+	mlx_string_put(game->mlx, game->win, game->img.size.x - 260, game->img.size.y - 8, COLOR_CYAN_F,
+				   (char []){'H', 'e', 'a', 'l', 't', 'h', ':',
+	'0' + game->p.health / 100, '0' + game->p.health / 10 % 10, '0' + game->p.health % 10, '\0'});
+	mlx_string_put(game->mlx, game->win, game->img.size.x - 110, game->img.size.y - 8, COLOR_CYAN_F,
+		(char []){'A', 'm', 'm', 'o', ':',
+			'0' + game->p.ammo / 10 % 10, '0' + game->p.ammo % 10, '\0'});
 //	demo_fillrate(game, 1);
 //	demo_cursor(game, 0xFF88FF);
 //	demo_radar(game, 360);

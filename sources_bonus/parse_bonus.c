@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/16 00:26:37 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/16 15:12:16 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	encode()
 
 	if ((file_read = open(".cub", O_RDONLY)) == -1)
 		exit(0);
-	if ((file_write = open("enc", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)) == -1)
+	if ((file_write = open(".enc", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)) == -1)
 		exit(0);
 	while ((ret = read(file_read, buf, 1)) > 0)
 	{
@@ -219,7 +219,7 @@ void	generate_scenefile(t_game *game, unsigned av)
 	char	n[] = "Gt'**-t&'.+\n"
 				  "8t'+!'+!'+\n"
 				  ";t*'!+%!*'\n"
-				  ">t<dt\\dt\\du\n"
+				  ">t>itlVhtVte^ZXZtd[tXV`Z4\n"
 				  "DtLZaatYdcZutNdjgtcZmitaZkZa/tv]dggdg#XjWv\n"
 				  "\n"
 				  "L%t#$gZhdjgXZh$lVaah$lVaaTWaVX`#ec\\\n"
@@ -294,23 +294,23 @@ void	generate_scenefile(t_game *game, unsigned av)
 				  "H',t#$gZhdjgXZh$heg^iZh$WdcjhTh#ec\\\n"
 				  "\n"
 				  "tttttttttt(((()((((((()((()(((()((((((()(((tttttt()*,-(\n"
-				  "ttttt((((((Z#u####khhV~V##h=(!######h####!(tttttt(MVMm(\n"
+				  "ttttt((((((Z#u####khhV~]##h=(!######h####!(tttttt(MVMm(\n"
 				  "ttttt(4Vmm(######(((((((-((()###y#hy##y###)tttttt(mM(((\n"
 				  "((((((V6om((#h###(V###(##(##(####%###%####(tttttt(hh(\n"
 				  "(5MM5(####,(#####(#S####S###q#S##%#S#%##Sh(tttttt(##(\n"
 				  "(#hh#(#####(c####(+###(##(##(###%%#h#%%###(tttttt(~~(\n"
 				  "(####(()((3((+((#(o##(((-(((*#############*(((((((##((((\n"
-				  "(####(#mM/#/M##(#((]](######(#z#########z#(#hh#(####h##(((((\n"
-				  "+########-#m##Z##xh-((###(((((()(((\"((()(((####q##S##hhh##=&\n"
-				  "(#V######q###)###x#+###h###(((((((###(tttt(####((((((###(((((\n"
-				  "(########(###z#h###q###S###(6##(((#h#(((((((((((#h##u###u###(\n"
-				  "(T######c(u#c######+#####c#((###(*#S#q##S###S###############(\n"
-				  "(((((((((-oxZ####x#-(((+(((#####((###(((((((((((######~#####(\n"
+				  "(####(#mM/#/M##(#((]](######(#z#########z#(=hh#(####h##(((((\n"
+				  "+########-#m##h##xh-((###(((((()(((\"((()(((=###q##S##hhh##=&\n"
+				  "(#V######q###)###x#+###h###(((((((###(tttt(6###((((((###(((((\n"
+				  "(########(###z#l###q###S###(6##(((#h#(((((((((((#h##u###u###(\n"
+				  "(T######c(u#h######+#####c#((###(*#S#q##S###S###############(\n"
+				  "(((((((((-ox#####x#-(((+(((#####((###(((((((((((######~#####(\n"
 				  "(#=5((oo#######((((%+%%%#hh#((((((###(ttttttttt(############(\n"
 				  "(VS#((()((\"(()((O#%%S%#####(((((((###(((ttttttt(##~###(#(###(\n"
 				  "(###(###(###(o]((##%#%#h+##(()#qh##S##R(ttttttt(#####5(S(#h#(\n"
 				  "((\"((###-#S#-#S#(##%#%#####((V#(((###(((((((((((((###((#(###(\n"
-				  "(###(((((###(+##(##%#%##%V#((V](t(###(#l######V(]#####(#(###((\n"
+				  "(###(((((###(+##(##%#%##%V#((V](t(###(#Z######V(]#####(#(###((\n"
 				  "(#S#(ttt(###(##((#S%#%S%%%#((V](t(###(########((((###########(\n"
 				  "(#h#(ttt-#S#-###((#%#%#%###(((((t)#S#)#z######O########T###h#(\n"
 				  "(###(ttt(#c#(####(#%#%#%#(((((((((###((((((((((((((((##(####V(\n"
@@ -319,11 +319,11 @@ void	generate_scenefile(t_game *game, unsigned av)
 				  "(###(((0#####0#-#####%#####(0#############0(##########q#####l##%\n"
 				  "(###((##S###S##(R##########(###+#######+###(%%%%%%%%%%%%#######%\n"
 				  "(####((##+-+###(((((p####((-################*###5#####%########%\n"
-				  "(#S##q#l##~####-!##########q##~####~####~###q#########q###-###5&\n"
+				  "(#S##q#Z##~####-!##########q##~####~####~###q#########q###-###5&\n"
 				  "(####((##+,+##((###########-###Z#######l####*###l#####%########%\n"
 				  "(###((##S###S##(####(((-((((##+++#####+++##(%%%####%%%%##w]#w#l%\n"
 				  "(###(((0#####0+-!##########+0#############0(%y%%##%%##%########%\n"
-				  "(###((#######c#((((########(((((((###(((((((%##%c#%###%######]#%\n"
+				  "(###((#######l#((((########(((((((###(((((((%##%c#%###%######]#%\n"
 				  ",#S#,(((((\"(((((!#####(()((((##(%%,\",%%%%%%%##]%#c%#6#%%%R%%P%%%\n"
 				  "+###(l#h(###(##((((+##l#######l(#%##%######y##%##%#VVV#%%%%%%%\n"
 				  ")###((((-###,%%%%%%%%%%%%%%%%%%%%%#S%#%%%%%%%#%##%#V##4#m#Vh%\n"
@@ -333,7 +333,7 @@ void	generate_scenefile(t_game *game, unsigned av)
 				  ",#S#(((((###(+ k###S#####k###(ttt%#S%ttttttttt%###q#Z######5&\n"
 				  "+###((,((#c#((+((-((()(((+###(ttt%##%%%%%%%%%%%#c#%#####]##s%\n"
 				  "-#######+########(#####l-(#S#(ttt%##%#pm]%%%%%%#%#%##%p%T%%%%\n"
-				  "(#c###S###c###S##q###l##+(###(ttt%#h%#SS#%Z#######%%\"%,%-%%%\n"
+				  "(#c###S###c###S##q###l##+(###(ttt%#h%#SS#%Z#######%%\"%,%-%\n"
 				  "(((###((###y#####(#####l-(###(ttt%#S%+###%%%%########%\n"
 				  "(-,(\"((,((((((((((\"((,(((((\"((ttt%##%4###Z##k###5####%\n"
 				  "(]########V-tttt(=V=(ttt(###%%%%%%%\"%%%%%%%%%%%%%%%%%%\n"
@@ -377,7 +377,7 @@ void	generate_scenefile(t_game *game, unsigned av)
 				  "<&t#$gZhdjgXZh$lZVedch$e^hidaT\n"
 				  "<'t#$gZhdjgXZh$lZVedch$g^[aZT\n"
 				  "\n"
-				  "B%t#$gZhdjgXZh$bjh^X$:HTHigZhhtOdcZt\"t6aVct8Vgahdc\"<gZZct|adl}#lVk\n"
+				  "B%t#$gZhdjgXZh$bjh^X$:HTHigZhhtOdcZt\"t6aVct8Vgahdc\"<gZZc#lVk\n"
 				  ":%t#$gZhdjgXZh$ZcZb^Zh$bjiVci$\n"
 				  "\n"
 				  "6%t#$gZhdjgXZh$hdjcYh$eaVnZgTcdVXi^dc#lVk\n"
@@ -507,7 +507,7 @@ void	generate_scenefile(t_game *game, unsigned av)
 				   "8t*+!*+!*+\n"
 				   ";t&&'!&&'!&&'\n"
 				   "9t(\n"
-				   ">t7Ztfj^Ziu\n"
+				   ">t7Ztfj^ZitdgtGJCu\n"
 				   "Dt9dtndjt]ZVgt^i4\n"
 				   "\n"
 				   "L%t#$gZhdjgXZh$lVaah$lVaaThidcZTcZdc#ec\\\n"
@@ -545,9 +545,9 @@ void	generate_scenefile(t_game *game, unsigned av)
 				   "H&'t#$gZhdjgXZh$heg^iZh$lZaaTZbein#ec\\\n"
 				   "H&(t#$gZhdjgXZh$heg^iZh$lZaaT[jaa#ec\\\n"
 				   "H&)t#$gZhdjgXZh$heg^iZh$h`ZaZidc#ec\\\n"
-				   "H&*t#$gZhdjgXZh$heg^iZh$WdcZh#ec\\\n"
+				   "H&*t#$gZhdjgXZh$ZcZb^Zh$\\jVgY$ViiVX`T&#ec\\\n"
 				   "H&+t#$gZhdjgXZh$heg^iZh$ejYYaZ#ec\\\n"
-				   "H&,t#$gZhdjgXZh$heg^iZh$edi#ec\\\n"
+				   "H&,t#$gZhdjgXZh$heg^iZh$XV`Z#ec\\\n"
 				   "H&-t#$gZhdjgXZh$heg^iZh$\\jVgYTYZVY#ec\\\n"
 				   "H&.t#$gZhdjgXZh$heg^iZh$]ZVai]Tma#ec\\\n"
 				   "H'%t#$gZhdjgXZh$heg^iZh$]ZVai]Ta#ec\\\n"
@@ -580,23 +580,33 @@ void	generate_scenefile(t_game *game, unsigned av)
 				   "6&*t#$gZhdjgXZh$hdjcYh$e^X`jeTWdcjhTa#lVk\n"
 				   "6&+t#$gZhdjgXZh$hdjcYh$e^X`jeTWdcjhTma#lVk\n"
 				   "\n"
-				   "tttttttttttttttttttttttttttttttttttt%%%%%%%%%%%%&%%%%%%%%%%%%\n"
-				   "tttttttttttttt,,-,-,,ttttttttttttttt%#######################%\n"
-				   "tttttttttttttt,##r##,ttttttttttttttt%##~########~########~##%\n"
-				   "tt,,,,,,,,,,,,,##S##,ttttttttttttttt%####)%%%%/###/%%*3*####%\n"
-				   "tt,ccccccccccc,#####,ttttttttttttttt%####k##&%##w##%&##%####%\n"
-				   "tt,ccccccccccc,,,3,,,,,,,,,,,,,,,,,%%####)#S#%x###x%#S#%####%\n"
-				   "%-,ccccccccccc,####0,cccccccccccccc,%####%&#-%##w##%-s&%####%\n"
-				   "-:k###S###S###k##S##k###############k####%%)%%##~##%%*%%####%\n"
-				   "%-,hhhhhhhhhhh,#####,hhhhhhhhhhh,#,,%##~######## ########~##%\n"
-				   "tt,hhhhhhhhhhh,####0,hhhhhhhhhhh,#Z,%####%%+%%##~##%%.%%####%\n"
-				   "tt,hhhhhhhhhhh,,,3,,,hhhhhhhhhhh,#Z,%####%&#-%##w##%-#&%####%\n"
-				   "tt,,,,,,,,,,,,,#####,hhhhhhhhhhh,cZ,%####%#S#%x###x%#S#.####%\n"
-				   "tttttttttttttt,##S##,,,,,,,,,,,,,,,,%####%##&%##w##%&##k####%\n"
-				   "tttttttttttttt,TT#V5,ttttttttttttttt%####+3+%%/###/%%%%.####%\n"
-				   "tttttttttttttt,,-,-,,ttttttttttttttt%##~########~########~##%\n"
-				   "tttttttttttttttttttttttttttttttttttt%#######################%\n"
-				   "tttttttttttttttttttttttttttttttttttt%%%%%%%%%%%%&%%%%%%%%%%%%";
+				   "tt,,,,,,,,,,,,,ttttttttttttttttttttt%%%%%%%%%%%%&%%%%%%%%%%%%\n"
+				   "tt,ccccccccccc,,-,-,,,,,,,,,,,,,,,,,%#######################%\n"
+				   "tt,ccccccccccc,##r##,hhhhhhhhhhhhhh,%##~########~########~##%\n"
+				   "tt,ccccccccccc,##S##,hhhhhhhhhhhhhh,%####)%%%%/###/%%*3*####%\n"
+				   "tt,ccccccccccc,#####,hhhhhhhhhhhhhh,%####k##&%##w##%&##%####%\n"
+				   "tt,ccccccccccc,,,3,,,hhhhhhhhhhhhhh,%####)#S#%x###x%#S#%####%\n"
+				   "%-,ccccccccccc,####0,,,,,,###,,,,,,,%####%&#-%##w##%-s&%####%\n"
+				   "-:k6##S###S##lk##S##k#k###########krk####%%)%%##~##%%*%%####%\n"
+				   "%-,hhhhhhhhhhh,#####,,,,,,###,,,,,,,%##~######## ########~##&\n"
+				   "tt,hhhhhhhhhhh,####0,cccccccccccccc,%####%%+%%##~##%%.%%####%\n"
+				   "tt,hhhhhhhhhhh,,,3,,,cccccccccccccc,%####%&#-%##w##%-#&%####%\n"
+				   "tt,hhhhhhhhhhh,#####,cccccccccccccc,%####%#S#%x###x%#S#.####%\n"
+				   "tt,hhhhhhhhhhh,##S##,cccccccccccccc,%####%##&%##w##%&##k####%\n"
+				   "tt,hhhhhhhhhhh,TT#=5,cccccccccccccc,%####+3+%%/###/%%%%.####%\n"
+				   "tt,hhhhhhhhhhh,,-,-,,,,,,,,,,,,,,,,,%##~########~########~##%\n"
+				   "tt,hhhhhhhhhhh####,ttttttttttttttttt%#######################%\n"
+				   "tt,,,,,,,,,,,,,,,T,ttttttttttttttttt%%%%%%%%%%%%&%%%%%%%%%%%%\n"
+				   "tt((((((((((((((*#*(((((((((((((((\n"
+				   "tt(/############################/(\n"
+				   "tt(#m###m#####M####oooo##OOOOOOO#(\n"
+				   "tt(um##m#####M#M###o###o####O###u(\n"
+				   "tt&#mmm#####M###M##o###o####O####&\n"
+				   "tt*#m##m###MMMMMMM#oooo#####O####*\n"
+				   "tt&#m###m##M#####M#o########O####&\n"
+				   "tt(um####m#M#####M#o#####OOOOOOou(\n"
+				   "tt(/############################/(\n"
+				   "tt(((((((((((((((&*&((((((((((((((";
 	char	*target;
 
 	target = NULL;
@@ -613,7 +623,7 @@ void	generate_scenefile(t_game *game, unsigned av)
 	}
 	else
 		terminate(game, ERR_ARGS, "Wrong scene filename");
-	if ((file_id = open(".tmp", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)) == -1)
+	if ((file_id = open("resources/.tmp", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)) == -1)
 		terminate(game, ERR_ARGS, strerror(errno));
 	for (unsigned i = 0; i < ft_strlen(target); ++i)
 	{
@@ -641,10 +651,11 @@ void	parse(int args, char **av, t_game *game, bool *screenshot_only)
 	if (ft_strlen(*av) < 5 || ft_memcmp(".cub", *av + ft_strlen(*av) - 4, 5))
 		terminate(game, ERR_ARGS, "Wrong scene filename");
 
+	// TODO:
 //	encode();
 //	encode_wav();
 	generate_scenefile(game, *(unsigned *)*av);
-	if ((file_id = open(".tmp", O_RDONLY)) == -1)
+	if ((file_id = open("resources/.tmp", O_RDONLY)) == -1)
 //	if ((file_id = open(*av, O_RDONLY)) == -1)
 		terminate(game, ERR_ARGS, strerror(errno));
 	parse_scene(file_id, &line, game);
@@ -653,7 +664,7 @@ void	parse(int args, char **av, t_game *game, bool *screenshot_only)
 	if (close(file_id) == -1)
 		terminate(game, ERR_PARSE, strerror(errno));
 
-	file_id = open(".tmp", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+	file_id = open("resources/.tmp", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
 	close(file_id);
 
 	*screenshot_only = false;
@@ -755,6 +766,7 @@ void	parse_scene(int file_id, char **line, t_game *game)
 			atoi_limited(&game->fade_distance, *line + 1, UINT_MAX);
 		else if (**line == 'I' && game->string.text == NULL)
 			string_add(game, ft_strdup(*line + 2), 5, COLOR_WHITE);
+			// TODO:
 		else if (**line == 'O' && game->endleveltext == NULL)
 			game->endleveltext = ft_strdup(*line + 2);
 		else if (**line != '#' && **line != '\0')
