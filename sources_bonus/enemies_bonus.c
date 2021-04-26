@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:53:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/15 16:21:40 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/26 15:53:48 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,83 +57,77 @@ void	enemy_sprite(t_game *game, t_object *obj)
 
 void	enemy_move(t_game *game, t_object *obj)
 {
-	t_point		move_int;
-	t_fpoint	move_float;
-	t_list		*next;
-	t_door		*door;
+	const t_point	move_int = *(t_point *)obj->e->path->content;
+	const float		move_speed = ENEMY_SPEED + ENEMY_SPEED * obj->e->alarmed;
 
-	if (obj->e->path == NULL)
-		return ;
-	move_int = *((t_point *)obj->e->path->content);
-	move_float = (t_fpoint){move_int.x + 0.5f, move_int.y + 0.5f};
-	if (fabsf(obj->pos.x - move_float.x) < 0.3f &&
-		fabsf(obj->pos.y - move_float.y) < 0.3f)
+	if (obj->e->path->next)
+		obj->e->path_angle = atan2f(move_int.y + 0.5f - obj->pos.y,
+									move_int.x + 0.5f - obj->pos.x);
+	else
+		obj->e->path_angle = atan2f(obj->e->target.y - obj->pos.y,
+									obj->e->target.x - obj->pos.x);
+	obj->pos.x += cosf(obj->e->path_angle) * move_speed;
+	obj->pos.y += sinf(obj->e->path_angle) * move_speed;
+	if (game->map.grid[move_int.y][move_int.x] != '.')
+		door_open(game, move_int, false);
+	if ((int)obj->pos.x == move_int.x && (int)obj->pos.y == move_int.y)
 	{
-		next = obj->e->path->next;
-		ft_lstdelone(obj->e->path, free);
-		obj->e->path = next;
-		enemy_move(game, obj);
-		return ;
-	}
-	obj->e->path_angle = atan2f(move_float.y - obj->pos.y,
-								move_float.x - obj->pos.x);
-	obj->pos.x += cosf(obj->e->path_angle) * ENEMY_SPEED;
-	obj->pos.y += sinf(obj->e->path_angle) * ENEMY_SPEED;
-	if (game->map.grid[move_int.y][move_int.x] != '.' && ft_memchr(CHAR_DOORS,
-			game->map.grid[move_int.y][move_int.x], sizeof(CHAR_DOORS) - 1))
-	{
-		door = door_find(game, move_int);
-		if (door->opening == false)
+		if (obj->e->path->next || obj->e->see)
+			ft_lstpop(&obj->e->path);
+		else if (fabsf(obj->e->target.x - obj->pos.x) < 0.1f &&
+				  fabsf(obj->e->target.y - obj->pos.y) < 0.1f)
 		{
-			door->opening = true;
-			door_sound(game, door);
+			obj->e->tick = obj->e->ticks;
+			ft_lstpop(&obj->e->path);
 		}
 	}
 }
 
 void	enemy_logic(t_game *game, t_object *obj)
 {
-	bool	see;
-
 	if (obj->e->state == ST_DEATH && obj->e->tick + 1 == obj->e->ticks)
 		return ;
-	see = false;
+	obj->e->see = false;
 	if (obj->e->state != ST_DEATH && (fabsf(obj->e->p_to_angle) < ENEMY_FOV_HALF
 										|| game->p.weapon_noise == true))
-		see = ray_intersect_distance(game, obj->atan_diff) > obj->distance_real;
-	if (obj->e->state == ST_WAIT && see == false)
+		obj->e->see = ray_intersect_distance(game, obj->atan_diff) > obj->distance_real;
+	if (obj->e->state == ST_WAIT && obj->e->see == false)
 		return ;
-	if (see == true)
+	if (obj->e->see == true)
 	{
 		if (obj->e->alarmed == false)
+		{
 			enemy_sound(game, obj, SND_ENEMY_ALARM);
+			if (obj->e->state == ST_WALK)
+				obj->e->tick = obj->e->ticks;
+		}
 		obj->e->angle = obj->atan_diff + M_PI;
 		obj->e->alarmed = true;
 		obj->e->target = game->p.pos;
 	}
-	if (obj->e->state == ST_WALK)
+	if (obj->e->state == ST_WALK && obj->e->path)
 		enemy_move(game, obj);
 	if (++obj->e->tick >= obj->e->ticks ||
-		(obj->e->state == ST_ATTACK && see == false))
+		(obj->e->state == ST_ATTACK && obj->e->see == false))
 	{
-		if (see == true && (obj->e->state == ST_WAIT ||
+		if (obj->e->see == true && (obj->e->state == ST_WAIT ||
 						obj->e->state == ST_PAIN || obj->e->state == ST_WALK))
 			enemy_set_state(game, obj, ST_ATTACK);
-		else if (see == true && obj->e->state == ST_ATTACK &&
+		else if (obj->e->see == true && obj->e->state == ST_ATTACK &&
 											obj->distance_real < 2.0f)
 			enemy_set_state(game, obj, ST_ATTACK);
-		else if (see == true && obj->e->state == ST_ATTACK)
+		else if (obj->e->see == true && obj->e->state == ST_ATTACK)
 			enemy_set_state(game, obj,
 			(enum e_objstate[]){ST_ATTACK, ST_WALK, ST_WALK}[arc4random() % 3]);
-		else if (see == false && obj->e->state == ST_ATTACK)
+		else if (obj->e->see == false && obj->e->state == ST_ATTACK)
 			enemy_set_state(game, obj, ST_WALK);
-		else if (see == false && obj->e->state == ST_WALK && obj->e->path)
+		else if (obj->e->see == false && obj->e->state == ST_WALK && obj->e->path)
 			enemy_set_state(game, obj, ST_WALK);
 		else if ((int)obj->pos.x != (int)obj->e->location.x ||
 				(int)obj->pos.y != (int)obj->e->location.y)
 		{
 			obj->e->target = obj->e->location;
-			obj->e->angle = obj->e->path_angle + M_PI;
+			obj->e->angle = obj->e->path_angle + M_PI_F;
 			enemy_set_state(game, obj, ST_WALK);
 			obj->e->alarmed = false;
 		}
@@ -193,7 +187,6 @@ void	enemy_set_state(t_game *g, t_object *obj, enum e_objstate state)
 	{
 		obj->e->imgset = g->enemyset[obj->e->type].attack;
 		obj->e->frames = 3;
-		obj->e->ticks *= ENEMY_SHOT_DELAY;
 		obj->e->shot = false;
 	}
 	else if (state == ST_PAIN)
@@ -210,8 +203,8 @@ void	enemy_set_state(t_game *g, t_object *obj, enum e_objstate state)
 	}
 	obj->e->tick = 0;
 	obj->e->ticks = obj->e->frames * ANIM_ENEMY_TICKS;
-	if (state == ST_ATTACK)
-		obj->e->ticks *= ENEMY_SHOT_DELAY;
+	if (state == ST_ATTACK || (state == ST_WALK && obj->e->alarmed == false))
+		obj->e->ticks *= ANIM_ENEMY_SLOWMO;
 	obj->e->frame = 0;
 	obj->sprite = &obj->e->imgset[obj->e->frame];
 }

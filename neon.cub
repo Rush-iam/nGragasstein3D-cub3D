@@ -2,7 +2,6 @@ R 2558 1296
 C 26,26,26
 F 52,60,52
 I It was a piece of cake?
-O Well done! Your next level: "horror.cub"
 
 W0 ./resources/walls/wall_black.png
 W1 ./resources/walls/wall_black_jail.png

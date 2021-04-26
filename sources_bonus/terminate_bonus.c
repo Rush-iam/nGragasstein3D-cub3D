@@ -14,9 +14,6 @@
 
 int		terminate(t_game *game, int return_value, char *message)
 {
-	// TODO:
-	open("resources/.tmp", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
-
 	if (return_value)
 	{
 		ft_putendl_fd("Error", 2);
@@ -26,8 +23,7 @@ int		terminate(t_game *game, int return_value, char *message)
 		else if (return_value == ERR_PARSE)
 			ft_putendl_fd("Plese fix scene file", 2);
 		else if (return_value == ERR_ARGS)
-			ft_putendl_fd("Usage: ./cub3D [level].cub\nExample: ./cub3D e1m1.cub", 2);
-//			ft_putendl_fd("Usage: ./cub3D scene_name.cub [--save]", 2);
+			ft_putendl_fd("Usage: ./cub3D scene_name.cub [--save]", 2);
 		else if (return_value == ERR_BMP)
 			ft_putendl_fd("Unable to save screenshot", 2);
 	}

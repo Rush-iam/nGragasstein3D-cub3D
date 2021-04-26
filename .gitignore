@@ -1,0 +1,11 @@
+/cub3D
+/objects/
+/.idea
+*.dSYM
+*.o
+*.d
+*.a
+*.bmp
+*.enc
+/minilibx_swift/
+/.tmp

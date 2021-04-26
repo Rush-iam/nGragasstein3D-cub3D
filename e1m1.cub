@@ -2,7 +2,6 @@ R 2558 1296
 C 56,56,56
 F 112,112,112
 I Get Psyched!
-O Well done! Your next level: "neon.cub"
 
 W0 ./resources/walls/wall_0.png
 W1 ./resources/walls/wall_1.png

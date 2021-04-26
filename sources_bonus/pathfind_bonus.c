@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/13 22:01:43 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/16 18:17:40 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/26 16:05:35 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,34 +141,29 @@ void	*pathfind(t_list **path, t_point from, t_point to, struct s_map *map)
 	int		i;
 
 	ft_lstclear(path, free);
-	if (pathfind_init(map, to, &queue, &pt) == false)
-		return (NULL);
-	while (queue)
-	{
-		pt = ft_lstpop(&queue);
-		i = pathfind_nears(map, *pt, nears);
-		while (--i >= 0)
+	if (pathfind_init(map, to, &queue, &pt) == true)
+		while (queue)
 		{
-			if (map->grid_bfs[nears[i].y][nears[i].x] == 0)
-			{
-				map->grid_bfs[nears[i].y][nears[i].x] = map->grid_bfs[pt->y][pt->x] + 1;
-				if (nears[i].x == from.x && nears[i].y == from.y)
+			pt = ft_lstpop(&queue);
+			i = pathfind_nears(map, *pt, nears);
+			while (--i >= 0)
+				if (map->grid_bfs[nears[i].y][nears[i].x] == 0)
 				{
-					pathfind_deinit(&queue, pt);
-					return (pathfind_construct(path, from, map));
+					map->grid_bfs[nears[i].y][nears[i].x] =
+											map->grid_bfs[pt->y][pt->x] + 1;
+					if (nears[i].x == from.x && nears[i].y == from.y)
+					{
+						pathfind_deinit(&queue, pt);
+						return (pathfind_construct(path, from, map));
+					}
+					near_lst = ft_lstnew(malloc(sizeof(*nears)));
+					if (near_lst == NULL || near_lst->content == NULL)
+						return (pathfind_deinit(&queue, pt));
+					*(t_point *)near_lst->content = nears[i];
+					ft_lstadd_back(&queue, near_lst);
 				}
-				near_lst = ft_lstnew(malloc(sizeof(*nears)));
-				if (near_lst == NULL)
-					return (pathfind_deinit(&queue, pt));
-				ft_lstadd_back(&queue, near_lst);
-				*((t_point *)near_lst->content) = nears[i];
-			}
-			else
-				map->grid_bfs[nears[i].y][nears[i].x] = ft_umin(
-					map->grid_bfs[nears[i].y][nears[i].x], map->grid_bfs[pt->y][pt->x] + 1);
+			free(pt);
 		}
-		free(pt);
-	}
 	return (NULL);
 }
 

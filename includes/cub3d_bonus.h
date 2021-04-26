@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/15 22:59:25 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/26 15:53:48 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,15 +209,15 @@ enum	e_sound
 
 # define ENEMY_HEALTH		25
 # define ENEMY_FOV_HALF		M_PI_2_F
-# define ENEMY_SHOT_DELAY	2
 # define ENEMY_MISS_MAX		60
 # define ENEMY_DMG_MIN		3
 # define ENEMY_DMG_MAX		30
 //# define ENEMY_DMG_MIN		1
 //# define ENEMY_DMG_MAX		1
-# define ENEMY_SPEED		0.02f
+# define ENEMY_SPEED		0.01f
 # define ANIM_ENEMY_TICKS	10
 # define ANIM_ENEMY_WALK_FRAMES	4
+# define ANIM_ENEMY_SLOWMO	2
 
 # define ANIM_DOOR_TICKS	60
 # define DOOR_TIMER_TICKS	300
@@ -281,6 +281,7 @@ typedef struct	s_object
 		{
 			ENEMY_GUARD = 0
 		}			type;
+		bool		see;
 		bool		alarmed;
 		bool		shot;
 		float		angle;
@@ -420,8 +421,6 @@ typedef struct	s_game
 		unsigned	color;
 	}			string;
 	t_img		effect_img;
-	char		*endleveltext;
-	bool		lastlevel;
 }				t_game;
 
 void			initialize_game		(t_game *game, bool screenshot_only);
@@ -478,7 +477,7 @@ int				dead_exit(t_game *game);
 
 void			doors(t_game *game);
 t_door			*door_find(t_game *game, t_point cell);
-void			door_open(t_game *g);
+void			door_open(t_game *g, t_point cell, bool by_player);
 void			door_sound(t_game *game, t_door *door);
 
 void			weapon(t_game *game, struct s_weapon *weapon);
