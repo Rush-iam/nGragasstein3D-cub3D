@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/26 16:16:31 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/26 17:40:30 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void	draw_fps(t_game *game)
 		(char []){'0' + fps/100, '0' + fps / 10 % 10, '0' + fps % 10, '\0'});
 }
 
-int	game_loop(t_game *game)
+void	game_tick(t_game *game)
 {
 	static struct timespec	time;
 	static unsigned			tick_prev;
@@ -101,11 +101,8 @@ int	game_loop(t_game *game)
 	clock_gettime(CLOCK_MONOTONIC, &time);
 	tick_prev = game->tick;
 	game->tick = TICKS_PER_SEC * time.tv_sec +
-				TICKS_PER_SEC * time.tv_nsec / NANSECS_PER_SEC;
+				 TICKS_PER_SEC * time.tv_nsec / NANSECS_PER_SEC;
 	game->tick_diff = game->tick - tick_prev;
-	sounds(game);
-	if (game->p.health < 0)
-		return dead_exit(game);
 	if (game->effect.frame_cur < game->effect.frames)
 		game->effect.frame_cur += game->tick_diff;
 	if (game->string.frame_cur < game->string.frames)
@@ -120,6 +117,27 @@ int	game_loop(t_game *game)
 		ray_cast(game);
 		game->tick_diff--;
 	}
+}
+
+void draw_hud(t_game *game)
+{
+	mlx_string_put(game->mlx, game->win,
+				game->img.size.x - 260, game->img.size.y - 8, COLOR_CYAN_F,
+		(char []){'H', 'e', 'a', 'l', 't', 'h', ':',
+		'0' + game->p.health / 100, '0' + game->p.health / 10 % 10,
+		'0' + game->p.health % 10, '\0'});
+	mlx_string_put(game->mlx, game->win,
+				game->img.size.x - 110, game->img.size.y - 8, COLOR_CYAN_F,
+		(char []){'A', 'm', 'm', 'o', ':',
+		'0' + game->p.ammo / 10 % 10, '0' + game->p.ammo % 10, '\0'});
+}
+
+int	game_loop(t_game *game)
+{
+	if (game->p.health < 0)
+		return dead_exit(game);
+	game_tick(game);
+	sounds(game);
 //	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
 	mlx_put_image_to_window(game->mlx, game->win, game->img_bg.ptr, 0, 0);
 	img_clear_rgb(&game->img, -1U);
@@ -130,13 +148,7 @@ int	game_loop(t_game *game)
 	draw_weapon(game, &game->p.weapon);
 	draw_map(game);
 	draw_string(game, &game->string);
-
-	mlx_string_put(game->mlx, game->win, game->img.size.x - 260, game->img.size.y - 8, COLOR_CYAN_F,
-				   (char []){'H', 'e', 'a', 'l', 't', 'h', ':',
-	'0' + game->p.health / 100, '0' + game->p.health / 10 % 10, '0' + game->p.health % 10, '\0'});
-	mlx_string_put(game->mlx, game->win, game->img.size.x - 110, game->img.size.y - 8, COLOR_CYAN_F,
-		(char []){'A', 'm', 'm', 'o', ':',
-			'0' + game->p.ammo / 10 % 10, '0' + game->p.ammo % 10, '\0'});
+	draw_hud(game);
 	draw_fps(game);
 //	demo_fillrate(game, 1);
 //	demo_cursor(game, 0xFF88FF);
@@ -146,6 +158,7 @@ int	game_loop(t_game *game)
 
 int	dead_exit(t_game *game)
 {
+	sounds(game);
 	game->effect.frame_cur++;
 	if (game->effect.type != EF_FIZZLEFADE)
 	{

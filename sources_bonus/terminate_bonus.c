@@ -32,8 +32,8 @@ int		terminate(t_game *game, int return_value, char *message)
 		mlx_destroy_image(game->mlx, game->map.img.ptr);
 	if (game->img.ptr)
 		mlx_destroy_image(game->mlx, game->img.ptr);
-	if (game->effect_img.ptr)
-		mlx_destroy_image(game->mlx, game->effect_img.ptr);
+	if (game->img_effect.ptr)
+		mlx_destroy_image(game->mlx, game->img_effect.ptr);
 	if (game->win)
 		mlx_destroy_window(game->mlx, game->win);
 	terminate_audio(game);

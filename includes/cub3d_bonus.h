@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/26 15:53:48 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/26 17:33:31 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -420,15 +420,17 @@ typedef struct	s_game
 		bool		fade;
 		unsigned	color;
 	}			string;
-	t_img		effect_img;
+	t_img		img_effect;
 }				t_game;
 
 void			initialize_game		(t_game *game, bool screenshot_only);
-void			initialize_game_images(t_game *game, bool screenshot_only);
+void			initialize_game_images(t_game *g, bool screenshot_only);
 void			initialize_weapons_scale(t_game *game);
 void			initialize_bfs_grid(t_game *g);
 
-int				game_loop		(t_game *game);
+int				game_loop(t_game *game);
+void			game_tick(t_game *game);
+void			draw_fps(t_game *game);
 int				dead_exit(t_game *game);
 
 void			parse(int args, char **av, t_game *game, bool *screenshot_only);
@@ -446,8 +448,7 @@ void			set_textures		(char *string, t_game *game);
 void			load_audioset(t_set *dst, char *path, t_game *game);
 void			load_audio_file(t_snd *dst, char *path);
 void			load_spriteset(t_img dst[], int count, char *path, t_game *game);
-void			load_texture_file(char *path, t_img *dst_img, char *err,
-						t_game *game);
+void img_create_from_file(t_game *g, char *path, t_img *dst_img, char *err);
 
 void			set_map				(t_game *game, t_list *map);
 void			set_map_process		(t_game *game);
@@ -553,6 +554,7 @@ void			string_add(t_game *g, char *string, int timer, unsigned color);
 float			distance(t_fpoint from, t_fpoint to);
 char			*atoi_limited	(unsigned *dst_int, const char *src_string,
 															unsigned limit);
+t_img			*img_create(void *mlx_ptr, t_img *dst, unsigned x, unsigned y);
 t_img			img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres);
 t_img			img_faded_copy(void *mlx_ptr, t_img *img);
 void			img_alpha_columns_get(t_img *img);

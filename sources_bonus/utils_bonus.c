@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:41 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/26 14:28:29 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/26 17:18:58 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,18 +36,52 @@ char	*atoi_limited(unsigned *dst_int, const char *src_string, unsigned limit)
 	return ((char *)src_string);
 }
 
+t_img	*img_create(void *mlx_ptr, t_img *dst, unsigned x, unsigned y)
+{
+	int n;
+
+	dst->ptr = mlx_new_image(mlx_ptr, x, y);
+	if (dst->ptr == NULL)
+		return (NULL);
+	dst->data = (void *)mlx_get_data_addr(dst->ptr, &n, &n, &n);
+	dst->size = (t_upoint){x, y};
+	dst->aspect = (float)x / y;
+	return (dst);
+}
+
+void	img_create_from_file(t_game *g, char *path, t_img *dst_img, char *err)
+{
+	int				n;
+	const size_t	str_len = ft_strlen(path);
+
+	if (str_len < 5)
+		terminate(g, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
+	if (ft_memcmp(".xpm", path + str_len - 4, 5) == 0)
+		dst_img->ptr = mlx_xpm_file_to_image(g->mlx, path,
+						(int *)&dst_img->size.x, (int *)&dst_img->size.y);
+	else if (ft_memcmp(".png", path + str_len - 4, 5) == 0)
+		dst_img->ptr = mlx_png_file_to_image(g->mlx, path,
+						(int *)&dst_img->size.x, (int *)&dst_img->size.y);
+	else
+		terminate(g, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
+	if (dst_img->ptr == NULL)
+		terminate(g, ERR_PARSE, err);
+	dst_img->data = (unsigned *)mlx_get_data_addr(dst_img->ptr, &n, &n, &n);
+	dst_img->aspect = dst_img->size.x / dst_img->size.y;
+	dst_img->alpha_y = ft_calloc(dst_img->size.y, sizeof(bool));
+	if (dst_img->alpha_y == NULL)
+		terminate(g, ERR_MEM, strerror(errno));
+	img_alpha_columns_get(dst_img);
+}
+
 t_img	img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres)
 {
 	t_img		dst_img;
-	int			n;
 	t_upoint	src_pix;
 	t_upoint	dst_pix;
 
-	if ((dst_img.ptr = mlx_new_image(mlx_ptr, dstres.x, dstres.y)) == NULL)
+	if (img_create(mlx_ptr, &dst_img, dstres.x, dstres.y) == NULL)
 		return (dst_img);
-	dst_img.data = (unsigned *)mlx_get_data_addr(dst_img.ptr, &n, &n, &n);
-	dst_img.size = dstres;
-	dst_img.aspect = dstres.x / dstres.y;
 	dst_pix.y = 0;
 	while (dst_pix.y < dst_img.size.y)
 	{
@@ -72,17 +106,13 @@ t_img	img_faded_copy(void *mlx_ptr, t_img *img)
 	t_img	img_faded;
 	int		i;
 
-	img_faded.ptr = mlx_new_image(mlx_ptr, img->size.x, img->size.y);
-	if (img_faded.ptr == NULL)
+	if (img_create(mlx_ptr, &img_faded, img->size.x, img->size.y) == NULL)
 		return (img_faded);
-	img_faded.data = (unsigned *)mlx_get_data_addr(img_faded.ptr, &i, &i, &i);
-	img_faded.size = img->size;
-	img_faded.aspect = img->aspect;
 	img_faded.alpha_y = NULL;
 	i = 0;
 	while (i < (int)(img->size.x * img->size.y))
 	{
-		img_faded.data[i] = pixel_fade(img->data[i], 0.65);
+		img_faded.data[i] = pixel_fade(img->data[i], 0.65f);
 		i++;
 	}
 	return (img_faded);
