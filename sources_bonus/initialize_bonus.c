@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/05 22:37:16 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/16 13:41:21 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/26 14:22:51 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,6 @@ void	initialize_game(t_game *game, bool screenshot_only)
 	player_set_weapon(game, W_PISTOL);
 	if (game->audio.music[0].file.channels[0])
 		sound_play(game, &game->audio.music[0], T_FPT_NULL)->looped = true;
-
-	// TODO:
-	if (game->lastlevel)
-		sound_play(game, &game->audio.sound[SND_EMITSOUND],
-									(t_fpoint){53.3f, 6.2f})->looped = true;
 }
 
 void	initialize_game_images(t_game *game, bool screenshot_only)

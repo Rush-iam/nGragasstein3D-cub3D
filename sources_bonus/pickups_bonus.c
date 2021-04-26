@@ -63,12 +63,7 @@ void	pickup_get(t_game *game, enum e_objtype item)
 	else if (item == T_HEALTH_M)
 		game->p.health += VAL_HEALTH_M;
 	else if (item == T_HEALTH_XL)
-	{
-		// TODO:
-		if (game->endleveltext)
-			string_add(game, ft_strdup(game->endleveltext), 60, COLOR_GREEN);
 		game->p.health = VAL_HEALTH_XL;
-	}
 	else if (item == T_AMMO)
 		game->p.ammo += VAL_AMMO_M;
 	else if (item == T_AMMO_ENEMY)

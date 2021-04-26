@@ -6,12 +6,12 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/04/13 22:04:15 by ngragas          ###   ########.fr        #
+#    Updated: 2021/04/26 14:25:26 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME 	= 	cub3D
-CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g #-Ofast -march=native #-fsanitize=address
+CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g -Ofast -march=native #-fsanitize=address
 SRC    :=		main			\
 				control			\
 				draw_walls		\
@@ -35,6 +35,7 @@ SRC_BONUS :=	demo_tools		\
 				pathfind		\
 				pickups			\
 				sounds			\
+				screenshot		\
 				terminate		\
 				weapons
 

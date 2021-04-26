@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/16 14:34:09 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/26 16:16:31 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,12 +82,21 @@ void	string_add(t_game *g, char *string, int timer, unsigned color)
 	g->string.color = color;
 }
 
+void	draw_fps(t_game *game)
+{
+	static clock_t	clock_cur;
+	int				fps;
+
+	fps = CLOCKS_PER_SEC / (clock() - clock_cur);
+	clock_cur = clock();
+	mlx_string_put(game->mlx, game->win, 0, 20, COLOR_WHITE,
+		(char []){'0' + fps/100, '0' + fps / 10 % 10, '0' + fps % 10, '\0'});
+}
+
 int	game_loop(t_game *game)
 {
-//	static clock_t			clock_cur;
 	static struct timespec	time;
 	static unsigned			tick_prev;
-//	int						fps;
 
 	clock_gettime(CLOCK_MONOTONIC, &time);
 	tick_prev = game->tick;
@@ -128,13 +137,10 @@ int	game_loop(t_game *game)
 	mlx_string_put(game->mlx, game->win, game->img.size.x - 110, game->img.size.y - 8, COLOR_CYAN_F,
 		(char []){'A', 'm', 'm', 'o', ':',
 			'0' + game->p.ammo / 10 % 10, '0' + game->p.ammo % 10, '\0'});
+	draw_fps(game);
 //	demo_fillrate(game, 1);
 //	demo_cursor(game, 0xFF88FF);
 //	demo_radar(game, 360);
-//	fps = CLOCKS_PER_SEC / (clock() - clock_cur);
-//	clock_cur = clock();
-//	mlx_string_put(game->mlx, game->win, 0, 20, COLOR_WHITE,
-//		(char []){'0' + fps/100, '0' + fps / 10 % 10, '0' + fps % 10, '\0'});
 	return (0);
 }
 

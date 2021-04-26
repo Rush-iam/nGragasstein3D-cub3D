@@ -3,7 +3,6 @@ C 56,56,56
 F 112,112,112
 D 3
 I Be quiet or RUN!
-O Do you hear it?
 
 W0 ./resources/walls/wall_stone_neon.png
 W1 ./resources/walls/wall_42_neon.png

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/26 15:20:37 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/26 16:14:21 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/26 15:11:50 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,18 +60,20 @@ t_door	*door_find(t_game *game, t_point cell)
 	return (NULL);
 }
 
-void	door_open(t_game *g)
+void	door_open(t_game *g, t_point cell, bool by_player)
 {
-	t_door			*door;
-	const t_point	cell = {g->p.pos.x + g->p.vect.x, g->p.pos.y + g->p.vect.y};
+	t_door	*door;
 
 	if (ft_memchr(CHAR_DOORS, g->map.grid[cell.y][cell.x], sizeof(CHAR_DOORS)))
 	{
 		door = door_find(g, cell);
-		door->opening ^= true;
+		if (by_player)
+			door->opening ^= true;
+		else
+			door->opening = true;
 		door_sound(g, door);
 	}
-	else
+	else if (by_player)
 		sound_play(g, &g->audio.sound[SND_PLAYER_NOACTION], T_FPT_NULL);
 }
 

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/05 17:49:49 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/26 14:29:28 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,10 +123,11 @@ void	player_control_toggler(t_game *g, int key_code)
 		}
 		g->key.mouse = !g->key.mouse;
 	}
-//	if (key_code == K_MAP_TOGGLE && g->key.k[key_code] == false)
-//		g->map.show = !g->map.show;
+	if (key_code == K_MAP_TOGGLE && g->key.k[key_code] == false)
+		g->map.show = !g->map.show;
 	if (key_code == K_USE && g->key.k[key_code] == false)
-		door_open(g);
+		door_open(g,
+		(t_point){g->p.pos.x + g->p.vect.x, g->p.pos.y + g->p.vect.y}, true);
 }
 
 void	player_control_extra(t_game *game)
