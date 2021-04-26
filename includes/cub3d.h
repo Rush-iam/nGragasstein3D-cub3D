@@ -27,7 +27,7 @@
 
 # define WIN_TITLE	"cub3D by nGragas"
 # define MAX_WIN	(t_upoint){2560, 1440}
-# define MAX_SCR	(t_upoint){20000, 20000}
+# define MAX_SCREENSHOT	(t_upoint){20000, 20000}
 # define MIN_RES_X	2
 
 # define ERR_MLX	1

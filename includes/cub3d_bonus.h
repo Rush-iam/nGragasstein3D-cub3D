@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/26 17:33:31 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/26 22:59:05 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,12 @@
 # include "x_events.h"
 
 # define WIN_TITLE	"nGragasstein 3D"
-# define MAX_WIN	(t_point){2558, 1396}
-# define MAX_SCR	(t_point){20000, 20000}
+# define MAX_SCREENSHOT	(t_point){20000, 20000}
 # define MIN_RES_X	2
 # define MAX_PLAYING_SOUNDS	24
+
+# define STATUS_BAR_FILE "./resources/status_bar.png"
+# define STATUS_DIGITS_FILE "./resources/status_bar_digits.png"
 
 # define T_FPT_NULL	(t_fpoint){0.0f, 0.0f}
 # define M_PI_F		(float)M_PI
@@ -89,7 +91,7 @@
 
 # define FOV_ZOOMSPEED	1.03f
 
-# define PL_SPEED		0.08f
+# define PL_SPEED		0.07f
 # define PL_RADIUS		0.4f
 # define FLOAT_FIX		0.00001f
 # define MOUSE_SPEED	2000.f
@@ -157,7 +159,6 @@ typedef struct	s_snd
 # define TEXTURE_DOOR_1_W	11
 # define TEXTURE_DOOR_2		12
 # define TEXTURE_DOOR_2_W	13
-
 
 enum	e_sound
 {
@@ -315,6 +316,12 @@ typedef struct	s_game
 	void		*win;
 	t_img		img;
 	t_img		img_bg;
+	struct		s_hud
+	{
+		t_img	bar;
+		t_img	bar_clean;
+		t_img	digits;
+	}			hud;
 	struct		s_sound
 	{
 		cs_context_t*	ctx;
@@ -425,7 +432,8 @@ typedef struct	s_game
 
 void			initialize_game		(t_game *game, bool screenshot_only);
 void			initialize_game_images(t_game *g, bool screenshot_only);
-void			initialize_weapons_scale(t_game *game);
+void			initialize_textures_and_hud(t_game *g);
+void			initialize_weapons_scale(t_game *g);
 void			initialize_bfs_grid(t_game *g);
 
 int				game_loop(t_game *game);
@@ -554,8 +562,8 @@ void			string_add(t_game *g, char *string, int timer, unsigned color);
 float			distance(t_fpoint from, t_fpoint to);
 char			*atoi_limited	(unsigned *dst_int, const char *src_string,
 															unsigned limit);
-t_img			*img_create(void *mlx_ptr, t_img *dst, unsigned x, unsigned y);
-t_img			img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres);
+t_img			*img_create(void *mlx_ptr, t_img *dst, t_upoint size);
+t_img			*img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres);
 t_img			img_faded_copy(void *mlx_ptr, t_img *img);
 void			img_alpha_columns_get(t_img *img);
 void			write_screenshot_and_exit	(t_game *game);

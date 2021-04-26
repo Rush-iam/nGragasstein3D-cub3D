@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:41 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/26 17:18:58 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/26 22:59:33 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,16 +36,16 @@ char	*atoi_limited(unsigned *dst_int, const char *src_string, unsigned limit)
 	return ((char *)src_string);
 }
 
-t_img	*img_create(void *mlx_ptr, t_img *dst, unsigned x, unsigned y)
+t_img	*img_create(void *mlx_ptr, t_img *dst, t_upoint size)
 {
 	int n;
 
-	dst->ptr = mlx_new_image(mlx_ptr, x, y);
+	dst->ptr = mlx_new_image(mlx_ptr, size.x, size.y);
 	if (dst->ptr == NULL)
 		return (NULL);
 	dst->data = (void *)mlx_get_data_addr(dst->ptr, &n, &n, &n);
-	dst->size = (t_upoint){x, y};
-	dst->aspect = (float)x / y;
+	dst->size = (t_upoint){size.x, size.y};
+	dst->aspect = (float)size.x / size.y;
 	return (dst);
 }
 
@@ -74,14 +74,14 @@ void	img_create_from_file(t_game *g, char *path, t_img *dst_img, char *err)
 	img_alpha_columns_get(dst_img);
 }
 
-t_img	img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres)
+t_img	*img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres)
 {
 	t_img		dst_img;
 	t_upoint	src_pix;
 	t_upoint	dst_pix;
 
-	if (img_create(mlx_ptr, &dst_img, dstres.x, dstres.y) == NULL)
-		return (dst_img);
+	if (img_create(mlx_ptr, &dst_img, dstres) == NULL)
+		return (NULL);
 	dst_pix.y = 0;
 	while (dst_pix.y < dst_img.size.y)
 	{
@@ -95,10 +95,11 @@ t_img	img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres)
 		}
 		dst_pix.y++;
 	}
-	mlx_destroy_image(mlx_ptr, src_img->ptr);
-	free(src_img->alpha_y);
 	dst_img.alpha_y = NULL;
-	return (dst_img);
+	free(src_img->alpha_y);
+	mlx_destroy_image(mlx_ptr, src_img->ptr);
+	*src_img = dst_img;
+	return (src_img);
 }
 
 t_img	img_faded_copy(void *mlx_ptr, t_img *img)
@@ -106,7 +107,7 @@ t_img	img_faded_copy(void *mlx_ptr, t_img *img)
 	t_img	img_faded;
 	int		i;
 
-	if (img_create(mlx_ptr, &img_faded, img->size.x, img->size.y) == NULL)
+	if (img_create(mlx_ptr, &img_faded, img->size) == NULL)
 		return (img_faded);
 	img_faded.alpha_y = NULL;
 	i = 0;

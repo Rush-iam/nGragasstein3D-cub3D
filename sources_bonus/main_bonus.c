@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/26 17:40:30 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/26 23:19:54 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,9 @@ void	game_tick(t_game *game)
 
 void draw_hud(t_game *game)
 {
+	mlx_put_image_to_window(game->mlx, game->win, game->hud.bar_clean.ptr, 0,
+								game->img.size.y - game->hud.bar.size.y);
+	mlx_put_image_to_window(game->mlx, game->win, game->hud.digits.ptr, 0, 0);
 	mlx_string_put(game->mlx, game->win,
 				game->img.size.x - 260, game->img.size.y - 8, COLOR_CYAN_F,
 		(char []){'H', 'e', 'a', 'l', 't', 'h', ':',

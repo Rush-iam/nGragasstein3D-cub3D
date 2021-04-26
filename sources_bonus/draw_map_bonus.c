@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:13 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/27 14:11:56 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/26 22:59:05 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 void	draw_map_init(t_game *game)
 {
-	game->map.show = true;
-	if (!img_create(game->mlx, &game->map.img, game->map.size.x * MAP_SCALE,
-												game->map.size.y * MAP_SCALE))
+	game->map.show = false;
+	if (!img_create(game->mlx, &game->map.img,
+		(t_upoint){game->map.size.x * MAP_SCALE, game->map.size.y * MAP_SCALE}))
 		terminate(game, ERR_MLX, strerror(errno));
 }
 
