@@ -35,7 +35,7 @@ int		main(int args, char *av[])
 
 void	initialize_game(t_game *game, bool screenshot)
 {
-	const t_upoint	max_res = (screenshot == true) ? MAX_SCR : MAX_WIN;
+	const t_upoint	max_res = (screenshot == true) ? MAX_SCREENSHOT : MAX_WIN;
 	int				n;
 
 	if (game->img.size.x < MIN_RES_X)
