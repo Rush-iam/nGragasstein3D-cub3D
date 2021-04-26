@@ -73,8 +73,8 @@ void	set_weapons(char *string, t_game *game)
 		if ((path = ft_strjoin(string,
 						(char []){'0' + i, '.', 'p', 'n', 'g', '\0'})) == NULL)
 			terminate(game, ERR_PARSE, strerror(errno));
-		load_texture_file(path, &game->p.weapon_img[id][i],
-										"Can't load weapon texture file", game);
+		img_create_from_file(game, path, &game->p.weapon_img[id][i],
+							 "Can't load weapon texture file");
 		free(path);
 		i++;
 	}
@@ -92,8 +92,8 @@ void	set_textures(char *string, t_game *game)
 			terminate(game, ERR_PARSE, "Texture ID out of array range");
 		if (game->texture[id].ptr != NULL)
 			terminate(game, ERR_PARSE, "Duplicated texture setting");
-		load_texture_file(string, &game->texture[id],
-										"Can't load wall texture file", game);
+		img_create_from_file(game, string, &game->texture[id],
+							 "Can't load wall texture file");
 	}
 	else if (*string == 'S')
 	{
@@ -103,8 +103,8 @@ void	set_textures(char *string, t_game *game)
 			terminate(game, ERR_PARSE, "Sprite ID out of array range");
 		if (game->sprite[id].ptr != NULL)
 			terminate(game, ERR_PARSE, "Duplicated sprite setting");
-		load_texture_file(string, &game->sprite[id],
-										"Can't load sprite file", game);
+		img_create_from_file(game, string, &game->sprite[id],
+							 "Can't load sprite file");
 	}
 }
 
@@ -159,37 +159,9 @@ void	load_spriteset(t_img dst[], int count, char *path, t_game *game)
 		if ((path2 = ft_strjoin(path,
 						(char []){'0' + i, '.', 'p', 'n', 'g', '\0'})) == NULL)
 			terminate(game, ERR_PARSE, strerror(errno));
-		load_texture_file(path2, &dst[i], "Can't load enemy sprite file", game);
+		img_create_from_file(game, path2, &dst[i], "Can't load enemy sprite file");
 		free(path2);
 		i++;
 	}
 	free(path);
-}
-
-void	load_texture_file(char *path, t_img *dst_img, char *err, t_game *game)
-{
-	int				n;
-	const size_t	str_len = ft_strlen(path);
-
-	if (str_len < 5)
-		terminate(game, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
-	if (ft_memcmp(".xpm", path + str_len - 4, 5) == 0)
-	{
-		if (!(dst_img->ptr = mlx_xpm_file_to_image(game->mlx, path,
-							(int *)&dst_img->size.x, (int *)&dst_img->size.y)))
-			terminate(game, ERR_PARSE, err);
-	}
-	else if (ft_memcmp(".png", path + str_len - 4, 5) == 0)
-	{
-		if (!(dst_img->ptr = mlx_png_file_to_image(game->mlx, path,
-							(int *)&dst_img->size.x, (int *)&dst_img->size.y)))
-			terminate(game, ERR_PARSE, err);
-	}
-	else
-		terminate(game, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
-	dst_img->data = (unsigned *)mlx_get_data_addr(dst_img->ptr, &n, &n, &n);
-	dst_img->aspect = dst_img->size.x / dst_img->size.y;
-	if ((dst_img->alpha_y = ft_calloc(dst_img->size.y, sizeof(bool))) == NULL)
-		terminate(game, ERR_MEM, strerror(errno));
-	img_alpha_columns_get(dst_img);
 }

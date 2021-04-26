@@ -14,16 +14,10 @@
 
 void	draw_map_init(t_game *game)
 {
-	int	null;
-
 	game->map.show = true;
-	game->map.img.size = (t_upoint){game->map.size.x * MAP_SCALE,
-									game->map.size.y * MAP_SCALE};
-	if (!(game->map.img.ptr = mlx_new_image(game->mlx, game->map.img.size.x,
-														game->map.img.size.y)))
-		terminate(game, ERR_MEM, "Memory allocation failed (draw map)");
-	game->map.img.data = (unsigned *)mlx_get_data_addr(game->map.img.ptr, &null,
-																&null, &null);
+	if (!img_create(game->mlx, &game->map.img, game->map.size.x * MAP_SCALE,
+												game->map.size.y * MAP_SCALE))
+		terminate(game, ERR_MLX, strerror(errno));
 }
 
 void	draw_map(t_game *game)
