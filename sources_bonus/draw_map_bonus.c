@@ -6,15 +6,15 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:13 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/26 22:59:05 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/27 15:52:36 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
 
-void	draw_map_init(t_game *game)
+void	initialize_map_hud(t_game *game)
 {
-	game->map.show = false;
+	game->map.enabled = false;
 	if (!img_create(game->mlx, &game->map.img,
 		(t_upoint){game->map.size.x * MAP_SCALE, game->map.size.y * MAP_SCALE}))
 		terminate(game, ERR_MLX, strerror(errno));
@@ -24,8 +24,6 @@ void	draw_map(t_game *game)
 {
 	t_point	pt;
 
-	if (game->map.show == false)
-		return ;
 	img_clear_rgb(&game->map.img, 0xAA000000);
 	pt.y = 0;
 	while (pt.y < (int)game->map.img.size.y)

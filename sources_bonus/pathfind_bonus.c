@@ -40,6 +40,41 @@ void	initialize_bfs_grid(t_game *g)
 	}
 }
 
+void	*pathfind(t_list **path, t_point from, t_point to, struct s_map *map)
+{
+	t_list	*queue;
+	t_list	*near_lst;
+	t_point	*pt;
+	t_point	nears[4];
+	int		i;
+
+	ft_lstclear(path, free);
+	if (pathfind_init(map, to, &queue, &pt) == true)
+		while (queue)
+		{
+			pt = ft_lstpop(&queue);
+			i = pathfind_nears(map, *pt, nears);
+			while (--i >= 0)
+				if (map->grid_bfs[nears[i].y][nears[i].x] == 0)
+				{
+					map->grid_bfs[nears[i].y][nears[i].x] =
+							map->grid_bfs[pt->y][pt->x] + 1;
+					if (nears[i].x == from.x && nears[i].y == from.y)
+					{
+						pathfind_deinit(&queue, pt);
+						return (pathfind_construct(path, from, map));
+					}
+					near_lst = ft_lstnew(malloc(sizeof(*nears)));
+					if (near_lst == NULL || near_lst->content == NULL)
+						return (pathfind_deinit(&queue, pt));
+					*(t_point *)near_lst->content = nears[i];
+					ft_lstadd_back(&queue, near_lst);
+				}
+			free(pt);
+		}
+	return (NULL);
+}
+
 void	*pathfind_deinit(t_list **queue, t_point *pt)
 {
 	ft_lstclear(queue, free);
@@ -131,40 +166,3 @@ void	*pathfind_construct(t_list **path, t_point from, struct s_map *map)
 	}
 	return (NULL);
 }
-
-void	*pathfind(t_list **path, t_point from, t_point to, struct s_map *map)
-{
-	t_list	*queue;
-	t_list	*near_lst;
-	t_point	*pt;
-	t_point	nears[4];
-	int		i;
-
-	ft_lstclear(path, free);
-	if (pathfind_init(map, to, &queue, &pt) == true)
-		while (queue)
-		{
-			pt = ft_lstpop(&queue);
-			i = pathfind_nears(map, *pt, nears);
-			while (--i >= 0)
-				if (map->grid_bfs[nears[i].y][nears[i].x] == 0)
-				{
-					map->grid_bfs[nears[i].y][nears[i].x] =
-											map->grid_bfs[pt->y][pt->x] + 1;
-					if (nears[i].x == from.x && nears[i].y == from.y)
-					{
-						pathfind_deinit(&queue, pt);
-						return (pathfind_construct(path, from, map));
-					}
-					near_lst = ft_lstnew(malloc(sizeof(*nears)));
-					if (near_lst == NULL || near_lst->content == NULL)
-						return (pathfind_deinit(&queue, pt));
-					*(t_point *)near_lst->content = nears[i];
-					ft_lstadd_back(&queue, near_lst);
-				}
-			free(pt);
-		}
-	return (NULL);
-}
-
-

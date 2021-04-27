@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:53:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/26 15:53:48 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/27 20:35:23 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@ void	enemy(t_game *game, t_object *obj)
 {
 	if (obj->e->state != ST_DEATH)
 	{
-		if (obj->distance_real < game->column[game->win_center.x].distance &&
-			obj->render.start.x <= (int)game->win_center.x &&
-			obj->render.end.x >= (int)game->win_center.x &&	(!game->p.target ||
+		if (obj->distance_real < game->column[game->img_center.x].distance &&
+			obj->render.start.x <= (int)game->img_center.x &&
+			obj->render.end.x >= (int)game->img_center.x && (!game->p.target ||
 							obj->distance_real < game->p.target->distance_real))
 			game->p.target = obj;
 	}
@@ -156,10 +156,11 @@ void	enemy_shoot(t_game *g, t_object *obj)
 	damage = ENEMY_DMG_MIN +
 			 arc4random() % (1 + ENEMY_DMG_MAX - ENEMY_DMG_MIN) * power;
 	g->p.health -= damage;
+	g->p.health = ft_max(0, g->p.health);
 	if (damage >= (ENEMY_DMG_MIN + ENEMY_DMG_MAX) / 2)
 		sound_play(g, &g->audio.sound[SND_PLAYER_PAIN], T_FPT_NULL);
-//	printf("Enemy shot you! -%u HP. Health: %hd\n", damage, g->p.health);
 	g->effect = (struct s_effect){15, 30, EF_FLASH, COLOR_RED, damage / 100.0f};
+	g->hud.needs_redraw = true;
 }
 
 void	enemy_set_state(t_game *g, t_object *obj, enum e_objstate state)

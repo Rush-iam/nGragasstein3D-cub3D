@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/16 15:12:16 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/27 15:08:54 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ void	parse_scene(int file_id, char **line, t_game *game)
 	while ((status = get_next_line(file_id, line)) >= 0)
 	{
 		if (**line == 'R')
-			set_resolution(*line, &game->img.size, game);
+			set_resolution(*line, &game->resolution, game);
 		else if (**line == 'C')
 			set_colors(*line, &game->color_ceil, game);
 		else if (**line == 'F')
@@ -198,7 +198,7 @@ void	validate_settings(t_game *game)
 		terminate(game, ERR_PARSE, "Floor color not found. Format: F R,G,B");
 	if (game->color_ceil == -1U)
 		terminate(game, ERR_PARSE, "Ceil color not found. Format: C R,G,B");
-	if (game->img.size.x == 0 || game->img.size.y == 0)
+	if (game->resolution.x == 0 || game->resolution.y == 0)
 		terminate(game, ERR_PARSE,
 		"Resolution doesn't set. Format: 'R WIDTH HEIGHT'");
 	i = 0;

@@ -38,8 +38,8 @@ void	initialize_game(t_game *game, bool screenshot)
 	const t_upoint	max_res = (screenshot == true) ? MAX_SCREENSHOT : MAX_WIN;
 	int				n;
 
-	if (game->img.size.x < MIN_RES_X)
-		game->img.size.x = MIN_RES_X;
+	if (game->img.size.x < MIN_RES)
+		game->img.size.x = MIN_RES;
 	if (game->img.size.x > max_res.x)
 		game->img.size.x = max_res.x;
 	if (game->img.size.y > max_res.y)

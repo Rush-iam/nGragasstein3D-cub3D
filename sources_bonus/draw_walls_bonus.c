@@ -97,17 +97,17 @@ void	draw_wall_scaled(t_game *g, t_img src, unsigned x)
 	const unsigned	src_x = g->column[x].texture_pos * src.size.x;
 	float			src_y;
 	unsigned		y;
-	const unsigned	half = ft_umin(g->win_center.y, g->column[x].height / 2);
+	const unsigned	half = ft_umin(g->img_center.y, g->column[x].height / 2);
 
-	g->img.data[g->win_center.y * g->img.size.x + x] =
+	g->img.data[g->img_center.y * g->img.size.x + x] =
 			src.data[(int)(src.size.y / 2.f) * src.size.x + src_x];
 	y = 1;
 	src_y = step;
 	while (y < half)
 	{
-		g->img.data[(g->win_center.y - y) * g->img.size.x + x] =
+		g->img.data[(g->img_center.y - y) * g->img.size.x + x] =
 				src.data[(int)(src.size.y / 2.f - src_y) * src.size.x + src_x];
-		g->img.data[(g->win_center.y + y) * g->img.size.x + x] =
+		g->img.data[(g->img_center.y + y) * g->img.size.x + x] =
 				src.data[(int)(src.size.y / 2.f + src_y) * src.size.x + src_x];
 		src_y += step;
 		y++;
@@ -120,17 +120,17 @@ void	draw_wall_scaled_f(t_game *g, t_img src, unsigned x, float fade)
 	const unsigned	src_x = g->column[x].texture_pos * src.size.x;
 	float			src_y;
 	unsigned		y;
-	const unsigned	half = ft_umin(g->win_center.y, g->column[x].height / 2);
+	const unsigned	half = ft_umin(g->img_center.y, g->column[x].height / 2);
 
-	g->img.data[g->win_center.y * g->img.size.x + x] =
+	g->img.data[g->img_center.y * g->img.size.x + x] =
 	pixel_fade(src.data[(int)(src.size.y / 2.f) * src.size.x + src_x], fade);
 	y = 1;
 	src_y = step;
 	while (y < half)
 	{
-		g->img.data[(g->win_center.y - y) * g->img.size.x + x] = pixel_fade(
+		g->img.data[(g->img_center.y - y) * g->img.size.x + x] = pixel_fade(
 		src.data[(int)(src.size.y / 2.f - src_y) * src.size.x + src_x], fade);
-		g->img.data[(g->win_center.y + y) * g->img.size.x + x] = pixel_fade(
+		g->img.data[(g->img_center.y + y) * g->img.size.x + x] = pixel_fade(
 		src.data[(int)(src.size.y / 2.f + src_y) * src.size.x + src_x], fade);
 		src_y += step;
 		y++;
