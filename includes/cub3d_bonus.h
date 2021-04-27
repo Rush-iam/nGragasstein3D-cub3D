@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/26 22:59:05 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/27 23:33:41 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,27 @@
 
 # define WIN_TITLE	"nGragasstein 3D"
 # define MAX_SCREENSHOT	(t_point){20000, 20000}
-# define MIN_RES_X	2
+# define MIN_RES	2
 # define MAX_PLAYING_SOUNDS	24
 
-# define STATUS_BAR_FILE "./resources/status_bar.png"
-# define STATUS_DIGITS_FILE "./resources/status_bar_digits.png"
+# define HUD_FACE_FILES "./resources/face/face_"
+# define HUD_BAR_FILE "./resources/hud_bar.png"
+# define HUD_DIGITS_FILE "./resources/hud_digits.png"
+# define HUD_KNIFE_FILE "./resources/hud_knife.png"
+# define HUD_PISTOL_FILE "./resources/hud_pistol.png"
+# define HUD_RIFLE_FILE "./resources/hud_rifle.png"
+# define HUD_DIGITS "0123456789 "
+# define HUD_VALUES_OFFSET_Y 0.395f
+# define HUD_SCORE_X	0.126f
+# define HUD_FLOOR_X	0.045f
+# define HUD_LIVES_X	0.347f
+# define HUD_HEALTH_X	0.528f
+# define HUD_AMMO_X		0.68f
+# define HUD_WEAPON_X	0.818f
+# define HUD_WEAPON_Y	0.095f
+# define HUD_FACE_X		0.44f
+# define HUD_FACE_Y		0.02f
+# define HUD_FACE_TICK_TIMER	20
 
 # define T_FPT_NULL	(t_fpoint){0.0f, 0.0f}
 # define M_PI_F		(float)M_PI
@@ -215,7 +231,7 @@ enum	e_sound
 # define ENEMY_DMG_MAX		30
 //# define ENEMY_DMG_MIN		1
 //# define ENEMY_DMG_MAX		1
-# define ENEMY_SPEED		0.01f
+# define ENEMY_SPEED		0.012f
 # define ANIM_ENEMY_TICKS	10
 # define ANIM_ENEMY_WALK_FRAMES	4
 # define ANIM_ENEMY_SLOWMO	2
@@ -314,13 +330,20 @@ typedef struct	s_game
 {
 	void		*mlx;
 	void		*win;
+	t_upoint	resolution;
 	t_img		img;
 	t_img		img_bg;
+	unsigned	img_bytecount;
 	struct		s_hud
 	{
+		bool	needs_redraw;
+		float	scale;
 		t_img	bar;
-		t_img	bar_clean;
 		t_img	digits;
+		t_img	weapon[3];
+		t_img	face[7][3];
+		t_img	face_dead;
+		float	digit_width;
 	}			hud;
 	struct		s_sound
 	{
@@ -344,7 +367,7 @@ typedef struct	s_game
 		t_fpoint	vect;
 		short		health;
 		short		ammo;
-		short		score;
+		int			score;
 		t_object	*target;
 		short		weapons_mask;
 		enum		e_weapon
@@ -381,10 +404,10 @@ typedef struct	s_game
 		t_upoint	size;
 		char		**grid;
 		unsigned	**grid_bfs;
-		bool		show;
+		bool		enabled;
 	}			map;
 	float		fov;
-	t_upoint	win_center;
+	t_upoint	img_center;
 	float		col_step;
 	float		col_scale;
 	float		*angles;
@@ -430,11 +453,12 @@ typedef struct	s_game
 	t_img		img_effect;
 }				t_game;
 
-void			initialize_game		(t_game *game, bool screenshot_only);
-void			initialize_game_images(t_game *g, bool screenshot_only);
-void			initialize_textures_and_hud(t_game *g);
-void			initialize_weapons_scale(t_game *g);
-void			initialize_bfs_grid(t_game *g);
+void			initialize_game(t_game *game, bool screenshot_only);
+void			initialize_window(t_game *g, bool screenshot_only);
+void			initialize_canvas_images(t_game *g);
+void			initialize_hud_images(t_game *g);
+void			initialize_face_images(t_game *g);
+void			initialize_weapons_and_faded_walls(t_game *g);
 
 int				game_loop(t_game *game);
 void			game_tick(t_game *game);
@@ -456,7 +480,6 @@ void			set_textures		(char *string, t_game *game);
 void			load_audioset(t_set *dst, char *path, t_game *game);
 void			load_audio_file(t_snd *dst, char *path);
 void			load_spriteset(t_img dst[], int count, char *path, t_game *game);
-void img_create_from_file(t_game *g, char *path, t_img *dst_img, char *err);
 
 void			set_map				(t_game *game, t_list *map);
 void			set_map_process		(t_game *game);
@@ -508,8 +531,15 @@ void			enemy_sprite(t_game *game, t_object *obj);
 void			enemy_shoot(t_game *g, t_object *obj);
 void			enemy_set_state(t_game *g, t_object *obj, enum e_objstate state);
 void			enemy_sound(t_game *game, t_object *obj, enum e_sound sound_type);
-void			*pathfind(t_list **path, t_point from, t_point to, struct s_map *map);
 
+void			initialize_bfs_grid(t_game *g);
+void			*pathfind(t_list **path, t_point from, t_point to, struct s_map *map);
+bool			pathfind_init(struct s_map *map, t_point target, t_list **queue, t_point **pt);
+void			*pathfind_deinit(t_list **queue, t_point *pt);
+int				pathfind_nears(struct s_map *map, t_point pt, t_point *nears);
+void			*pathfind_construct(t_list **path, t_point from, struct s_map *map);
+
+void			initialize_sounds(t_game *g);
 void			sounds(t_game *game);
 cs_playing_sound_t *	sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos);
 void			sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound);
@@ -533,7 +563,7 @@ void			draw_sprite(t_game *game, t_object *obj);
 void			draw_sprite_scaled(t_img *img, t_object *obj, t_point min, t_point max);
 void			draw_sprite_scaled_f(t_game *g, t_object *obj, t_point min, t_point max);
 
-void			draw_map_init	(t_game *game);
+void			initialize_map_hud	(t_game *game);
 void			draw_map		(t_game *game);
 void			draw_map_player	(t_game *g);
 void			draw_map_objects(t_game *game);
@@ -563,7 +593,9 @@ float			distance(t_fpoint from, t_fpoint to);
 char			*atoi_limited	(unsigned *dst_int, const char *src_string,
 															unsigned limit);
 t_img			*img_create(void *mlx_ptr, t_img *dst, t_upoint size);
+void			img_from_file(t_game *g, char *path, t_img *dst_img, char *err);
 t_img			*img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres);
+void			img_from_file_hud_scaled(t_game *g, char *path, t_img *dst_img, char *err);
 t_img			img_faded_copy(void *mlx_ptr, t_img *img);
 void			img_alpha_columns_get(t_img *img);
 void			write_screenshot_and_exit	(t_game *game);

@@ -34,10 +34,9 @@ bool	pickup(t_game *game, enum e_objtype type)
 	game->p.ammo = ft_min(game->p.ammo, 99);
 	if ((type == T_HEALTH_L || type == T_HEALTH_M) && game->p.health > 100)
 		game->p.health = 100;
-//	printf("STATUS: Health = %hd; Ammo = %hd; Score = %hd\n",
-//		   game->p.health, game->p.ammo, game->p.score);
 	game->effect = (struct s_effect){15, 30, EF_FLASH, COLOR_YELLOW, .2};
 	pickup_sound(game, type);
+	game->hud.needs_redraw = true;
 	return (true);
 }
 

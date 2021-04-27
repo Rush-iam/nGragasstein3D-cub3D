@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:41 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/26 22:59:33 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/27 21:55:37 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ t_img	*img_create(void *mlx_ptr, t_img *dst, t_upoint size)
 	return (dst);
 }
 
-void	img_create_from_file(t_game *g, char *path, t_img *dst_img, char *err)
+void	img_from_file(t_game *g, char *path, t_img *dst_img, char *err)
 {
 	int				n;
 	const size_t	str_len = ft_strlen(path);
@@ -100,6 +100,14 @@ t_img	*img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres)
 	mlx_destroy_image(mlx_ptr, src_img->ptr);
 	*src_img = dst_img;
 	return (src_img);
+}
+
+void	img_from_file_hud_scaled(t_game *g, char *path, t_img *dst_img, char *err)
+{
+	img_from_file(g, path, dst_img, err);
+	if (img_resize(g->mlx, dst_img, (t_upoint){dst_img->size.x * g->hud.scale,
+									dst_img->size.y * g->hud.scale}) == NULL)
+		terminate(g, ERR_MEM, strerror(errno));
 }
 
 t_img	img_faded_copy(void *mlx_ptr, t_img *img)

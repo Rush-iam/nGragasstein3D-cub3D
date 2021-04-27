@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/12 16:12:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/16 00:20:01 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/27 22:09:39 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,15 +62,16 @@ void	player_set_weapon(t_game *game, enum e_weapon weapon)
 	}
 	game->p.weapon.ticks = game->p.weapon.frames * ANIM_TICKS;
 	game->p.weapon_pos = (t_upoint){
-	game->win_center.x - game->p.weapon_img[game->p.weapon_cur][0].size.x / 2,
+			game->img_center.x - game->p.weapon_img[game->p.weapon_cur][0].size.x / 2,
 	game->img.size.y - game->p.weapon_img[game->p.weapon_cur][0].size.y};
+	game->hud.needs_redraw = true;
 }
 
 void	draw_weapon(t_game *game, struct s_weapon *weapon)
 {
 	mlx_put_image_to_window(game->mlx, game->win, game->p.weapon_img
 					[game->p.weapon_cur][weapon->animation[weapon->frame]].ptr,
-			game->p.weapon_pos.x, game->p.weapon_pos.y - game->hud.bar.size.y);
+			game->p.weapon_pos.x, game->p.weapon_pos.y);
 }
 
 void	weapon_sound(t_game *game, enum e_weapon weapon)
@@ -90,16 +91,14 @@ void	weapon_shoot(t_game *g, t_object *target)
 	weapon_sound(g, g->p.weapon_cur);
 	if (g->p.weapon_cur != W_KNIFE)
 		g->p.ammo--;
-	if (target)
+	if (target && (g->p.weapon_cur != W_KNIFE || target->distance_real < 1.0f))
 	{
-		if (g->p.weapon_cur == W_KNIFE && target->distance_real < 1)
+		if (g->p.weapon_cur == W_KNIFE)
 			damage = DMG_KNIFE_MIN + arc4random() %
 					(1 + DMG_KNIFE_MAX - DMG_KNIFE_MIN);
-		else if (g->p.weapon_cur != W_KNIFE)
+		else
 			damage = DMG_SHOT_MIN + arc4random() %
 					(1 + DMG_SHOT_MAX - DMG_SHOT_MIN);
-		else
-			return ;
 		target->e->health -= damage;
 		if (target->e->health <= 0)
 		{
@@ -110,6 +109,6 @@ void	weapon_shoot(t_game *g, t_object *target)
 		}
 		else
 			enemy_set_state(g, target, ST_PAIN);
-//		printf("bam! ammo left: %hd RND damage: %u\n", g->p.ammo, damage);
 	}
+	g->hud.needs_redraw = true;
 }

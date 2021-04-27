@@ -42,7 +42,7 @@ void	effect_fizzlefade(t_game *game, unsigned color)
 	unsigned		i;
 	unsigned		scale;
 
-	scale = ft_umax(game->win_center.x, game->img.size.y) / 256 + 1;
+	scale = ft_umax(game->img_center.x, game->img.size.y) / 256 + 1;
 	img_clear_rgb(&game->img_effect, 0xFF000000);
 	i = 0;
 	while (i < 512)

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/26 14:29:28 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/27 15:08:26 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ void	player_control_rotate(t_game *game)
 	{
 		mlx_mouse_get_pos(game->win, &game->key.mpos.x, &game->key.mpos.y);
 		game->key.mdir.x = game->key.mdir.x / 2 + game->key.mpos.x -
-						   game->win_center.x;
-		mlx_mouse_move(game->win, game->win_center.x, game->win_center.y);
+						   game->img_center.x;
+		mlx_mouse_move(game->win, game->img_center.x, game->img_center.y);
 		game->p.angle += game->key.mdir.x / MOUSE_SPEED;
 	}
 	if (game->key.k[K_TURN_LEFT])
@@ -101,11 +101,11 @@ void	player_set_fov(t_game *game, float fov, bool reset)
 	while (n < (int)game->img.size.x)
 	{
 		game->angles[n] =
-				atanf(game->col_step * (n - (int)game->win_center.x));
+				atanf(game->col_step * (n - (int)game->img_center.x));
 		n++;
 	}
 	if (reset == false)
-		printf("FOV %.1f\n", 114 * atanf(game->col_step * game->win_center.x));
+		printf("FOV %.1f\n", 114 * atanf(game->col_step * game->img_center.x));
 	if (reset == true || (M_PI_4_F / 4.0f < fov && fov < PI2_F))
 		game->fov = fov;
 }
@@ -118,13 +118,13 @@ void	player_control_toggler(t_game *g, int key_code)
 			mlx_mouse_show();
 		if (g->key.mouse == false)
 		{
-			mlx_mouse_move(g->win, g->win_center.x, g->win_center.y);
+			mlx_mouse_move(g->win, g->img_center.x, g->img_center.y);
 			mlx_mouse_hide();
 		}
 		g->key.mouse = !g->key.mouse;
 	}
 	if (key_code == K_MAP_TOGGLE && g->key.k[key_code] == false)
-		g->map.show = !g->map.show;
+		g->map.enabled = !g->map.enabled;
 	if (key_code == K_USE && g->key.k[key_code] == false)
 		door_open(g,
 		(t_point){g->p.pos.x + g->p.vect.x, g->p.pos.y + g->p.vect.y}, true);

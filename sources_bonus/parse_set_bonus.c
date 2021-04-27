@@ -23,7 +23,7 @@ void	set_resolution(const char *res_string, t_upoint *res, t_game *game)
 	res_string = atoi_limited(&res->y, res_string, UINT_MAX);
 	if (res_string == NULL)
 		terminate(game, ERR_PARSE, "Resolution Y setting is wrong");
-	if (*res_string != '\0' || res->x == 0 || res->y == 0)
+	else if (*res_string != '\0' || res->x == 0 || res->y == 0)
 		terminate(game, ERR_PARSE, "Wrong Resolution setting");
 }
 
@@ -39,17 +39,17 @@ void	set_colors(const char *color_string, unsigned *target, t_game *game)
 	color_string = atoi_limited(&r, color_string, UCHAR_MAX);
 	if (color_string == NULL)
 		terminate(game, ERR_PARSE, "F/C color Red is wrong (range: 0-255)");
-	if (*color_string++ != ',')
+	else if (*color_string++ != ',')
 		terminate(game, ERR_PARSE, "F/C color format: 'F R,G,B'/'C R,G,B'");
 	color_string = atoi_limited(&g, color_string, UCHAR_MAX);
 	if (color_string == NULL)
 		terminate(game, ERR_PARSE, "F/C color Green is wrong (range: 0-255)");
-	if (*color_string++ != ',')
+	else if (*color_string++ != ',')
 		terminate(game, ERR_PARSE, "F/C color format: 'F R,G,B'/'C R,G,B'");
 	color_string = atoi_limited(&b, color_string, UCHAR_MAX);
 	if (color_string == NULL)
 		terminate(game, ERR_PARSE, "F/C color Blue is wrong (range: 0-255)");
-	if (*color_string != '\0')
+	else if (*color_string != '\0')
 		terminate(game, ERR_PARSE, "F/C color line redundant symbols");
 	*target = (r << 16) | (g << 8) | b;
 }
@@ -73,8 +73,8 @@ void	set_weapons(char *string, t_game *game)
 		if ((path = ft_strjoin(string,
 						(char []){'0' + i, '.', 'p', 'n', 'g', '\0'})) == NULL)
 			terminate(game, ERR_PARSE, strerror(errno));
-		img_create_from_file(game, path, &game->p.weapon_img[id][i],
-							 "Can't load weapon texture file");
+		img_from_file(game, path, &game->p.weapon_img[id][i],
+					  "Can't load weapon texture file");
 		free(path);
 		i++;
 	}
@@ -92,8 +92,8 @@ void	set_textures(char *string, t_game *game)
 			terminate(game, ERR_PARSE, "Texture ID out of array range");
 		if (game->texture[id].ptr != NULL)
 			terminate(game, ERR_PARSE, "Duplicated texture setting");
-		img_create_from_file(game, string, &game->texture[id],
-							 "Can't load wall texture file");
+		img_from_file(game, string, &game->texture[id],
+					  "Can't load wall texture file");
 	}
 	else if (*string == 'S')
 	{
@@ -103,8 +103,8 @@ void	set_textures(char *string, t_game *game)
 			terminate(game, ERR_PARSE, "Sprite ID out of array range");
 		if (game->sprite[id].ptr != NULL)
 			terminate(game, ERR_PARSE, "Duplicated sprite setting");
-		img_create_from_file(game, string, &game->sprite[id],
-							 "Can't load sprite file");
+		img_from_file(game, string, &game->sprite[id],
+					  "Can't load sprite file");
 	}
 }
 
@@ -159,7 +159,7 @@ void	load_spriteset(t_img dst[], int count, char *path, t_game *game)
 		if ((path2 = ft_strjoin(path,
 						(char []){'0' + i, '.', 'p', 'n', 'g', '\0'})) == NULL)
 			terminate(game, ERR_PARSE, strerror(errno));
-		img_create_from_file(game, path2, &dst[i], "Can't load enemy sprite file");
+		img_from_file(game, path2, &dst[i], "Can't load enemy sprite file");
 		free(path2);
 		i++;
 	}
