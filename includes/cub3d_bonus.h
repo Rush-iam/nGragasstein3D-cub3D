@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/28 16:26:24 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/28 23:51:18 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,8 @@
 # define K_TURN_RIGHT	KEY_RIGHT
 # define K_RUN			KEY_SHIFT_LEFT
 # define K_USE			KEY_E
+# define K_JUMP			KEY_SPACE
+# define K_CROUCH		KEY_CONTROL_LEFT
 
 # define K_KNIFE	KEY_1
 # define K_PISTOL	KEY_2
@@ -111,8 +113,12 @@
 
 # define PL_SPEED		0.07f
 # define PL_RADIUS		0.4f
+# define PL_JUMP		0.033f
+# define PL_GRAVITY		-0.1f
+# define PL_CROUCH_Z	-0.2f
+# define PL_CROUCH_SPEED 5.0f
 # define FLOAT_FIX		0.00001f
-# define MOUSE_SPEED	2000.f
+# define MOUSE_SPEED_X	2000.f
 # define MAP_SCALE		(24 / 2)
 
 typedef struct	s_point
@@ -272,7 +278,7 @@ typedef struct	s_object
 	float		angle_to_p;
 	struct		s_render
 	{
-		t_upoint	size;
+		t_point		size;
 		int			start_0;
 		t_point		start;
 		t_point		end;
@@ -333,8 +339,53 @@ typedef struct	s_game
 	void		*win;
 	t_upoint	resolution;
 	t_img		img;
+	int			img_pixelcount;
 	t_img		img_bg;
-	unsigned	img_bytecount;
+	unsigned	color_ceil;
+	unsigned	color_floor;
+	unsigned	fade_distance;
+	unsigned	tick;
+	unsigned	tick_diff;
+	t_img		texture[28];
+	t_img		sprite[sizeof(CHAR_OBJECTS) - 1];
+	t_set		enemyset[1];
+	t_list		*doors;
+	t_list		*objects;
+	struct		s_map
+	{
+		t_img		img;
+		t_upoint	size;
+		char		**grid;
+		unsigned	**grid_bfs;
+		bool		enabled;
+	}			map;
+	t_point		center;
+	int			horizon;
+	float		z_level;
+	float		z_level_vy;
+	float		z_level_target;
+	float		fov;
+	float		*angles;
+	float		col_step;
+	float		col_scale;
+	struct		s_column
+	{
+		float		distance;
+		t_fpoint	pos;
+		t_point		cell;
+		char		dir;
+		int			height;
+		unsigned	texture_id;
+		float		texture_pos;
+	}			*column;
+	struct		s_key
+	{
+		bool		k[280];
+		bool		m[10];
+		t_point		mpos;
+		t_point		mdir;
+		bool		mouse;
+	}			key;
 	struct		s_hud
 	{
 		bool		needs_redraw;
@@ -348,6 +399,28 @@ typedef struct	s_game
 		unsigned	face_nexttick;
 		float		digit_width;
 	}			hud;
+	struct		s_effect
+	{
+		unsigned	frame_cur;
+		unsigned	frames;
+		enum		e_effect
+		{
+			EF_FLASH = 0,
+			EF_FIZZLEFADE
+		}			type;
+		unsigned	color;
+		float		max_power;
+	}			effect;
+	struct		s_string
+	{
+		char		*text;
+		t_upoint	pos;
+		unsigned	frame_cur;
+		unsigned	frames;
+		bool		fade;
+		unsigned	color;
+	}			string;
+	t_img		img_effect;
 	struct		s_sound
 	{
 		cs_context_t*	ctx;
@@ -361,8 +434,6 @@ typedef struct	s_game
 			t_fpoint			sourcepos;
 		}				playing[MAX_PLAYING_SOUNDS];
 	}			audio;
-	unsigned	tick;
-	unsigned	tick_diff;
 	struct		s_player
 	{
 		t_fpoint	pos;
@@ -393,73 +464,13 @@ typedef struct	s_game
 		t_img		weapon_img[3][4];
 		t_upoint	weapon_pos;
 	}			p;
-	struct		s_key
-	{
-		bool		k[280];
-		bool		m[10];
-		t_point		mpos;
-		t_point		mdir;
-		bool		mouse;
-	}			key;
-	struct		s_map
-	{
-		t_img		img;
-		t_upoint	size;
-		char		**grid;
-		unsigned	**grid_bfs;
-		bool		enabled;
-	}			map;
-	float		fov;
-	t_upoint	img_center;
-	float		col_step;
-	float		col_scale;
-	float		*angles;
-	struct		s_column
-	{
-		float		distance;
-		t_fpoint	pos;
-		t_point		cell;
-		char		dir;
-		unsigned	height;
-		unsigned	texture_id;
-		float		texture_pos;
-	}			*column;
-	unsigned	color_ceil;
-	unsigned	color_floor;
-	unsigned	fade_distance;
-	t_img		texture[28];
-	t_img		sprite[sizeof(CHAR_OBJECTS) - 1];
-	t_set		enemyset[1];
-	t_list		*doors;
-	t_list		*objects;
-	struct		s_effect
-	{
-		unsigned	frame_cur;
-		unsigned	frames;
-		enum		e_effect
-		{
-			EF_FLASH = 0,
-			EF_FIZZLEFADE
-		}			type;
-		unsigned	color;
-		float		max_power;
-	}			effect;
-	struct		s_string
-	{
-		char		*text;
-		t_upoint	pos;
-		unsigned	frame_cur;
-		unsigned	frames;
-		bool		fade;
-		unsigned	color;
-	}			string;
-	t_img		img_effect;
 }				t_game;
 
 // main
 int				game_loop(t_game *game);
-void			game_tick(t_game *game);
+void			game_ticks(t_game *game);
 int				dead_exit(t_game *game);
+void			draw_ceilfloor(t_game *g);
 
 // parse
 void			parse(int args, char **av, t_game *game, bool *screenshot_only);
@@ -502,6 +513,7 @@ int				hook_exit			(t_game *game);
 void			player_control			(t_game *game);
 void			player_control_rotate	(t_game *game);
 void			player_control_move		(t_game *game);
+void			player_control_jump_n_crouch(t_game *g);
 void			player_control_weapon(t_game *game);
 void			player_set_fov			(t_game *game, float fov, bool reset);
 void			player_control_toggler	(t_game *g, int key_code);
@@ -565,15 +577,14 @@ t_ray			ray_intersect_y(t_game *g, float step_x, int step_y);
 void			draw_wall_texture_set(t_game *g, struct s_column *col, t_point pt);
 void			draw_door_texture_set(t_game *game, struct s_column *col, char chr);
 void			draw_walls		(t_game *g);
-void			draw_wall_scaled(t_game *g, t_img src, unsigned x);
-void			draw_wall_scaled_f(t_game *g, t_img src, unsigned x, float fade);
+void			draw_wall_scaled(t_game *g, t_img src, t_point cur, int z_offset);
 void			draw_wall_solid	(t_game *game, unsigned x, float fade);
 
 // draw_objects
 void			draw_object_properties(t_game *game, t_object *obj);
 void			draw_objects(t_game *game);
 void			draw_sprite(t_game *game, t_object *obj);
-void			draw_sprite_scaled(t_img *img, t_object *obj, t_point min, t_point max);
+void			draw_sprite_scaled(t_game *g, t_object *obj, t_point min, t_point max);
 void			draw_sprite_scaled_f(t_game *g, t_object *obj, t_point min, t_point max);
 
 // draw_hud

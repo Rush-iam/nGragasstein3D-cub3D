@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/05 20:45:07 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/28 20:59:13 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,23 +42,22 @@ void	img_ceilfloor_rgb(t_img *img, unsigned ceil, unsigned floor)
 
 void	img_ceilfloor_rgb_faded(t_img *img, unsigned ceil, unsigned floor, unsigned fade_distance)
 {
-	const unsigned	full_screen = img->size.x * img->size.y;
-	const unsigned	half_screen = full_screen / 2;
-	unsigned		i;
+	t_upoint	cur;
+	int			line_color;
 
-	i = 0;
-	while (i < half_screen)
+	cur.y = 0;
+	while (cur.y < img->size.y)
 	{
-		img->data[i] = pixel_fade(ceil, 1.0f -
-			((i / img->size.x) / (img->size.y / 2.0f) / sqrtf(fade_distance)));
-		i++;
-	}
-	while (i < full_screen)
-	{
-		img->data[i] = pixel_fade(floor, 1.0f -
-			((full_screen - i) /
-					img->size.x) / (img->size.y / 2.0f) / sqrtf(fade_distance));
-		i++;
+		if (cur.y < img->size.y / 2)
+			line_color = pixel_fade(ceil, 1 - powf(
+			cur.y / (img->size.y / 2.f) / powf(fade_distance, 0.25f), 2.f));
+		else
+			line_color = pixel_fade(floor, 1 - powf(
+			(2 - 2.f * cur.y / img->size.y) / powf(fade_distance, 0.25f), 2.f));
+		cur.x = 0;
+		while (cur.x < img->size.x)
+			img->data[cur.y * img->size.x + cur.x++] = line_color;
+		cur.y++;
 	}
 }
 

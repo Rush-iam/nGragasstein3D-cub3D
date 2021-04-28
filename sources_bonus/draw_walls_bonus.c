@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 23:32:38 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/05 19:18:39 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/28 22:28:13 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,61 +80,41 @@ void	draw_walls(t_game *g)
 			else if (ft_memchr(CHAR_DOORS, chr, sizeof(CHAR_DOORS)))
 				draw_door_texture_set(g, &g->column[ray], chr);
 			g->column[ray].height = g->col_scale / g->column[ray].distance;
-			if (g->column[ray].distance < g->fade_distance)
-				draw_wall_scaled(g, g->texture[g->column[ray].texture_id], ray);
-			else
-				draw_wall_scaled_f(g, g->texture[g->column[ray].texture_id],
-						ray, g->fade_distance / g->column[ray].distance);
+			g->column[ray].height &= ~1;
+			draw_wall_scaled(g, g->texture[g->column[ray].texture_id],
+						(t_point){ray, 0}, g->z_level * g->column[ray].height);
 //			draw_wall_solid(game, ray, fade);
 		}
 		ray++;
 	}
 }
 
-void	draw_wall_scaled(t_game *g, t_img src, unsigned x)
+void	draw_wall_scaled(t_game *g, t_img src, t_point cur, int z_offset)
 {
-	const float		step = (float)src.size.y / g->column[x].height;
-	const unsigned	src_x = g->column[x].texture_pos * src.size.x;
-	float			src_y;
-	unsigned		y;
-	const unsigned	half = ft_umin(g->img_center.y, g->column[x].height / 2);
+	const float	fade = g->fade_distance / g->column[cur.x].distance;
+	const float	step = (float)src.size.y / g->column[cur.x].height;
+	const int	src_x = g->column[cur.x].texture_pos * src.size.x;
+	float		src_y;
+	const int	max_y = ft_min(g->img.size.y,
+						g->horizon + z_offset + g->column[cur.x].height / 2);
 
-	g->img.data[g->img_center.y * g->img.size.x + x] =
-			src.data[(int)(src.size.y / 2.f) * src.size.x + src_x];
-	y = 1;
-	src_y = step;
-	while (y < half)
-	{
-		g->img.data[(g->img_center.y - y) * g->img.size.x + x] =
-				src.data[(int)(src.size.y / 2.f - src_y) * src.size.x + src_x];
-		g->img.data[(g->img_center.y + y) * g->img.size.x + x] =
-				src.data[(int)(src.size.y / 2.f + src_y) * src.size.x + src_x];
-		src_y += step;
-		y++;
-	}
-}
-
-void	draw_wall_scaled_f(t_game *g, t_img src, unsigned x, float fade)
-{
-	const float		step = (float)src.size.y / g->column[x].height;
-	const unsigned	src_x = g->column[x].texture_pos * src.size.x;
-	float			src_y;
-	unsigned		y;
-	const unsigned	half = ft_umin(g->img_center.y, g->column[x].height / 2);
-
-	g->img.data[g->img_center.y * g->img.size.x + x] =
-	pixel_fade(src.data[(int)(src.size.y / 2.f) * src.size.x + src_x], fade);
-	y = 1;
-	src_y = step;
-	while (y < half)
-	{
-		g->img.data[(g->img_center.y - y) * g->img.size.x + x] = pixel_fade(
-		src.data[(int)(src.size.y / 2.f - src_y) * src.size.x + src_x], fade);
-		g->img.data[(g->img_center.y + y) * g->img.size.x + x] = pixel_fade(
-		src.data[(int)(src.size.y / 2.f + src_y) * src.size.x + src_x], fade);
-		src_y += step;
-		y++;
-	}
+	cur.y = ft_max(0, g->horizon + z_offset - g->column[cur.x].height / 2);
+	src_y = fmaxf(0.0f,
+				step * (g->column[cur.x].height / 2 - g->horizon - z_offset));
+	if (fade < 1.0f)
+		while (cur.y < max_y)
+		{
+			g->img.data[cur.y++ * g->img.size.x + cur.x] =
+				pixel_fade(src.data[(int)src_y * src.size.x + src_x], fade);
+			src_y += step;
+		}
+	else
+		while (cur.y < max_y)
+		{
+			g->img.data[cur.y++ * g->img.size.x + cur.x] =
+				src.data[(int)src_y * src.size.x + src_x];
+			src_y += step;
+		}
 }
 
 void	draw_wall_solid(t_game *game, unsigned x, float fade)
@@ -142,14 +122,14 @@ void	draw_wall_solid(t_game *game, unsigned x, float fade)
 	unsigned	start_y;
 	unsigned	end_y;
 
-	if (game->column[x].height >= game->img.size.y)
+	if (game->column[x].height >= (int)game->img.size.y)
 	{
 		start_y = 0;
 		end_y = game->img.size.y;
 	}
 	else
 	{
-		start_y = ((int)game->img.size.y - (int)game->column[x].height) / 2;
+		start_y = ((int)game->img.size.y - game->column[x].height) / 2;
 		end_y = start_y + game->column[x].height;
 
 	}

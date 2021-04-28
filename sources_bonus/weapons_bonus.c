@@ -62,8 +62,8 @@ void	player_set_weapon(t_game *game, enum e_weapon weapon)
 	}
 	game->p.weapon.ticks = game->p.weapon.frames * ANIM_TICKS;
 	game->p.weapon_pos = (t_upoint){
-			game->img_center.x - game->p.weapon_img[game->p.weapon_cur][0].size.x / 2,
-	game->img.size.y - game->p.weapon_img[game->p.weapon_cur][0].size.y};
+		game->center.x - game->p.weapon_img[game->p.weapon_cur][0].size.x / 2,
+		game->img.size.y - game->p.weapon_img[game->p.weapon_cur][0].size.y};
 	game->hud.needs_redraw = true;
 }
 
