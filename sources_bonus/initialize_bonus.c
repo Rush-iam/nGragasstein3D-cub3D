@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/05 22:37:16 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/28 15:55:56 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/28 20:24:44 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ void	initialize_game(t_game *game, bool screenshot_only)
 		terminate(game, ERR_MEM, "Memory allocation failed (ray angles)");
 	__sincosf(game->p.angle, &game->p.vect.y, &game->p.vect.x);
 	player_set_fov(game, 0, true);
+	game->z_level = 0.0f;
 	game->key.mouse = true;
 	game->p.health = START_HEALTH;
 	game->p.ammo = START_AMMO;
@@ -120,8 +121,9 @@ void	initialize_canvas_images(t_game *g)
 	if (img_create(g->mlx, &g->img, (t_upoint){g->resolution.x, ft_max(
 			(int)g->resolution.y - (int)g->hud.bar.size.y, MIN_RES)}) == NULL)
 		terminate(g, ERR_MEM, strerror(errno));
-	g->img_center = (t_upoint){g->img.size.x / 2, g->img.size.y / 2};
-	g->img_bytecount = g->img.size.x * g->img.size.y * 4;
+	g->center = (t_point){g->img.size.x / 2, g->img.size.y / 2};
+	g->img_pixelcount = g->img.size.x * g->img.size.y;
+	g->horizon = g->center.y;
 	if (img_create(g->mlx, &g->img_bg, g->img.size) == NULL)
 		terminate(g, ERR_MEM, strerror(errno));
 	img_ceilfloor_rgb_faded(&g->img_bg, g->color_ceil, g->color_floor,

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:53:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/27 20:35:23 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/28 16:47:15 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@ void	enemy(t_game *game, t_object *obj)
 {
 	if (obj->e->state != ST_DEATH)
 	{
-		if (obj->distance_real < game->column[game->img_center.x].distance &&
-			obj->render.start.x <= (int)game->img_center.x &&
-			obj->render.end.x >= (int)game->img_center.x && (!game->p.target ||
+		if (obj->distance_real < game->column[game->center.x].distance &&
+			obj->render.start.x <= game->center.x &&
+			obj->render.end.x >= game->center.x && (!game->p.target ||
 							obj->distance_real < game->p.target->distance_real))
 			game->p.target = obj;
 	}

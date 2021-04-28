@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/28 14:56:29 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/28 20:24:44 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,13 +39,38 @@ int	main(int args, char *av[])
 	mlx_loop(game.mlx);
 }
 
+void	draw_ceilfloor(t_game *g)
+{
+	const int	pixel_offset = (g->horizon - g->center.y) * (int)g->img.size.x;
+	int 		i;
+
+	if (pixel_offset < 0)
+	{
+		if (-pixel_offset < g->img_pixelcount)
+			ft_memcpy(g->img.data, g->img_bg.data - pixel_offset,
+						(g->img_pixelcount + pixel_offset) * 4);
+		i = ft_max(0, g->img_pixelcount + pixel_offset);
+		while (i < g->img_pixelcount)
+			g->img.data[i++] = g->color_floor;
+	}
+	else
+	{
+		i = ft_min(g->img_pixelcount, pixel_offset);
+		while (i >= 0)
+			g->img.data[i--] = g->color_ceil;
+		if (pixel_offset < g->img_pixelcount)
+			ft_memcpy(g->img.data + pixel_offset, g->img_bg.data,
+						(g->img_pixelcount - pixel_offset) * 4);
+	}
+}
+
 int	game_loop(t_game *game)
 {
 	if (game->p.health == 0)
 		return dead_exit(game);
-	game_tick(game);
+	game_ticks(game);
 	sounds(game);
-	ft_memcpy(game->img.data, game->img_bg.data, game->img_bytecount);
+	draw_ceilfloor(game);
 	draw_walls(game);
 	draw_objects(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
@@ -65,7 +90,7 @@ int	game_loop(t_game *game)
 	return (0);
 }
 
-void	game_tick(t_game *game)
+void	game_ticks(t_game *game)
 {
 	static struct timespec	time;
 	static unsigned			tick_prev;
