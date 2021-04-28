@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/05 22:37:16 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/27 23:33:41 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/28 15:55:56 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ void	initialize_game(t_game *game, bool screenshot_only)
 	initialize_hud_images(game);
 	initialize_face_images(game);
 	initialize_canvas_images(game);
+	game->hud.face_pos = (t_point){game->hud.bar.size.x * HUD_FACE_X,
+						game->img.size.y + game->hud.bar.size.y * HUD_FACE_Y};
 	initialize_weapons_and_faded_walls(game);
 	initialize_map_hud(game);
 	if (!(game->column = ft_calloc(game->img.size.x, sizeof(*game->column))))
@@ -66,20 +68,19 @@ void	initialize_hud_images(t_game *g)
 	const char	*weapons[] = {HUD_KNIFE_FILE, HUD_PISTOL_FILE, HUD_RIFLE_FILE};
 	unsigned	i;
 
-	img_from_file(g, HUD_BAR_FILE, &g->hud.bar,
-									"Error loading HUD status bar image file");
+	load_image_file(g, HUD_BAR_FILE, &g->hud.bar,
+					"Error loading HUD status bar image file");
 	g->hud.scale = (float)g->resolution.x / g->hud.bar.size.x;
 	if (img_resize(g->mlx, &g->hud.bar, (t_upoint)
 			{g->resolution.x, g->resolution.x / g->hud.bar.aspect}) == NULL)
 		terminate(g, ERR_MEM, strerror(errno));
-	img_from_file_hud_scaled(g, HUD_DIGITS_FILE, &g->hud.digits,
-							 "Error loading HUD digits image file");
+	img_from_file_scaled(g, HUD_DIGITS_FILE, &g->hud.digits, g->hud.scale);
 	g->hud.digit_width = (float)g->hud.digits.size.x / (sizeof(HUD_DIGITS) - 1);
 	i = 0;
 	while (i < sizeof(weapons) / sizeof(*weapons))
 	{
-		img_from_file_hud_scaled(g, (char *)weapons[i], &g->hud.weapon[i],
-								 "Error loading HUD weapon image file");
+		img_from_file_scaled(g, (char *)weapons[i], &g->hud.weapon[i],
+																g->hud.scale);
 		i++;
 	}
 	g->hud.needs_redraw = true;
@@ -87,30 +88,30 @@ void	initialize_hud_images(t_game *g)
 
 void	initialize_face_images(t_game *g)
 {
-	int		level;
+	int		lvl;
 	int		dir;
 	char	*path;
 
-	level = -1;
-	while (++level < (int)(sizeof(g->hud.face) / sizeof(*g->hud.face)))
+	lvl = 0;
+	while (lvl < HUD_FACE_LEVELS)
 	{
-		dir = -1;
-		while (++dir < 3)
+		dir = 0;
+		while (dir < HUD_FACE_DIRS)
 		{
 			path = ft_strjoin(HUD_FACE_FILES,
-				(char []){level + '0', dir + '0', '.', 'p', 'n', 'g', '\0'});
+				(char []){lvl + '0', dir + '0', '.', 'p', 'n', 'g', '\0'});
 			if (path == NULL)
 				terminate(g, ERR_MEM, "Failed to create path to HUD face file");
-			img_from_file_hud_scaled(g, path, &g->hud.face[level][dir],
-										"Error loading HUD face image file");
+			img_from_file_scaled(g, path, &g->hud.face[lvl][dir], g->hud.scale);
 			free(path);
+			dir++;
 		}
+		lvl++;
 	}
 	path = ft_strjoin(HUD_FACE_FILES, "dead.png");
 	if (path == NULL)
 		terminate(g, ERR_MEM, "Failed to create path to HUD face file");
-	img_from_file_hud_scaled(g, path, &g->hud.face_dead,
-							 "Error loading HUD face image file");
+	img_from_file_scaled(g, path, &g->hud.face_dead, g->hud.scale);
 	free(path);
 }
 

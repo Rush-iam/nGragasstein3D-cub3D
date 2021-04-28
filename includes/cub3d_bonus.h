@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/27 23:33:41 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/28 16:26:24 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,11 @@
 # define HUD_AMMO_X		0.68f
 # define HUD_WEAPON_X	0.818f
 # define HUD_WEAPON_Y	0.095f
-# define HUD_FACE_X		0.44f
-# define HUD_FACE_Y		0.02f
-# define HUD_FACE_TICK_TIMER	20
+# define HUD_FACE_X		0.423f
+# define HUD_FACE_Y		0.052f
+# define HUD_FACE_TICK_TIMER	30
+# define HUD_FACE_LEVELS	7
+# define HUD_FACE_DIRS		3
 
 # define T_FPT_NULL	(t_fpoint){0.0f, 0.0f}
 # define M_PI_F		(float)M_PI
@@ -195,7 +197,6 @@ enum	e_sound
 	SND_PICKUP_BONUS_M,
 	SND_PICKUP_BONUS_L,
 	SND_PICKUP_BONUS_XL,
-	SND_EMITSOUND,
 	SND_ENEMY_ALARM,
 	SND_ENEMY_ATTACK,
 	SND_ENEMY_DEATH,
@@ -336,14 +337,16 @@ typedef struct	s_game
 	unsigned	img_bytecount;
 	struct		s_hud
 	{
-		bool	needs_redraw;
-		float	scale;
-		t_img	bar;
-		t_img	digits;
-		t_img	weapon[3];
-		t_img	face[7][3];
-		t_img	face_dead;
-		float	digit_width;
+		bool		needs_redraw;
+		float		scale;
+		t_img		bar;
+		t_img		digits;
+		t_img		weapon[3];
+		t_img		face[HUD_FACE_LEVELS][HUD_FACE_DIRS];
+		t_img		face_dead;
+		t_point		face_pos;
+		unsigned	face_nexttick;
+		float		digit_width;
 	}			hud;
 	struct		s_sound
 	{
@@ -453,6 +456,34 @@ typedef struct	s_game
 	t_img		img_effect;
 }				t_game;
 
+// main
+int				game_loop(t_game *game);
+void			game_tick(t_game *game);
+int				dead_exit(t_game *game);
+
+// parse
+void			parse(int args, char **av, t_game *game, bool *screenshot_only);
+void			parse_scene		(int file_id, char **line, t_game *game);
+void			parse_map(int file_id, char *line, t_list *map, t_game *game);
+void			validate_settings(t_game *game);
+
+// parse_set
+void			set_resolution		(const char *res_string, t_upoint *res,
+									   t_game *game);
+void			set_colors			(const char *color_string, unsigned *target,
+									   t_game *game);
+void			set_weapons			(char *string, t_game *game);
+void			set_textures		(char *string, t_game *game);
+
+// parse_set_map
+void			set_map				(t_game *game, t_list *map);
+void			set_map_process		(t_game *game);
+void			set_map_door_add(t_game *game, t_upoint pt);
+void			set_map_object_add(t_game *game, char chr, unsigned type,
+								   t_upoint pt);
+void			set_map_check_cell	(t_game *game, char **map, t_upoint pt);
+
+// initialize
 void			initialize_game(t_game *game, bool screenshot_only);
 void			initialize_window(t_game *g, bool screenshot_only);
 void			initialize_canvas_images(t_game *g);
@@ -460,40 +491,14 @@ void			initialize_hud_images(t_game *g);
 void			initialize_face_images(t_game *g);
 void			initialize_weapons_and_faded_walls(t_game *g);
 
-int				game_loop(t_game *game);
-void			game_tick(t_game *game);
-void			draw_fps(t_game *game);
-int				dead_exit(t_game *game);
-
-void			parse(int args, char **av, t_game *game, bool *screenshot_only);
-void			parse_scene		(int file_id, char **line, t_game *game);
-void			parse_map(int file_id, char *line, t_list *map, t_game *game);
-void			validate_settings(t_game *game);
-
-void			set_resolution		(const char *res_string, t_upoint *res,
-															t_game *game);
-void			set_value(const char *res_string, unsigned *target, t_game *game);
-void			set_colors			(const char *color_string, unsigned *target,
-															t_game *game);
-void			set_weapons			(char *string, t_game *game);
-void			set_textures		(char *string, t_game *game);
-void			load_audioset(t_set *dst, char *path, t_game *game);
-void			load_audio_file(t_snd *dst, char *path);
-void			load_spriteset(t_img dst[], int count, char *path, t_game *game);
-
-void			set_map				(t_game *game, t_list *map);
-void			set_map_process		(t_game *game);
-void			set_map_door_add(t_game *game, t_upoint pt);
-void			set_map_object_add(t_game *game, char chr, unsigned type,
-											t_upoint pt);
-void			set_map_check_cell	(t_game *game, char **map, t_upoint pt);
-
+// hooks
 int				hook_key_press		(int key_code, t_game *game);
 int				hook_key_release	(int key_code, struct s_key *key);
 int				hook_mouse_press	(int btn, int x, int y, struct s_key *key);
 int				hook_mouse_release	(int btn, int x, int y, struct s_key *key);
 int				hook_exit			(t_game *game);
 
+// control
 void			player_control			(t_game *game);
 void			player_control_rotate	(t_game *game);
 void			player_control_move		(t_game *game);
@@ -505,26 +510,35 @@ void			player_control_borders	(t_game *g);
 void			player_control_borders_diag(t_game *g);
 void			player_set_weapon(t_game *game, enum e_weapon weapon);
 
-int				dead_exit(t_game *game);
+// sounds
+void			initialize_sounds(t_game *g);
+void			sounds(t_game *game);
+cs_playing_sound_t *	sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos);
+void			sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound);
 
+// doors
 void			doors(t_game *game);
 t_door			*door_find(t_game *game, t_point cell);
 void			door_open(t_game *g, t_point cell, bool by_player);
 void			door_sound(t_game *game, t_door *door);
 
+// weapons
 void			weapon(t_game *game, struct s_weapon *weapon);
 void			draw_weapon(t_game *game, struct s_weapon *weapon);
 void			weapon_shoot(t_game *g, t_object *target);
 
+// objects
 void			objects				(t_game *g);
 void			object_add(t_game *game, t_list **dst, void *obj);
 int				objects_sort		(t_object *obj1, t_object *obj2);
 
+// pickup
 bool			pickup(t_game *game, enum e_objtype type);
 void			pickup_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img);
 void			pickup_get(t_game *game, enum e_objtype item);
 void			pickup_sound(t_game *game, enum e_objtype item);
 
+// enemies
 void			enemy(t_game *game, t_object *obj);
 void			enemy_logic(t_game *game, t_object *obj);
 void			enemy_sprite(t_game *game, t_object *obj);
@@ -532,6 +546,7 @@ void			enemy_shoot(t_game *g, t_object *obj);
 void			enemy_set_state(t_game *g, t_object *obj, enum e_objstate state);
 void			enemy_sound(t_game *game, t_object *obj, enum e_sound sound_type);
 
+// pathfind
 void			initialize_bfs_grid(t_game *g);
 void			*pathfind(t_list **path, t_point from, t_point to, struct s_map *map);
 bool			pathfind_init(struct s_map *map, t_point target, t_list **queue, t_point **pt);
@@ -539,17 +554,14 @@ void			*pathfind_deinit(t_list **queue, t_point *pt);
 int				pathfind_nears(struct s_map *map, t_point pt, t_point *nears);
 void			*pathfind_construct(t_list **path, t_point from, struct s_map *map);
 
-void			initialize_sounds(t_game *g);
-void			sounds(t_game *game);
-cs_playing_sound_t *	sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos);
-void			sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound);
-
+// raycasting
 void			ray_cast		(t_game *game);
 struct s_column	ray_intersect	(t_game *g, float tan_angle, t_point negative);
 float			ray_intersect_distance(t_game *game, float angle);
 t_ray			ray_intersect_x	(t_game *g, int step_x, float step_y);
 t_ray			ray_intersect_y(t_game *g, float step_x, int step_y);
 
+// draw_walls
 void			draw_wall_texture_set(t_game *g, struct s_column *col, t_point pt);
 void			draw_door_texture_set(t_game *game, struct s_column *col, char chr);
 void			draw_walls		(t_game *g);
@@ -557,56 +569,80 @@ void			draw_wall_scaled(t_game *g, t_img src, unsigned x);
 void			draw_wall_scaled_f(t_game *g, t_img src, unsigned x, float fade);
 void			draw_wall_solid	(t_game *game, unsigned x, float fade);
 
+// draw_objects
 void			draw_object_properties(t_game *game, t_object *obj);
 void			draw_objects(t_game *game);
 void			draw_sprite(t_game *game, t_object *obj);
 void			draw_sprite_scaled(t_img *img, t_object *obj, t_point min, t_point max);
 void			draw_sprite_scaled_f(t_game *g, t_object *obj, t_point min, t_point max);
 
+// draw_hud
+void			draw_hud(t_game *g);
+void			draw_hud_face(t_game *g, bool force_redraw);
+char			*hud_num_to_str(char num_str[11], unsigned num, int length);
+void			hud_digits_bake(struct s_hud *hud, char num_str[], t_upoint pos);
+void			draw_fps(t_game *game);
+
+// draw_map
 void			initialize_map_hud	(t_game *game);
 void			draw_map		(t_game *game);
 void			draw_map_player	(t_game *g);
 void			draw_map_objects(t_game *game);
 
+// load_files
+void			load_image_file(t_game *g, char *path, t_img *dst_img, char *err);
+void			load_audio_file(t_snd *dst, char *path);
+void			load_audioset(t_set *dst, char *path, t_game *game);
+void			load_spriteset(t_img dst[], int count, char *path, t_game *game);
+
+// image_utils
+t_img			*img_create(void *mlx_ptr, t_img *dst, t_upoint size);
+t_img			*img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres);
+void			img_from_file_scaled(t_game *g, char *path, t_img *dst_img, float scale);
+void			img_alpha_columns_get(t_img *img);
+t_img			img_faded_copy(void *mlx_ptr, t_img *img);
+
+// draw_pixels
+void			pixel_put	(t_img *img, unsigned x, unsigned y, int color);
+int				pixel_fade	(int color, float fade);
+int				pixel_alpha	(int color, float alpha);
+int				pixel_fade_contrast(int color, float fade);
+
+// draw_fills
 void			img_clear				(t_img *img);
 void			img_clear_rgb			(t_img *img, unsigned color);
 void			img_ceilfloor_rgb	(t_img *img, unsigned ceil, unsigned floor);
 void			img_ceilfloor_rgb_faded(t_img *img, unsigned ceil, unsigned floor, unsigned fade_distance);
 
-void			pixel_put	(t_img *img, unsigned x, unsigned y, int color);
-int				pixel_fade	(int color, float fade);
-int				pixel_alpha(int color, float alpha);
-int				pixel_fade_contrast(int color, float fade);
+// draw_figures
 void			draw_line	(t_img *img, t_point p1, t_point p2, int color);
 void			draw_square	(t_img *img, t_point center, int size, int color);
 void			draw_square_fill(t_img *img, t_point top_left, int size, int color);
 void			draw_4pts	(t_img *img, t_point *pts, int color);
 
+// effects
 void			draw_effect(t_game *game, struct s_effect *ef);
 void			effect_flash(t_game *game, unsigned color, float power);
 void			effect_fizzlefade(t_game *game, unsigned color);
 
-void			draw_string(t_game *g, struct s_string *s);
+// utils
+char			*atoi_limited(unsigned *dst_int, const char *src_string,
+							  unsigned limit);
 void			string_add(t_game *g, char *string, int timer, unsigned color);
+void			draw_string(t_game *g, struct s_string *s);
 
-float			distance(t_fpoint from, t_fpoint to);
-char			*atoi_limited	(unsigned *dst_int, const char *src_string,
-															unsigned limit);
-t_img			*img_create(void *mlx_ptr, t_img *dst, t_upoint size);
-void			img_from_file(t_game *g, char *path, t_img *dst_img, char *err);
-t_img			*img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres);
-void			img_from_file_hud_scaled(t_game *g, char *path, t_img *dst_img, char *err);
-t_img			img_faded_copy(void *mlx_ptr, t_img *img);
-void			img_alpha_columns_get(t_img *img);
+// screenshot
 void			write_screenshot_and_exit	(t_game *game);
 void			write_screenshot_data	(t_game *game, int file_id);
 
+// terminate
 int				terminate		(t_game *game, int return_value, char *message);
 void			terminate_free	(t_game *game);
 void			terminate_free_images(t_game *game, t_img *arr, unsigned count);
 void			terminate_free_object(void *object);
 void			terminate_audio(t_game *game);
 
+// demo_tools
 void			demo_fillrate	(t_game *mlx, int step);
 void			demo_radar		(t_game *mlx, int rays);
 void			demo_cursor		(t_game *game, int color);

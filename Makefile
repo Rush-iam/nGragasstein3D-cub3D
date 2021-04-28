@@ -6,7 +6,7 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/04/27 17:55:05 by ngragas          ###   ########.fr        #
+#    Updated: 2021/04/28 16:22:09 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,11 +27,15 @@ SRC_BONUS :=	demo_tools		\
 				draw_effects	\
 				draw_figures	\
 				draw_fills		\
+				draw_hud		\
 				draw_objects	\
+				draw_pixels		\
 				draw_map		\
 				enemies			\
 				hooks			\
 				initialize		\
+				image_utils		\
+				load_files		\
 				pathfind		\
 				pickups			\
 				sounds			\
