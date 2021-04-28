@@ -12,28 +12,6 @@
 
 #include "cub3d_bonus.h"
 
-void	load_wav(t_game *game)
-{
-	int		file_read;
-	int		ret;
-	char	*wav;
-	char	*wav2;
-
-	if ((file_read = open("./resources/sounds/player_noaction_bg.wav", O_RDONLY)) == -1)
-		return ;
-	wav = malloc(200000);
-	ret = read(file_read, wav, 200000);
-	wav2 = malloc(200000);
-	for (int i = ret - 1; i >= 0; --i)
-		wav2[ret - 1 - i] = wav[i] - 42;
-	free(wav);
-	cs_read_mem_wav(wav2, ret, &game->audio.sound[SND_EMITSOUND].file);
-	game->audio.sound[SND_EMITSOUND].props =
-						cs_make_def(&game->audio.sound[SND_EMITSOUND].file);
-	free(wav2);
-	close(file_read);
-}
-
 void	parse(int args, char **av, t_game *game, bool *screenshot_only)
 {
 	int		file_id;
@@ -61,7 +39,6 @@ void	parse(int args, char **av, t_game *game, bool *screenshot_only)
 		else
 			terminate(game, ERR_ARGS, "Invalid option");
 	}
-	load_wav(game);
 }
 
 void	set_enemies(char *string, t_game *g)

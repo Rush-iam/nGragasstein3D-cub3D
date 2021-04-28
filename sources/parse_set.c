@@ -23,7 +23,7 @@ void	set_resolution(const char *res_string, t_upoint *res, t_game *game)
 	res_string = atoi_limited(&res->y, res_string, UINT_MAX);
 	if (res_string == NULL)
 		terminate(game, ERR_PARSE, "Resolution Y setting is wrong");
-	if (*res_string != '\0' || res->x == 0 || res->y == 0)
+	else if (*res_string != '\0' || res->x == 0 || res->y == 0)
 		terminate(game, ERR_PARSE, "Wrong Resolution setting");
 }
 
@@ -39,17 +39,17 @@ void	set_colors(const char *color_string, unsigned *target, t_game *game)
 	color_string = atoi_limited(&r, color_string, UCHAR_MAX);
 	if (color_string == NULL)
 		terminate(game, ERR_PARSE, "F/C color Red is wrong (range: 0-255)");
-	if (*color_string++ != ',')
+	else if (*color_string++ != ',')
 		terminate(game, ERR_PARSE, "F/C color format: 'F R,G,B'/'C R,G,B'");
 	color_string = atoi_limited(&g, color_string, UCHAR_MAX);
 	if (color_string == NULL)
 		terminate(game, ERR_PARSE, "F/C color Green is wrong (range: 0-255)");
-	if (*color_string++ != ',')
+	else if (*color_string++ != ',')
 		terminate(game, ERR_PARSE, "F/C color format: 'F R,G,B'/'C R,G,B'");
 	color_string = atoi_limited(&b, color_string, UCHAR_MAX);
 	if (color_string == NULL)
 		terminate(game, ERR_PARSE, "F/C color Blue is wrong (range: 0-255)");
-	if (*color_string != '\0')
+	else if (*color_string != '\0')
 		terminate(game, ERR_PARSE, "F/C color line redundant symbols");
 	*target = (r << 16) | (g << 8) | b;
 }

@@ -73,8 +73,8 @@ void	set_weapons(char *string, t_game *game)
 		if ((path = ft_strjoin(string,
 						(char []){'0' + i, '.', 'p', 'n', 'g', '\0'})) == NULL)
 			terminate(game, ERR_PARSE, strerror(errno));
-		img_from_file(game, path, &game->p.weapon_img[id][i],
-					  "Can't load weapon texture file");
+		load_image_file(game, path, &game->p.weapon_img[id][i],
+						"Can't load weapon texture file");
 		free(path);
 		i++;
 	}
@@ -92,8 +92,8 @@ void	set_textures(char *string, t_game *game)
 			terminate(game, ERR_PARSE, "Texture ID out of array range");
 		if (game->texture[id].ptr != NULL)
 			terminate(game, ERR_PARSE, "Duplicated texture setting");
-		img_from_file(game, string, &game->texture[id],
-					  "Can't load wall texture file");
+		load_image_file(game, string, &game->texture[id],
+						"Can't load wall texture file");
 	}
 	else if (*string == 'S')
 	{
@@ -103,65 +103,7 @@ void	set_textures(char *string, t_game *game)
 			terminate(game, ERR_PARSE, "Sprite ID out of array range");
 		if (game->sprite[id].ptr != NULL)
 			terminate(game, ERR_PARSE, "Duplicated sprite setting");
-		img_from_file(game, string, &game->sprite[id],
-					  "Can't load sprite file");
+		load_image_file(game, string, &game->sprite[id],
+						"Can't load sprite file");
 	}
-}
-
-void	load_audio_file(t_snd *dst, char *path)
-{
-	dst->file = cs_load_wav(path);
-	if (dst->file.channels[0] == NULL)
-		printf("- Failed to load audio %s:\n%s\n", path, cs_error_reason);
-	dst->props = cs_make_def(&dst->file);
-}
-
-void	load_audioset(t_set *dst, char *path, t_game *game)
-{
-	char	*path2;
-	char	*path3;
-
-	if ((path2 = ft_strjoin(path, "alarm.wav")) == NULL)
-		terminate(game, ERR_PARSE, strerror(errno));
-	load_audio_file(&dst->s_alarm, path2);
-	free(path2);
-	if ((path2 = ft_strjoin(path, "attack.wav")) == NULL)
-		terminate(game, ERR_PARSE, strerror(errno));
-	load_audio_file(&dst->s_attack, path2);
-	free(path2);
-	if ((path2 = ft_strjoin(path, "death_")) == NULL)
-		terminate(game, ERR_PARSE, strerror(errno));
-	while (dst->s_death_count < sizeof(dst->s_death) / sizeof(*dst->s_death))
-	{
-		if ((path3 = ft_strjoin(path2,
-		(char []){'0' + dst->s_death_count, '.', 'w', 'a', 'v', 0})) == NULL)
-			terminate(game, ERR_PARSE, strerror(errno));
-		if (ft_file_exists(path3) == false)
-		{
-			free(path3);
-			break ;
-		}
-		load_audio_file(&dst->s_death[dst->s_death_count++], path3);
-		free(path3);
-	}
-	free(path2);
-}
-
-
-void	load_spriteset(t_img dst[], int count, char *path, t_game *game)
-{
-	int		i;
-	char	*path2;
-
-	i = 0;
-	while (i < count)
-	{
-		if ((path2 = ft_strjoin(path,
-						(char []){'0' + i, '.', 'p', 'n', 'g', '\0'})) == NULL)
-			terminate(game, ERR_PARSE, strerror(errno));
-		img_from_file(game, path2, &dst[i], "Can't load enemy sprite file");
-		free(path2);
-		i++;
-	}
-	free(path);
 }

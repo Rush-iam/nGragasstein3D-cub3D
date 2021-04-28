@@ -45,7 +45,7 @@ void	effect_fizzlefade(t_game *game, unsigned color)
 	scale = ft_umax(game->img_center.x, game->img.size.y) / 256 + 1;
 	img_clear_rgb(&game->img_effect, 0xFF000000);
 	i = 0;
-	while (i < 512)
+	while (i < 1024)
 	{
 		pos.x = ((rndval & 0x1FF00) >> 8) * scale;
 		pos.y = (rndval & 0x000FF) * scale;
