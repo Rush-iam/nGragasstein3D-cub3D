@@ -61,6 +61,7 @@ void	img_from_file_scaled(t_game *g, char *path, t_img *dst_img, float scale)
 		terminate(g, ERR_MEM, strerror(errno));
 }
 
+// float to int?
 void	img_alpha_columns_get(t_img *img)
 {
 	t_upoint	px;

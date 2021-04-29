@@ -22,6 +22,9 @@ W14 ./resources/walls/door_1.png
 W15 ./resources/walls/door_2.png
 W16 ./resources/walls/door_1.png
 
+W17 ./resources/walls/wall_metal_1.png
+W18 ./resources/walls/wall_black.png
+
 G0 ./resources/weapons/knife_
 G1 ./resources/weapons/pistol_
 G2 ./resources/weapons/rifle_
