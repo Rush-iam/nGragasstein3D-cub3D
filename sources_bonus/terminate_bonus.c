@@ -107,7 +107,10 @@ void	terminate_audio(t_game *game)
 		cs_free_sound(&game->enemyset[0].s_death[i++].file);
 	cs_free_sound(&game->enemyset[0].s_alarm.file);
 	cs_free_sound(&game->enemyset[0].s_attack.file);
-	cs_shutdown_context(game->audio.ctx);
-	cs_shutdown_context(game->audio.ctx7);
-	cs_shutdown_context(game->audio.ctx22);
+	if (game->audio.ctx)
+		cs_shutdown_context(game->audio.ctx);
+	if (game->audio.ctx7)
+		cs_shutdown_context(game->audio.ctx7);
+	if (game->audio.ctx22)
+		cs_shutdown_context(game->audio.ctx22);
 }

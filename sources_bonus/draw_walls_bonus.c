@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 23:32:38 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/29 17:50:23 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/30 00:28:15 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,18 +94,27 @@ void	draw_walls(t_game *g)
 	}
 }
 
-void	draw_ceilfloor_textured(t_game *g, t_point px, int max_y)
+void	draw_ceilfloor_textured(t_game *g, t_img src, t_point px, int max_y)
 {
-	t_point src;
+	float		distance;
+	t_fpoint	pt;
+	t_fpoint	mult_angle;
+	const float	mult_dist = g->col_scale / cosf(g->angles[px.x]);
+	int			step = (max_y > px.y) - (max_y < px.y);
 
-	src.x = 0;
-	src.y = 0;
-	while (px.y < max_y)
+	__sincosf(g->p.angle + g->angles[px.x], &mult_angle.y, &mult_angle.x);
+	mult_angle.x *= mult_dist;
+	mult_angle.y *= mult_dist;
+	while (px.y >= 0 && px.y != max_y)
 	{
-//		src
-		g->img.data[px.y * g->img.size.x + px.x] =
-				g->texture[0].data[src.y * g->texture[0].size.x + src.x];
-		px.y++;
+		distance = g->column[px.x].height + abs(max_y - px.y) /
+												(.5f - g->z_level * step);
+		pt = (t_fpoint){g->p.pos.x + mult_angle.x / distance,
+						g->p.pos.y + mult_angle.y / distance};
+		g->img.data[px.y * g->img.size.x + px.x] = src.data[
+				(int)(((pt.y - (int)pt.y)) * src.size.y) * src.size.x +
+				(int)((pt.x - (int)pt.x) * src.size.x)];
+		px.y += step;
 	}
 }
 
@@ -121,7 +130,7 @@ void	draw_wall_scaled(t_game *g, t_img src, t_point cur, int z_offset)
 	start_y = ft_max(0, g->horizon + z_offset - g->column[cur.x].height / 2);
 	src_y = fmaxf(0.0f,
 				step * (g->column[cur.x].height / 2 - g->horizon - z_offset));
-	draw_ceilfloor_textured(g, cur, start_y);
+	draw_ceilfloor_textured(g, g->texture[TEXTURE_CEIL], cur, start_y);
 	cur.y = start_y;
 	while (cur.y < max_y)
 	{
@@ -129,7 +138,9 @@ void	draw_wall_scaled(t_game *g, t_img src, t_point cur, int z_offset)
 				src.data[(int)src_y * src.size.x + src_x];
 		src_y += step;
 	}
-	draw_ceilfloor_textured(g, cur, g->img.size.y);
+
+	draw_ceilfloor_textured(g, g->texture[TEXTURE_FLOOR],
+							(t_point){cur.x, g->img.size.y - 1}, max_y - 1);
 }
 
 void	draw_wall_scaled_f(t_game *g, t_img src, t_point cur, int z_offset)

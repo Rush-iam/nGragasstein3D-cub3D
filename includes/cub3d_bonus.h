@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/29 17:27:09 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/30 00:15:31 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 # define MIN_RES	2
 # define MAX_PLAYING_SOUNDS	24
 # define MAX_MESSAGE_LEN 64
+# define MAX_TEXTURES	19
 # define END_LEVEL_MESSAGE "Well done! Thanks for playing :)"
 # define MUSIC_BG_ID	0
 # define MUSIC_END_ID	1
@@ -189,6 +190,8 @@ typedef struct	s_snd
 # define TEXTURE_DOOR_1_W	14
 # define TEXTURE_DOOR_2		15
 # define TEXTURE_DOOR_2_W	16
+# define TEXTURE_CEIL		17
+# define TEXTURE_FLOOR		18
 
 enum	e_sound
 {
@@ -354,7 +357,7 @@ typedef struct	s_game
 	unsigned	fade_distance;
 	unsigned	tick;
 	unsigned	tick_diff;
-	t_img		texture[34];
+	t_img		texture[MAX_TEXTURES * 2];
 	t_img		sprite[sizeof(CHAR_OBJECTS) - 1];
 	t_set		enemyset[1];
 	t_list		*doors;
