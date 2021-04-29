@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:49 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/14 23:15:49 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/29 14:51:49 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void	set_map_process(t_game *game)
 				set_map_object_add(game, chr, chr_ptr - obj_chars, pt);
 			else if (chr == 'n' || chr == 's' || chr == 'w' || chr == 'e')
 				set_map_object_add(game, chr, sizeof(CHAR_OBJECTS) - 1, pt);
-			else if (ft_strchr(CHAR_DOORS, chr))
+			else if (ft_strchr(CHAR_DOORS, chr) || chr == *CHAR_ELEVATOR)
 				set_map_door_add(game, pt);
 			pt.x++;
 		}
@@ -100,6 +100,8 @@ void	set_map_door_add(t_game *game, t_upoint pt)
 	if ((door = ft_calloc(1, sizeof(t_object))) == NULL)
 		terminate(game, ERR_MEM, "Memory allocation failed (door)");
 	door->cell = (t_point){pt.x, pt.y};
+	if (game->map.grid[pt.y][pt.x] == *CHAR_ELEVATOR)
+		door->end_level = true;
 	object_add(game, &game->doors, door);
 }
 
@@ -109,7 +111,7 @@ void	set_map_check_cell(t_game *game, char **map, t_upoint pt)
 
 	if (ft_strchr(CHAR_ALLOWED, map[pt.y][pt.x]) == NULL)
 		terminate(game, ERR_PARSE, "Wrong map character");
-	if (map[pt.y][pt.x] == ' ' || ft_isdigit(map[pt.y][pt.x]))
+	if (map[pt.y][pt.x] == ' ' || chr_is_wall(map[pt.y][pt.x]))
 		return ;
 	if (pt.x == 0 || pt.x == game->map.size.x - 1 ||
 		pt.y == 0 || pt.y == game->map.size.y - 1)

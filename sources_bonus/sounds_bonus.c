@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:30:14 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/16 00:09:57 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/29 15:36:31 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,23 @@ cs_playing_sound_t	*sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos)
 	if (sourcepos.x != 0.0f)
 		sound_adjust_pan(&game->p, game->audio.playing[i]);
 	return (game->audio.playing[i].snd);
+}
+
+void	music_play(t_game *game, t_snd *music)
+{
+	unsigned	i;
+
+	if (music->file.channels[0] == NULL)
+		return ;
+	i = 0;
+	while (i < sizeof(game->audio.playing) / sizeof(*game->audio.playing))
+	{
+		if (game->audio.playing[i].snd != NULL &&
+			game->audio.playing[i].snd->looped)
+			cs_stop_sound(game->audio.playing[i].snd);
+		i++;
+	}
+	sound_play(game, music, T_FPT_NULL)->looped = true;
 }
 
 void	sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound)

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/28 20:24:44 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/29 15:03:32 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ int	game_loop(t_game *game)
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
 	draw_effect(game, &game->effect);
 	draw_weapon(game, &game->p.weapon);
-	if (game->string.text)
+	if (*game->string.text)
 		draw_string(game, &game->string);
 	if (game->map.enabled)
 		draw_map(game);
@@ -122,7 +122,7 @@ int	dead_exit(t_game *game)
 	game->effect.frame_cur++;
 	if (game->effect.type != EF_FIZZLEFADE)
 	{
-		game->effect = (struct s_effect){0, 384, EF_FIZZLEFADE, COLOR_RED, 0};
+		game->effect = (struct s_effect){0, 192, EF_FIZZLEFADE, COLOR_RED, 0};
 		cs_stop_all_sounds(game->audio.ctx);
 		cs_stop_all_sounds(game->audio.ctx7);
 		cs_stop_all_sounds(game->audio.ctx22);
@@ -132,4 +132,9 @@ int	dead_exit(t_game *game)
 	if (game->effect.frame_cur > game->effect.frames)
 		terminate(game, 0, NULL);
 	return (0);
+}
+
+inline bool	chr_is_wall(char c)
+{
+	return ((unsigned char)(c - '0') < sizeof(CHAR_WALLS) - 1);
 }

@@ -67,7 +67,7 @@ t_ray	ray_intersect_x(t_game *g, int step_x, float step_y)
 		chr = g->map.grid[(unsigned)y][x];
 		if (chr == '.' || chr == CHAR_SOLID_MAP)
 			;
-		else if (ft_isdigit(chr))
+		else if (chr_is_wall(chr))
 			break ;
 		else if ((chr == CHAR_DOORS_V[0] || chr == CHAR_DOORS_V[1]) &&
 			y + step_y / 2.0f - (int)y < 1 &&
@@ -96,7 +96,7 @@ t_ray	ray_intersect_y(t_game *g, float step_x, int step_y)
 		chr = g->map.grid[y][(unsigned)x];
 		if (chr == '.' || chr == CHAR_SOLID_MAP)
 			;
-		else if (ft_isdigit(chr))
+		else if (chr_is_wall(chr))
 			break ;
 		else if ((chr == CHAR_DOORS_H[0] || chr == CHAR_DOORS_H[1]) &&
 			x + step_x / 2.0f - (int)x < 1 &&
@@ -152,7 +152,7 @@ float	ray_intersect_distance(t_game *game, float angle)
 //		if (ray.pos.x < ray.pos.y)
 //		{
 //			ray.cell.x += step.x;
-//			if (ft_isdigit(g->map.grid[ray.cell.y][ray.cell.x]))
+//			if (chr_is_wall(g->map.grid[ray.cell.y][ray.cell.x]))
 //				break ;
 ////			else if (ft_memchr(CHAR_DOORS, chr, sizeof(CHAR_DOORS)) &&
 ////					ray_intersect_door_x(g, step, dist_step, &ray))
@@ -162,7 +162,7 @@ float	ray_intersect_distance(t_game *game, float angle)
 //		else
 //		{
 //			ray.cell.y += step.y;
-//			if (ft_isdigit(g->map.grid[ray.cell.y][ray.cell.x]))
+//			if (chr_is_wall(g->map.grid[ray.cell.y][ray.cell.x]))
 //				break ;
 //			ray.pos.y += dist_step.y;
 //		}

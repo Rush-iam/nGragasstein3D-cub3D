@@ -35,7 +35,7 @@ void	draw_map(t_game *game)
 					(t_point){pt.x + MAP_SCALE, pt.y}, COLOR_GREEN_FF);
 			draw_line(&game->map.img, pt,
 					(t_point){pt.x, pt.y + MAP_SCALE}, COLOR_GREEN_FF);
-			if (ft_isdigit(game->map.grid[pt.y / MAP_SCALE][pt.x / MAP_SCALE]))
+			if (chr_is_wall(game->map.grid[pt.y / MAP_SCALE][pt.x / MAP_SCALE]))
 				draw_square(&game->map.img, (t_point){pt.x + MAP_SCALE / 2,
 						pt.y + MAP_SCALE / 2}, MAP_SCALE - 4, COLOR_CYAN_F);
 			pt.x += MAP_SCALE;

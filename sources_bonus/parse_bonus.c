@@ -127,8 +127,8 @@ void	parse_scene(int file_id, char **line, t_game *game)
 			set_audio(*line, game);
 		else if (**line == 'D')
 			atoi_limited(&game->fade_distance, *line + 1, UINT_MAX);
-		else if (**line == 'I' && game->string.text == NULL)
-			string_add(game, ft_strdup(*line + 2), 5, COLOR_WHITE);
+		else if (**line == 'I' && *game->string.text == '\0')
+			string_add(game, *line + 2, 5, COLOR_WHITE);
 		else if (**line != '#' && **line != '\0')
 			return ;
 		free(*line);
