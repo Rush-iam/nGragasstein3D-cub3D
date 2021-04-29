@@ -14,11 +14,13 @@ W6 ./resources/walls/wall_42.png
 W7 ./resources/walls/wall_medoed.png
 W8 ./resources/walls/wall_salamandra.png
 W9 ./resources/walls/wall_fire.png
+W10 ./resources/walls/wall_metal_3.png
+W11 ./resources/walls/wall_elevator.png
 
-W10 ./resources/walls/door_red_0.png
-W11 ./resources/walls/door_red_1.png
-W12 ./resources/walls/door_2.png
-W13 ./resources/walls/door_1.png
+W12 ./resources/walls/door_red_0.png
+W13 ./resources/walls/door_red_1.png
+W14 ./resources/walls/door_2.png
+W15 ./resources/walls/door_1.png
 
 G0 ./resources/weapons/knife_
 G1 ./resources/weapons/pistol_
@@ -78,8 +80,8 @@ S27 ./resources/sprites/bonus_s.png
 #     ^ lamp.png
 #     * chandelier.png
 #     $ skulls.png
-#     : plant_green.png
-#     ; plant_dry.png
+#     ( plant_green.png
+#     ) plant_dry.png
 #     , vase.png
 #     ! flag.png
 #     @ barrel_brown.png
@@ -100,7 +102,7 @@ S27 ./resources/sprites/bonus_s.png
 0.^|.^hH0.00000.^.h.^.?0?Zhz^.0...}0
 0..0.^aA0....00.......?0?Zhz^.|^..}0
 0.s00000000..0000000000000000000}..0
-0s.0}..}0Ev....;...;000;...;..}0}..0
+0s.0}..}0Ev....)...)000)...)..}0}..0
 0^s0..^a000.......^.....^....^}0..00
 0..0@.0000000000000000000000-00..000
 0.00....}0eeeee00}{}.{}.H{{0..0.00
@@ -116,14 +118,14 @@ S27 ./resources/sprites/bonus_s.png
 0{.0..0}...e...`....00}.0.}0}.00.0
 0..|^.00-0000000000.00`.0.000-0..0
 0.}0..0a^0034373835-300.0..0{.0.00
-0-00}}0..03:^.^h^.^.60..0`.0..0.00
-0.00}}0;.03:^&*h*&^.60^.0`.0..|^00
+0-00}}0..03(^.^h^.^.60..0`.0..0.00
+0.00}}0).03(^&*h*&^.60^.0`.0..|^00
 0.a01200-03..*&*&*..90..00.00.0}00
-0-00}^|.^03:^&*h*&^w60n.0`.0..0200 00000000000
+0-00}^|.^03(^&*h*&^w60n.0`.0..0200 00000000000
 0..01200003.^.^h^.^w60^`0..0[.0h0000^.....^..0
 0^.0^}~}^03-7343538330.00.}0`.0..|...0000000^0
 0.n0....w00s0000000000.}0.000.00000000}..Z?0.0
-0.n0....s00^...^..e^...}0s.0;.|.^.w^.|.*zH?0^0
+0.n0....s00^...^..e^...}0s.0).|.^.w^.|.*zH?0^0
 0.^0^...^00e.^e..^.e...}0.s0..00000000}..Z?0.0
 0.%0..00-0000000000000000..00.00.|...0000000^0
 0..0..00.0000000000000000.$0{.00.000^.....^..0

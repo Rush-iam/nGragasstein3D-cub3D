@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/29 00:08:11 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/29 14:17:48 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,24 +194,24 @@ void	player_control_borders(t_game *g)
 	char			check;
 
 	check = g->map.grid[(int)g->p.pos.y][minus.x];
-	if (ft_isdigit(check) || check == CHAR_SOLID_MAP ||
+	if (check != '.' && (chr_is_wall(check) || check == CHAR_SOLID_MAP ||
 			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_DOORS)) && door_find(g,
-					(t_point){minus.x, (int)g->p.pos.y})->part_opened < 0.5f))
+					(t_point){minus.x, (int)g->p.pos.y})->part_opened < 0.5f)))
 		g->p.pos.x = minus.x + 1 + PL_RADIUS + FLOAT_FIX;
 	check = g->map.grid[(int)g->p.pos.y][plus.x];
-	if (ft_isdigit(check) || check == CHAR_SOLID_MAP ||
+	if (check != '.' && (chr_is_wall(check) || check == CHAR_SOLID_MAP ||
 			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_DOORS)) && door_find(g,
-					(t_point){plus.x, (int)g->p.pos.y})->part_opened < 0.5f))
+					(t_point){plus.x, (int)g->p.pos.y})->part_opened < 0.5f)))
 		g->p.pos.x = plus.x - PL_RADIUS - FLOAT_FIX;
 	check = g->map.grid[minus.y][(int)g->p.pos.x];
-	if (ft_isdigit(check) || check == CHAR_SOLID_MAP ||
+	if (check != '.' && (chr_is_wall(check) || check == CHAR_SOLID_MAP ||
 			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_DOORS)) && door_find(g,
-					(t_point){(int)g->p.pos.x, minus.y})->part_opened < 0.5f))
+					(t_point){(int)g->p.pos.x, minus.y})->part_opened < 0.5f)))
 		g->p.pos.y = minus.y + 1 + PL_RADIUS + FLOAT_FIX;
 	check = g->map.grid[plus.y][(int)g->p.pos.x];
-	if (ft_isdigit(check) || check == CHAR_SOLID_MAP ||
+	if (check != '.' && (chr_is_wall(check) || check == CHAR_SOLID_MAP ||
 			(ft_memchr(CHAR_DOORS, check, sizeof(CHAR_DOORS)) && door_find(g,
-					(t_point){(int)g->p.pos.x, plus.y})->part_opened < 0.5f))
+					(t_point){(int)g->p.pos.x, plus.y})->part_opened < 0.5f)))
 		g->p.pos.y = plus.y - PL_RADIUS - FLOAT_FIX;
 	player_control_borders_diag(g);
 	player_control_borders_enemies(g);
@@ -222,23 +222,19 @@ void	player_control_borders_diag(t_game *g)
 	const t_upoint	plus = {g->p.pos.x + PL_RADIUS, g->p.pos.y + PL_RADIUS};
 	const t_upoint	minus = {g->p.pos.x - PL_RADIUS, g->p.pos.y - PL_RADIUS};
 
-	if (ft_isdigit(g->map.grid[minus.y][minus.x]) ||
-			g->map.grid[minus.y][minus.x] == CHAR_SOLID_MAP)
+	if (chr_is_wall(g->map.grid[minus.y][minus.x]))
 		(g->p.pos.x - (int)g->p.pos.x > g->p.pos.y - (int)g->p.pos.y) ?
 		(g->p.pos.x = minus.x + 1 + PL_RADIUS) :
 		(g->p.pos.y = minus.y + 1 + PL_RADIUS);
-	if (ft_isdigit(g->map.grid[plus.y][plus.x]) ||
-			g->map.grid[plus.y][plus.x] == CHAR_SOLID_MAP)
+	if (chr_is_wall(g->map.grid[plus.y][plus.x]))
 		(g->p.pos.x - (int)g->p.pos.x < g->p.pos.y - (int)g->p.pos.y) ?
 		(g->p.pos.x = plus.x - PL_RADIUS) :
 		(g->p.pos.y = plus.y - PL_RADIUS);
-	if (ft_isdigit(g->map.grid[minus.y][plus.x]) ||
-			g->map.grid[minus.y][plus.x] == CHAR_SOLID_MAP)
+	if (chr_is_wall(g->map.grid[minus.y][plus.x]))
 		(1.f - (g->p.pos.x - (int)g->p.pos.x) > g->p.pos.y - (int)g->p.pos.y) ?
 		(g->p.pos.x = plus.x - PL_RADIUS) :
 		(g->p.pos.y = minus.y + 1 + PL_RADIUS);
-	if (ft_isdigit(g->map.grid[plus.y][minus.x]) ||
-			g->map.grid[plus.y][minus.x] == CHAR_SOLID_MAP)
+	if (chr_is_wall(g->map.grid[plus.y][minus.x]))
 		(g->p.pos.x - (int)g->p.pos.x > 1.f - (g->p.pos.y - (int)g->p.pos.y)) ?
 		(g->p.pos.x = minus.x + 1 + PL_RADIUS) :
 		(g->p.pos.y = plus.y - PL_RADIUS);

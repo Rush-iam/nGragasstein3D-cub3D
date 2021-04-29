@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 23:32:38 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/28 22:28:13 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/29 17:50:23 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,46 +75,81 @@ void	draw_walls(t_game *g)
 			(unsigned)g->column[ray].cell.y < g->map.size.y)
 		{
 			chr = g->map.grid[g->column[ray].cell.y][g->column[ray].cell.x];
-			if (ft_isdigit(chr))
+			if (chr_is_wall(chr))
 				draw_wall_texture_set(g, &g->column[ray], g->column[ray].cell);
 			else if (ft_memchr(CHAR_DOORS, chr, sizeof(CHAR_DOORS)))
 				draw_door_texture_set(g, &g->column[ray], chr);
 			g->column[ray].height = g->col_scale / g->column[ray].distance;
 			g->column[ray].height &= ~1;
-			draw_wall_scaled(g, g->texture[g->column[ray].texture_id],
+			if (g->column[ray].distance < g->fade_distance)
+				draw_wall_scaled(g, g->texture[g->column[ray].texture_id],
 						(t_point){ray, 0}, g->z_level * g->column[ray].height);
+			else
+				draw_wall_scaled_f(g, g->texture[g->column[ray].texture_id],
+						(t_point){ray, 0}, g->z_level * g->column[ray].height);
+
 //			draw_wall_solid(game, ray, fade);
 		}
 		ray++;
 	}
 }
 
+void	draw_ceilfloor_textured(t_game *g, t_point px, int max_y)
+{
+	t_point src;
+
+	src.x = 0;
+	src.y = 0;
+	while (px.y < max_y)
+	{
+//		src
+		g->img.data[px.y * g->img.size.x + px.x] =
+				g->texture[0].data[src.y * g->texture[0].size.x + src.x];
+		px.y++;
+	}
+}
+
 void	draw_wall_scaled(t_game *g, t_img src, t_point cur, int z_offset)
+{
+	const float	step = (float)src.size.y / g->column[cur.x].height;
+	const int	src_x = g->column[cur.x].texture_pos * src.size.x;
+	float		src_y;
+	const int	max_y = ft_min(g->img.size.y,
+						g->horizon + z_offset + g->column[cur.x].height / 2);
+	int			start_y;
+
+	start_y = ft_max(0, g->horizon + z_offset - g->column[cur.x].height / 2);
+	src_y = fmaxf(0.0f,
+				step * (g->column[cur.x].height / 2 - g->horizon - z_offset));
+	draw_ceilfloor_textured(g, cur, start_y);
+	cur.y = start_y;
+	while (cur.y < max_y)
+	{
+		g->img.data[cur.y++ * g->img.size.x + cur.x] =
+				src.data[(int)src_y * src.size.x + src_x];
+		src_y += step;
+	}
+	draw_ceilfloor_textured(g, cur, g->img.size.y);
+}
+
+void	draw_wall_scaled_f(t_game *g, t_img src, t_point cur, int z_offset)
 {
 	const float	fade = g->fade_distance / g->column[cur.x].distance;
 	const float	step = (float)src.size.y / g->column[cur.x].height;
 	const int	src_x = g->column[cur.x].texture_pos * src.size.x;
 	float		src_y;
 	const int	max_y = ft_min(g->img.size.y,
-						g->horizon + z_offset + g->column[cur.x].height / 2);
+								g->horizon + z_offset + g->column[cur.x].height / 2);
 
 	cur.y = ft_max(0, g->horizon + z_offset - g->column[cur.x].height / 2);
 	src_y = fmaxf(0.0f,
-				step * (g->column[cur.x].height / 2 - g->horizon - z_offset));
-	if (fade < 1.0f)
-		while (cur.y < max_y)
-		{
-			g->img.data[cur.y++ * g->img.size.x + cur.x] =
+				  step * (g->column[cur.x].height / 2 - g->horizon - z_offset));
+	while (cur.y < max_y)
+	{
+		g->img.data[cur.y++ * g->img.size.x + cur.x] =
 				pixel_fade(src.data[(int)src_y * src.size.x + src_x], fade);
-			src_y += step;
-		}
-	else
-		while (cur.y < max_y)
-		{
-			g->img.data[cur.y++ * g->img.size.x + cur.x] =
-				src.data[(int)src_y * src.size.x + src_x];
-			src_y += step;
-		}
+		src_y += step;
+	}
 }
 
 void	draw_wall_solid(t_game *game, unsigned x, float fade)

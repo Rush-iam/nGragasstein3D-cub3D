@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/28 23:51:18 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/29 17:27:09 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,10 @@
 # define MAX_SCREENSHOT	(t_point){20000, 20000}
 # define MIN_RES	2
 # define MAX_PLAYING_SOUNDS	24
+# define MAX_MESSAGE_LEN 64
+# define END_LEVEL_MESSAGE "Well done! Thanks for playing :)"
+# define MUSIC_BG_ID	0
+# define MUSIC_END_ID	1
 
 # define HUD_FACE_FILES "./resources/face/face_"
 # define HUD_BAR_FILE "./resources/hud_bar.png"
@@ -162,10 +166,13 @@ typedef struct	s_snd
 	cs_play_sound_def_t	props;
 }				t_snd;
 
-# define CHAR_DECOR		"^*$:;,!@%#&?[]{}_~`"
+# define CHAR_ELEVATOR	";"
+# define CHAR_ELEVATOR_2 "<"
+# define CHAR_WALLS		"0123456789:" CHAR_ELEVATOR CHAR_ELEVATOR_2
+# define CHAR_DECOR		"^*$(),!@%#&?[]{}_~`"
 # define CHAR_PICKUP	"+HhAaZzXx"
 # define CHAR_ENEMY		"nswe"
-# define CHAR_SOLID		"$:;,!@%#&?[]"
+# define CHAR_SOLID		"$(),!@%#&?[]"
 # define CHAR_SOLID_MAP	'"'
 # define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP
 # define CHAR_DOOR_1_H	"-"
@@ -176,19 +183,19 @@ typedef struct	s_snd
 # define CHAR_DOOR_2	CHAR_DOOR_2_H CHAR_DOOR_2_V
 # define CHAR_DOORS_H	CHAR_DOOR_1_H CHAR_DOOR_2_H
 # define CHAR_DOORS_V	CHAR_DOOR_1_V CHAR_DOOR_2_V
-# define CHAR_DOORS		CHAR_DOOR_1 CHAR_DOOR_2
-# define CHAR_WALLS		"0123456789" CHAR_DOORS
+# define CHAR_DOORS		CHAR_DOOR_1 CHAR_DOOR_2 CHAR_ELEVATOR
 # define CHAR_ALLOWED	" .NSWE" CHAR_WALLS CHAR_DOORS CHAR_OBJECTS CHAR_ENEMY
-# define TEXTURE_DOOR_1		10
-# define TEXTURE_DOOR_1_W	11
-# define TEXTURE_DOOR_2		12
-# define TEXTURE_DOOR_2_W	13
+# define TEXTURE_DOOR_1		13
+# define TEXTURE_DOOR_1_W	14
+# define TEXTURE_DOOR_2		15
+# define TEXTURE_DOOR_2_W	16
 
 enum	e_sound
 {
 	SND_PLAYER_NOACTION,
 	SND_PLAYER_PAIN,
 	SND_PLAYER_DEATH,
+	SND_ELEVATOR,
 	SND_DOOR_OPEN,
 	SND_DOOR_CLOSE,
 	SND_KNIFE,
@@ -243,7 +250,7 @@ enum	e_sound
 # define ANIM_ENEMY_WALK_FRAMES	4
 # define ANIM_ENEMY_SLOWMO	2
 
-# define ANIM_DOOR_TICKS	60
+# define DOOR_ANIM_TICKS	60
 # define DOOR_TIMER_TICKS	300
 
 typedef struct	s_set
@@ -266,6 +273,7 @@ typedef struct	s_door
 	float				part_opened;
 	time_t				ticks_to_close;
 	cs_playing_sound_t	*sound;
+	bool				end_level;
 }				t_door;
 
 typedef struct	s_object
@@ -346,7 +354,7 @@ typedef struct	s_game
 	unsigned	fade_distance;
 	unsigned	tick;
 	unsigned	tick_diff;
-	t_img		texture[28];
+	t_img		texture[34];
 	t_img		sprite[sizeof(CHAR_OBJECTS) - 1];
 	t_set		enemyset[1];
 	t_list		*doors;
@@ -413,7 +421,7 @@ typedef struct	s_game
 	}			effect;
 	struct		s_string
 	{
-		char		*text;
+		char		text[MAX_MESSAGE_LEN + 1];
 		t_upoint	pos;
 		unsigned	frame_cur;
 		unsigned	frames;
@@ -426,8 +434,8 @@ typedef struct	s_game
 		cs_context_t*	ctx;
 		cs_context_t*	ctx7;
 		cs_context_t*	ctx22;
-		t_snd			music[1];
-		t_snd			sound[20];
+		t_snd			music[2];
+		t_snd			sound[21];
 		struct			s_playing_sound
 		{
 			cs_playing_sound_t	*snd;
@@ -471,6 +479,7 @@ int				game_loop(t_game *game);
 void			game_ticks(t_game *game);
 int				dead_exit(t_game *game);
 void			draw_ceilfloor(t_game *g);
+bool			chr_is_wall(char c);
 
 // parse
 void			parse(int args, char **av, t_game *game, bool *screenshot_only);
@@ -526,13 +535,14 @@ void			player_set_weapon(t_game *game, enum e_weapon weapon);
 void			initialize_sounds(t_game *g);
 void			sounds(t_game *game);
 cs_playing_sound_t *	sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos);
+void			music_play(t_game *game, t_snd *music);
 void			sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound);
 
 // doors
 void			doors(t_game *game);
 t_door			*door_find(t_game *game, t_point cell);
 void			door_open(t_game *g, t_point cell, bool by_player);
-void			door_sound(t_game *game, t_door *door);
+void			door_sound(t_game *game, t_door *door, t_snd *sound);
 
 // weapons
 void			weapon(t_game *game, struct s_weapon *weapon);
@@ -578,6 +588,7 @@ void			draw_wall_texture_set(t_game *g, struct s_column *col, t_point pt);
 void			draw_door_texture_set(t_game *game, struct s_column *col, char chr);
 void			draw_walls		(t_game *g);
 void			draw_wall_scaled(t_game *g, t_img src, t_point cur, int z_offset);
+void			draw_wall_scaled_f(t_game *g, t_img src, t_point cur, int z_offset);
 void			draw_wall_solid	(t_game *game, unsigned x, float fade);
 
 // draw_objects

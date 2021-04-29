@@ -3,7 +3,6 @@ C 56,56,56
 F 112,112,112
 D 10
 I Hi!
-O Level done!
 
 W0 ./resources/walls/wall_black.png
 W1 ./resources/walls/wall_black_jail.png
@@ -15,11 +14,13 @@ W6 ./resources/walls/wall_42.png
 W7 ./resources/walls/wall_medoed.png
 W8 ./resources/walls/wall_salamandra.png
 W9 ./resources/walls/wall_fire.png
+W10 ./resources/walls/wall_metal_3.png
+W11 ./resources/walls/wall_elevator.png
 
-W10 ./resources/walls/door_0.png
-W11 ./resources/walls/door_1.png
-W12 ./resources/walls/door_2.png
+W12 ./resources/walls/door_0.png
 W13 ./resources/walls/door_1.png
+W14 ./resources/walls/door_2.png
+W15 ./resources/walls/door_1.png
 
 G0 ./resources/weapons/knife_
 G1 ./resources/weapons/pistol_
@@ -78,19 +79,19 @@ S27 ./resources/sprites/bonus_s.png
 
 # W0-W9   = 0123456789			- стены
 # W10-W11 = -|>v				- двери
-# S0-S18  = ^*$:;,!@%#&?[]{}_~`	- декорации
+# S0-S18  = ^*$(),!@%#&?[]{}_~`	- декорации
 # S19-S27 = +HhAaZzXx			- предметы
 # E0		nswe				- враги (направление взгляда)
 
 # Символы NSWE - стартовая точка игрока.
 # Пока что непроходимые вот эти спрайты: (задаётся в коде)
-# S2-S13  = $:;,!@%#&|[]
+# S2-S13  = $(),!@%#&|[]
 
 # Кнопка Backspace - вкл/откл мышку
 # Кнопка M - откл/вкл карту
 
   00000000000000000012345678900000
-  0^*$:;,!@%#&?[]{}_~`.......v.|.0
+  0^*$(),!@%#&?[]{}_~`.......v.|.0
   0+HhAaZzXx.................0>0-0000000000000000000
   0................................................0
 000..........................0-0...................000

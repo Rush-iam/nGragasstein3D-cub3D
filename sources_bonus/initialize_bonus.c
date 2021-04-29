@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/05 22:37:16 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/28 20:24:44 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/29 15:29:07 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,7 @@ void	initialize_game(t_game *game, bool screenshot_only)
 	game->p.weapons_mask = START_WEAPONS;
 	player_set_weapon(game, W_KNIFE);
 	player_set_weapon(game, W_PISTOL);
-	if (game->audio.music[0].file.channels[0])
-		sound_play(game, &game->audio.music[0], T_FPT_NULL)->looped = true;
+	music_play(game, &game->audio.music[MUSIC_BG_ID]);
 }
 
 void	initialize_window(t_game *g, bool screenshot_only)
