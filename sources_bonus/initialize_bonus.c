@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/05 22:37:16 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/01 16:51:40 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/01 19:51:06 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	initialize_game(t_game *game, bool screenshot_only)
 {
 	initialize_sounds(game);
-	initialize_bfs_grid(game);
+	bfs_grid_initialize(game);
 	initialize_window(game, screenshot_only);
 	initialize_hud_images(game);
 	initialize_face_images(game);

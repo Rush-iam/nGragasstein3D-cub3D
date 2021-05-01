@@ -6,11 +6,31 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 23:32:38 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/30 23:27:34 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/01 23:36:46 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
+
+void	draw_texture_set(t_game *g, struct s_column *col)
+{
+	const char	chr = g->map.grid[col->cell.y][col->cell.x];
+	const int	faded_offset = sizeof(g->texture) / sizeof(*g->texture) / 2;
+
+	if (chr_is_wall(chr))
+	{
+		draw_wall_texture_set(g, col, col->cell);
+		draw_wall_texture_set_pos(col);
+	}
+	else if (ft_memchr(CHAR_DOORS, chr, sizeof(CHAR_DOORS) - 1))
+		draw_door_texture_set(g, col, chr);
+	else if (chr == *CHAR_DOOR_SECRET)
+	{
+		col->texture_id = door_find(g, col->cell)->secret_texture_id + \
+			(col->dir == 'W' || col->dir == 'E') * faded_offset;
+		draw_wall_texture_set_pos(col);
+	}
+}
 
 void	draw_door_texture_set(t_game *game, struct s_column *col, char chr)
 {
@@ -31,16 +51,16 @@ void	draw_door_texture_set(t_game *game, struct s_column *col, char chr)
 
 void	draw_wall_texture_set(t_game *g, struct s_column *col, t_point pt)
 {
-	const int	textures = sizeof(g->texture) / sizeof(*g->texture) / 2;
+	const int	faded_offset = sizeof(g->texture) / sizeof(*g->texture) / 2;
 
 	if (col->dir == 'N' && g->map.grid[pt.y + 1][pt.x] == CHAR_DOORS_V[0])
-		col->texture_id = TEXTURE_DOOR_1_W + textures;
+		col->texture_id = TEXTURE_DOOR_1_W + faded_offset;
 	else if (col->dir == 'N' && g->map.grid[pt.y + 1][pt.x] == CHAR_DOORS_V[1])
-		col->texture_id = TEXTURE_DOOR_2_W + textures;
+		col->texture_id = TEXTURE_DOOR_2_W + faded_offset;
 	else if (col->dir == 'S' && g->map.grid[pt.y - 1][pt.x] == CHAR_DOORS_V[0])
-		col->texture_id = TEXTURE_DOOR_1_W + textures;
+		col->texture_id = TEXTURE_DOOR_1_W + faded_offset;
 	else if (col->dir == 'S' && g->map.grid[pt.y - 1][pt.x] == CHAR_DOORS_V[1])
-		col->texture_id = TEXTURE_DOOR_2_W + textures;
+		col->texture_id = TEXTURE_DOOR_2_W + faded_offset;
 	else if (col->dir == 'W' && g->map.grid[pt.y][pt.x + 1] == CHAR_DOORS_H[0])
 		col->texture_id = TEXTURE_DOOR_1_W;
 	else if (col->dir == 'W' && g->map.grid[pt.y][pt.x + 1] == CHAR_DOORS_H[1])
@@ -49,10 +69,13 @@ void	draw_wall_texture_set(t_game *g, struct s_column *col, t_point pt)
 		col->texture_id = TEXTURE_DOOR_1_W;
 	else if (col->dir == 'E' && g->map.grid[pt.y][pt.x - 1] == CHAR_DOORS_H[1])
 		col->texture_id = TEXTURE_DOOR_2_W;
-	else if (col->dir == 'W' || col->dir == 'E')
-		col->texture_id = g->map.grid[pt.y][pt.x] - '0' + textures;
 	else
-		col->texture_id = g->map.grid[pt.y][pt.x] - '0';
+		col->texture_id = g->map.grid[pt.y][pt.x] - '0' + \
+			(col->dir == 'W' || col->dir == 'E') * faded_offset;
+}
+
+void	draw_wall_texture_set_pos(struct s_column *col)
+{
 	if (col->dir == 'N')
 		col->texture_pos = col->pos.x - (int)col->pos.x;
 	else if (col->dir == 'E')
@@ -66,7 +89,6 @@ void	draw_wall_texture_set(t_game *g, struct s_column *col, t_point pt)
 void	draw_walls(t_game *g)
 {
 	unsigned	ray;
-	char		chr;
 
 	ray = 0;
 	g->height_step_up = 1.0f / (0.5f - g->z_level);
@@ -76,11 +98,7 @@ void	draw_walls(t_game *g)
 		if ((unsigned)g->column[ray].cell.x < g->map.size.x &&
 			(unsigned)g->column[ray].cell.y < g->map.size.y)
 		{
-			chr = g->map.grid[g->column[ray].cell.y][g->column[ray].cell.x];
-			if (chr_is_wall(chr))
-				draw_wall_texture_set(g, &g->column[ray], g->column[ray].cell);
-			else if (ft_memchr(CHAR_DOORS, chr, sizeof(CHAR_DOORS)))
-				draw_door_texture_set(g, &g->column[ray], chr);
+			draw_texture_set(g, &g->column[ray]);
 			__sincosf(g->p.angle + g->angles[ray],
 									&g->ray_vector.y, &g->ray_vector.x);
 			g->ray_vector.x /= cosf(g->angles[ray]);

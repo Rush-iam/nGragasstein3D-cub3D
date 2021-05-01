@@ -107,12 +107,11 @@ void	parse_scene(int file_id, char **line, t_game *game)
 {
 	int	status;
 
-	game->color_floor = -1U;
-	game->color_ceil = -1U;
-	while ((status = get_next_line(file_id, line)) >= 0)
+	status = get_next_line(file_id, line);
+	while (status >= 0)
 	{
 		if (**line == 'R')
-			set_resolution(*line, &game->resolution, game);
+			set_resolution(*line, game);
 		else if (**line == 'C' || **line == 'F')
 			set_ceilfloor(*line, game);
 		else if (**line == 'W' || **line == 'S')
@@ -132,6 +131,7 @@ void	parse_scene(int file_id, char **line, t_game *game)
 		free(*line);
 		if (status == 0)
 			terminate(game, ERR_PARSE, "There is no map in scene file");
+		status = get_next_line(file_id, line);
 	}
 	if (status == -1)
 		terminate(game, ERR_PARSE, "Can't load scene file");

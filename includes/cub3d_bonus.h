@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/01 18:47:07 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/01 23:55:02 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,9 +177,9 @@ typedef struct	s_snd
 	cs_play_sound_def_t	props;
 }				t_snd;
 
-# define CHAR_ELEVATOR	";"
-# define CHAR_ELEVATOR_2 "<"
-# define CHAR_WALLS		"0123456789:" CHAR_ELEVATOR CHAR_ELEVATOR_2
+# define CHAR_ELEVATOR		";"
+# define CHAR_ELEVATOR_ON	"<"
+# define CHAR_WALLS		"0123456789:" CHAR_ELEVATOR CHAR_ELEVATOR_ON
 # define CHAR_DECOR		"^*$(),!@%#&?[]{}_~`"
 # define CHAR_PICKUP	"+HhAaZzXx"
 # define CHAR_ENEMY		"nswe"
@@ -194,20 +194,20 @@ typedef struct	s_snd
 # define CHAR_DOOR_2	CHAR_DOOR_2_H CHAR_DOOR_2_V
 # define CHAR_DOORS_H	CHAR_DOOR_1_H CHAR_DOOR_2_H
 # define CHAR_DOORS_V	CHAR_DOOR_1_V CHAR_DOOR_2_V
+# define CHAR_DOOR_SECRET	"="
 # define CHAR_DOORS		CHAR_DOOR_1 CHAR_DOOR_2 CHAR_ELEVATOR
-# define CHAR_ALLOWED	" .NSWE" CHAR_WALLS CHAR_DOORS CHAR_OBJECTS CHAR_ENEMY
+# define CHAR_ALLOWED	" .NSWE" CHAR_WALLS CHAR_DOORS CHAR_OBJECTS CHAR_ENEMY CHAR_DOOR_SECRET
 # define TEXTURE_DOOR_1		13
 # define TEXTURE_DOOR_1_W	14
 # define TEXTURE_DOOR_2		15
 # define TEXTURE_DOOR_2_W	16
-# define TEXTURE_CEIL		17
-# define TEXTURE_FLOOR		18
 
 enum	e_sound
 {
 	SND_PLAYER_NOACTION,
 	SND_PLAYER_PAIN,
 	SND_PLAYER_DEATH,
+	SND_DOOR_SECRET,
 	SND_ELEVATOR,
 	SND_DOOR_OPEN,
 	SND_DOOR_CLOSE,
@@ -286,6 +286,9 @@ typedef struct	s_door
 	float				part_opened;
 	time_t				ticks_to_close;
 	cs_playing_sound_t	*sound;
+	bool				secret;
+	char				secret_texture_id;
+	t_point				secret_target;
 	bool				end_level;
 }				t_door;
 
@@ -314,7 +317,7 @@ typedef struct	s_object
 		T_RIFLE,
 		T_AMMO,
 		T_BONUS_XL,
-		T_BONUS_L,
+		T_BONUS_L __attribute__((unused)),
 		T_BONUS_M,
 		T_BONUS_S,
 		T_ENEMY,
@@ -508,8 +511,7 @@ void			parse_map(int file_id, char *line, t_list *map, t_game *game);
 void			validate_settings(t_game *game);
 
 // parse_set
-void			set_resolution		(const char *res_string, t_upoint *res,
-									   t_game *game);
+void			set_resolution		(const char *res_string, t_game *game);
 void			set_ceilfloor		(char *string, t_game *game);
 void			set_ceilfloor_color(char *string, uint32_t *target, t_game *game);
 void			set_weapons			(char *string, t_game *game);
@@ -544,11 +546,12 @@ void			player_control_rotate	(t_game *game);
 void			player_control_move		(t_game *g);
 void			player_control_jump_n_crouch(t_game *g);
 void			player_control_weapon(t_game *game);
-void			player_set_fov			(t_game *game, float fov, bool reset);
 void			player_control_toggler	(t_game *g, int key_code);
 void			player_control_fov	(t_game *g);
+void			player_set_fov			(t_game *game, float fov, bool reset);
 void			player_control_borders	(t_game *g);
 void			player_control_borders_diag(t_game *g);
+void			player_control_borders_enemies(t_game *game);
 void			player_set_weapon(t_game *game, enum e_weapon weapon);
 
 // sounds
@@ -562,7 +565,7 @@ void			sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound);
 void			doors(t_game *game);
 t_door			*door_find(t_game *game, t_point cell);
 void			door_open(t_game *g, t_point cell, bool by_player);
-void			door_sound(t_game *game, t_door *door, t_snd *sound);
+void			door_sound(t_game *game, t_door *door);
 
 // weapons
 void			weapon(t_game *game, struct s_weapon *weapon);
@@ -589,7 +592,8 @@ void			enemy_set_state(t_game *g, t_object *obj, enum e_objstate state);
 void			enemy_sound(t_game *game, t_object *obj, enum e_sound sound_type);
 
 // pathfind
-void			initialize_bfs_grid(t_game *g);
+void			bfs_grid_initialize(t_game *g);
+void			bfs_grid_update(t_game *g);
 void			*pathfind(t_list **path, t_point from, t_point to, struct s_map *map);
 bool			pathfind_init(struct s_map *map, t_point target, t_list **queue, t_point **pt);
 void			*pathfind_deinit(t_list **queue, t_point *pt);
@@ -598,10 +602,10 @@ void			*pathfind_construct(t_list **path, t_point from, struct s_map *map);
 
 // raycasting
 void			ray_cast		(t_game *game);
-struct s_column	ray_intersect	(t_game *g, float tan_angle, t_point negative);
+struct s_column	ray_intersect	(t_game *g, float tan_angle, t_point step);
 float			ray_intersect_distance(t_game *game, float angle);
-t_ray			ray_intersect_x	(t_game *g, int step_x, float step_y);
-t_ray			ray_intersect_y(t_game *g, float step_x, int step_y);
+t_ray			ray_intersect_x	(t_game *g, int stx, float sty);
+t_ray			ray_intersect_y(t_game *g, float stx, int sty);
 
 // draw_ceilfloor
 void	draw_ceil_textured(t_game *g, t_point px);
@@ -617,6 +621,7 @@ void	draw_ceilfloor_plain(t_game *g);
 
 // draw_walls
 void			draw_wall_texture_set(t_game *g, struct s_column *col, t_point pt);
+void			draw_wall_texture_set_pos(struct s_column *col);
 void			draw_door_texture_set(t_game *game, struct s_column *col, char chr);
 void			draw_walls		(t_game *g);
 void			draw_wall_scaled(t_game *g, t_img src, t_point cur, int z_offset);

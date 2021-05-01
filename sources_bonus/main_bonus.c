@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/01 18:12:26 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/01 22:01:41 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ int	main(int args, char *av[])
 	static struct timespec	time;
 
 	game = (t_game){0};
+	game.color_floor = -1U;
+	game.color_ceil = -1U;
 	game.fade_distance = 8;
 	if (!(game.mlx = mlx_init()))
 		terminate(&game, ERR_MLX, strerror(errno));

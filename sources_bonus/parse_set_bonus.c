@@ -12,18 +12,18 @@
 
 #include "cub3d_bonus.h"
 
-void	set_resolution(const char *res_string, t_upoint *res, t_game *game)
+void	set_resolution(const char *res_string, t_game *game)
 {
-	if (res->x)
+	if (game->resolution.x)
 		terminate(game, ERR_PARSE, "Duplicated Resolution setting");
 	res_string++;
-	res_string = atoi_limited(&res->x, res_string, UINT_MAX);
+	res_string = atoi_limited(&game->resolution.x, res_string, UINT_MAX);
 	if (res_string == NULL)
 		terminate(game, ERR_PARSE, "Resolution X setting is wrong");
-	res_string = atoi_limited(&res->y, res_string, UINT_MAX);
+	res_string = atoi_limited(&game->resolution.y, res_string, UINT_MAX);
 	if (res_string == NULL)
 		terminate(game, ERR_PARSE, "Resolution Y setting is wrong");
-	else if (*res_string != '\0' || res->x == 0 || res->y == 0)
+	else if (*res_string != '\0' || !game->resolution.x || !game->resolution.y)
 		terminate(game, ERR_PARSE, "Wrong Resolution setting");
 }
 

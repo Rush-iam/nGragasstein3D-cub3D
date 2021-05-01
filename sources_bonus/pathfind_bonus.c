@@ -12,7 +12,7 @@
 
 #include "cub3d_bonus.h"
 
-void	initialize_bfs_grid(t_game *g)
+void	bfs_grid_initialize(t_game *g)
 {
 	unsigned	y;
 	unsigned	x;
@@ -31,6 +31,28 @@ void	initialize_bfs_grid(t_game *g)
 		{
 			if (g->map.grid[y][x] != '.' &&
 				ft_strchr(CHAR_DOORS, g->map.grid[y][x]) == NULL)
+				g->map.grid_bfs[y][x] = -1U;
+			else
+				g->map.grid_bfs[y][x] = 0;
+			x++;
+		}
+		y++;
+	}
+}
+
+void	bfs_grid_update(t_game *g)
+{
+	unsigned	y;
+	unsigned	x;
+
+	y = 0;
+	while (y < g->map.size.y)
+	{
+		x = 0;
+		while (x < g->map.size.x)
+		{
+			if (g->map.grid[y][x] != '.' && ft_memchr(CHAR_DOORS,
+					g->map.grid[y][x], sizeof(CHAR_DOORS) - 1) == NULL)
 				g->map.grid_bfs[y][x] = -1U;
 			else
 				g->map.grid_bfs[y][x] = 0;
