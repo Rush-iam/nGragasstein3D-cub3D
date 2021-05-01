@@ -1,29 +1,29 @@
 R 2558 1296
-C 56,56,56
-F 112,112,112
-I Get Psyched!
+#C 56,56,56
+#F 112,112,112
+CT ./resources/textures/ceilfloor/concrete_dark512.png
+FT ./resources/textures/ceilfloor/concrete_medium512.png
+I Get psyched!
+D 6
 
-W0 ./resources/walls/wall_0.png
-W1 ./resources/walls/wall_1.png
-W2 ./resources/walls/wall_2.png
-W3 ./resources/walls/wall_wood.png
-W4 ./resources/walls/wall_4.png
-W5 ./resources/walls/wall_5.png
-W6 ./resources/walls/wall_6.png
-W7 ./resources/walls/wall_7.png
-W8 ./resources/walls/wall_8.png
-W9 ./resources/walls/wall_9.png
-W10 ./resources/walls/wall_metal_3.png
-W11 ./resources/walls/wall_elevator_down.png
-W12 ./resources/walls/wall_elevator_up.png
+W0 ./resources/textures/wall_0.png
+W1 ./resources/textures/wall_1.png
+W2 ./resources/textures/wall_2.png
+W3 ./resources/textures/wall_wood.png
+W4 ./resources/textures/wall_4.png
+W5 ./resources/textures/wall_5.png
+W6 ./resources/textures/wall_6.png
+W7 ./resources/textures/wall_7.png
+W8 ./resources/textures/wall_8.png
+W9 ./resources/textures/wall_9.png
+W10 ./resources/textures/wall_metal_3.png
+W11 ./resources/textures/wall_elevator_down.png
+W12 ./resources/textures/wall_elevator_up.png
 
-W13 ./resources/walls/door_0.png
-W14 ./resources/walls/door_1.png
-W15 ./resources/walls/door_2.png
-W16 ./resources/walls/door_1.png
-
-W17 ./resources/walls/wall_metal_1.png
-W18 ./resources/walls/wall_black.png
+W13 ./resources/textures/door_0.png
+W14 ./resources/textures/door_1.png
+W15 ./resources/textures/door_2.png
+W16 ./resources/textures/door_1.png
 
 G0 ./resources/weapons/knife_
 G1 ./resources/weapons/pistol_
@@ -48,6 +48,7 @@ S15 ./resources/sprites/bones.png
 S16 ./resources/sprites/puddle.png
 S17 ./resources/sprites/pot.png
 S18 ./resources/sprites/guard_dead.png
+
 S19 ./resources/sprites/health_xl.png
 S20 ./resources/sprites/health_l.png
 S21 ./resources/sprites/health_m.png
@@ -66,29 +67,30 @@ E0 ./resources/enemies/guard/
 A0 ./resources/sounds/player_noaction.wav
 A1 ./resources/sounds/player_pain.wav
 A2 ./resources/sounds/player_death.wav
-A3 ./resources/sounds/elevator.wav
-A4 ./resources/sounds/door_open.wav
-A5 ./resources/sounds/door_close.wav
-A6 ./resources/sounds/weapon_knife.wav
-A7 ./resources/sounds/weapon_pistol.wav
-A8 ./resources/sounds/weapon_rifle.wav
-A9 ./resources/sounds/pickup_ammo.wav
-A10 ./resources/sounds/pickup_rifle.wav
-A11 ./resources/sounds/pickup_health_m.wav
-A12 ./resources/sounds/pickup_health_l.wav
-A13 ./resources/sounds/pickup_health_xl.wav
-A14 ./resources/sounds/pickup_bonus_s.wav
-A15 ./resources/sounds/pickup_bonus_m.wav
-A16 ./resources/sounds/pickup_bonus_l.wav
-A17 ./resources/sounds/pickup_bonus_xl.wav
+A3 ./resources/sounds/door_secret.wav
+A4 ./resources/sounds/elevator.wav
+A5 ./resources/sounds/door_open.wav
+A6 ./resources/sounds/door_close.wav
+A7 ./resources/sounds/weapon_knife.wav
+A8 ./resources/sounds/weapon_pistol.wav
+A9 ./resources/sounds/weapon_rifle.wav
+A10 ./resources/sounds/pickup_ammo.wav
+A11 ./resources/sounds/pickup_rifle.wav
+A12 ./resources/sounds/pickup_health_m.wav
+A13 ./resources/sounds/pickup_health_l.wav
+A14 ./resources/sounds/pickup_health_xl.wav
+A15 ./resources/sounds/pickup_bonus_s.wav
+A16 ./resources/sounds/pickup_bonus_m.wav
+A17 ./resources/sounds/pickup_bonus_l.wav
+A18 ./resources/sounds/pickup_bonus_xl.wav
 
                             333433333334333
      666666                 3,...........,3
      6aaxx6      666666686664...&.s&..&...43333
      6aazx66     6..........3.............3xxX3
-     6aazz76     6.^....^...|......*.....s|.wx4
+     6aazz.6     6.^....^...|......*.....s|.wx4
      6aaz..6     6..........3.............3XXX3
-     66966>66966 6...66686665.............53333
+     66966=66966 6...66686665.............53333
      6.xX(.(X..6 6...6      3.............3
      8.$...x.$s866...666    3334333-3334333
      6..e......6...n...6         3...3
@@ -97,7 +99,7 @@ A17 ./resources/sounds/pickup_bonus_xl.wav
 666668z$e....$.866696666         3...3
 6.H@66zz.......6                 3...3
 6.^.666966-66966            333333...333
-6...6   6...6               34.ve..^..?3
+6...6   6...6               34.=e..^..?3
 66-66   8.^.8               3a.333...333
 6...66666...6               3aH3 3...3
 6.^.6..h6...6               3AH3 3...3
@@ -124,13 +126,13 @@ A17 ./resources/sounds/pickup_bonus_xl.wav
 6................6.....w8::      0...0         000000.0.0.0{00
 6.n...^.......^..|...w..v.;      0.n.0              000000000
 6........n.......6.....w8::      0.^.0
-666666666676666666>669666        0...0
-         ::8..66...H6       0000000-0000000
-         ;.v..6..6666       0}h..0...0....0
+666666666676666666=669666        0...0
+         ::8..6..=.H6       0000000-0000000
+         ;.v..6..6.66       0}h..0...0....0
          ::8.....666        0....|.^.|.{..0
-           66>6666          0....0...0....0
+           66=6666          0....0...0....0
             6..6            0....0...0....0
-            66+6            000000...000000
+            6.+6            000000...000000
             6666            0....0...0....0
                             0E.`a|.^.|h..}0
                             0....0...0....0

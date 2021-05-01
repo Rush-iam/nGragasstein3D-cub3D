@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/22 20:55:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 17:52:14 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 19:55:11 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,16 @@ void	player_control(t_game *game)
 	if (game->key[K_TURN_RIGHT])
 		game->p.angle += PL_SPEED / 2;
 	if (game->key[K_MOVE_FORWARD])
-		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.vect.x,
+		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.vect.x, \
 								game->p.pos.y + PL_SPEED * game->p.vect.y};
 	if (game->key[K_MOVE_BACK])
-		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vect.x,
+		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vect.x, \
 								game->p.pos.y - PL_SPEED * game->p.vect.y};
 	if (game->key[K_MOVE_LEFT])
-		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.vect.y,
+		game->p.pos = (t_fpoint){game->p.pos.x + PL_SPEED * game->p.vect.y, \
 								game->p.pos.y - PL_SPEED * game->p.vect.x};
 	if (game->key[K_MOVE_RIGHT])
-		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vect.y,
+		game->p.pos = (t_fpoint){game->p.pos.x - PL_SPEED * game->p.vect.y, \
 								game->p.pos.y + PL_SPEED * game->p.vect.x};
 	if (game->key[K_FOV_WIDE])
 		player_set_fov(game, game->fov * 1.03, false);
@@ -56,9 +56,9 @@ void	player_control_borders(t_game *game)
 		game->p.pos.y = game->map.size.y - 0.0001;
 }
 
-int		hook_key_press(int key_code, t_game *game)
+int	hook_key_press(int key_code, t_game *game)
 {
-	if (key_code >= (int)sizeof(game->key))
+	if (key_code >= (int) sizeof(game->key))
 		return (1);
 	if (key_code == KEY_ESCAPE)
 		terminate(game, EXIT_SUCCESS, NULL);
@@ -66,15 +66,15 @@ int		hook_key_press(int key_code, t_game *game)
 	return (0);
 }
 
-int		hook_key_release(int key_code, t_game *game)
+int	hook_key_release(int key_code, t_game *game)
 {
-	if (key_code >= (int)sizeof(game->key))
+	if (key_code >= (int) sizeof(game->key))
 		return (1);
 	game->key[key_code] = false;
 	return (0);
 }
 
-int		hook_exit(t_game *game)
+int	hook_exit(t_game *game)
 {
 	return (terminate(game, 0, NULL));
 }

@@ -55,9 +55,9 @@ void	draw_square(t_img *img, t_point center, int size, int color)
 	center.x -= shift;
 	center.y -= shift;
 	draw_line(img, center, (t_point){center.x + size, center.y}, color);
-	draw_line(img, (t_point){center.x + size, center.y},
+	draw_line(img, (t_point){center.x + size, center.y}, \
 					(t_point){center.x + size, center.y + size}, color);
-	draw_line(img, (t_point){center.x + size, center.y + size},
+	draw_line(img, (t_point){center.x + size, center.y + size}, \
 					(t_point){center.x, center.y + size}, color);
 	draw_line(img, (t_point){center.x, center.y + size}, center, color);
 }

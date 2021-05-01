@@ -31,7 +31,8 @@ char	*ft_itoa(int n)
 		digits[i++] = '0' + n % 10 * ((n > 0) - digits[10]);
 		n /= 10;
 	}
-	if (!(str = malloc(digits[10] + i + 1)))
+	str = malloc(digits[10] + i + 1);
+	if (str == NULL)
 		return (NULL);
 	k = digits[10];
 	if (k)

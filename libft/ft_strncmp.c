@@ -33,7 +33,7 @@ static int	ft_strncmp_check_tail(const char *s1, const char *s2, size_t n)
 	return ((unsigned char)*(s1 + 7) - (unsigned char)*(s2 + 7));
 }
 
-int			ft_strncmp(const char *s1, const char *s2, size_t n)
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
 	if (!n)
 		return (0);

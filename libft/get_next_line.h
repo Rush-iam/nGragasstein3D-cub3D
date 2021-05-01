@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/30 16:55:41 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/23 15:16:29 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 16:35:40 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <stdlib.h>
 # include <unistd.h>
+# include <stdbool.h>
 # include "libft.h"
 
 /*
@@ -29,14 +30,14 @@
 #  define BUFFER_SIZE 65536
 # endif
 
-typedef struct	s_buf
+typedef struct s_buf
 {
 	char		*s;
 	char		*cur;
-	unsigned	max;
-	unsigned	cap;
-}				t_buf;
+	uint32_t	max;
+	uint32_t	cap;
+}	t_buf;
 
-int				get_next_line(int fd, char **line);
+int	get_next_line(int fd, char **line);
 
 #endif

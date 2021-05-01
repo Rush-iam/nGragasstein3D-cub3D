@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/28 18:43:41 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/04 15:57:36 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 22:06:25 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ void	set_resolution(const char *res_string, t_upoint *res, t_game *game)
 	if (res->x)
 		terminate(game, ERR_PARSE, "Duplicated Resolution setting");
 	res_string++;
+	if (*res_string != ' ')
+		terminate(game, ERR_PARSE, "Add space after Resolution identifier");
 	res_string = atoi_limited(&res->x, res_string, UINT_MAX);
 	if (res_string == NULL)
 		terminate(game, ERR_PARSE, "Resolution X setting is wrong");
@@ -27,15 +29,18 @@ void	set_resolution(const char *res_string, t_upoint *res, t_game *game)
 		terminate(game, ERR_PARSE, "Wrong Resolution setting");
 }
 
-void	set_colors(const char *color_string, unsigned *target, t_game *game)
+void	set_ceilfloor(const char *color_string, unsigned int *target,
+																t_game *game)
 {
-	unsigned	r;
-	unsigned	g;
-	unsigned	b;
+	unsigned int	r;
+	unsigned int	g;
+	unsigned int	b;
 
-	if (*target != (unsigned)-1)
-		terminate(game, ERR_PARSE, "Duplicated F or C color setting");
+	if (*target != -1U)
+		terminate(game, ERR_PARSE, "Duplicated F/C color identifier");
 	color_string++;
+	if (*color_string != ' ')
+		terminate(game, ERR_PARSE, "Add space after F/C identifier");
 	color_string = atoi_limited(&r, color_string, UCHAR_MAX);
 	if (color_string == NULL)
 		terminate(game, ERR_PARSE, "F/C color Red is wrong (range: 0-255)");
@@ -72,7 +77,10 @@ void	set_textures(char *string, t_game *game)
 	else
 		terminate(game, ERR_PARSE, "Wrong texture setting. Valid: NO/SO/WE/EA");
 	if (game->texture[id].ptr != NULL)
-		terminate(game, ERR_PARSE, "Duplicated texture setting");
+		terminate(game, ERR_PARSE, "Duplicated sprite/texture identifier");
+	if ((id == SPRITE && string[1] != ' ') || \
+		(id != SPRITE && string[2] != ' '))
+		terminate(game, ERR_PARSE, "Add space after texture identifier");
 	string += 2;
 	while (*string == ' ')
 		string++;
@@ -81,26 +89,21 @@ void	set_textures(char *string, t_game *game)
 
 void	set_textures_import(char *string, t_img *texture, t_game *game)
 {
-	int				null;
+	int				n;
 	const size_t	str_len = ft_strlen(string);
 
 	if (str_len < 5)
 		terminate(game, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
 	if (ft_memcmp(".xpm", string + str_len - 4, 5) == 0)
-	{
-		if (!(texture->ptr = mlx_xpm_file_to_image(game->mlx, string,
-							(int *)&texture->size.x, (int *)&texture->size.y)))
-			terminate(game, ERR_PARSE, "Can't load texture file");
-	}
+		texture->ptr = mlx_xpm_file_to_image(game->mlx, string, \
+							(int *)&texture->size.x, (int *)&texture->size.y);
 	else if (ft_memcmp(".png", string + str_len - 4, 5) == 0)
-	{
-		if (!(texture->ptr = mlx_png_file_to_image(game->mlx, string,
-							(int *)&texture->size.x, (int *)&texture->size.y)))
-			terminate(game, ERR_PARSE, "Can't load texture file");
-	}
+		texture->ptr = mlx_png_file_to_image(game->mlx, string, \
+							(int *)&texture->size.x, (int *)&texture->size.y);
 	else
 		terminate(game, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
-	texture->data = (unsigned *)mlx_get_data_addr(texture->ptr, &null, &null,
-																		&null);
+	if (texture->ptr == NULL)
+		terminate(game, ERR_PARSE, "Can't load texture file");
+	texture->data = (unsigned int *)mlx_get_data_addr(texture->ptr, &n, &n, &n);
 	texture->aspect = texture->size.x / texture->size.y;
 }

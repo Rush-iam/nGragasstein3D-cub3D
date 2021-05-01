@@ -44,31 +44,26 @@ static void	*ft_memchr_check_tail(const char *s, char c, size_t n)
 	return ((void *)s);
 }
 
-void		*ft_memchr(const void *s, int c, size_t n)
+void	*ft_memchr(const void *s, int c, size_t n)
 {
 	const size_t	mask_0 = 0x7F7F7F7F7F7F7F7F;
-	size_t			mask_c;
+	const int		ch = (unsigned char)c;
+	const size_t	mask_c = 0x0101010101010101 * ch;
 	size_t			check;
 
-	c = (unsigned char)c;
 	while (((size_t)s & 0b111) && n)
 	{
-		if (*(unsigned char *)s++ == c)
+		if (*(unsigned char *)s++ == ch)
 			return ((void *)(s - 1));
 		n--;
 	}
-	if (n >= 8)
+	while (n >= 8)
 	{
-		mask_c = 0x0101010101010101 * c;
-		while (1)
-		{
-			check = *(size_t *)s ^ mask_c;
-			if (~((check & mask_0) + mask_0 | check | mask_0) != 0)
-				return (ft_memchr_check_8((char *)s, (char)c));
-			s += 8;
-			if ((n -= 8) < 8)
-				break ;
-		}
+		check = *(size_t *)s ^ mask_c;
+		if (~((check & mask_0) + mask_0 | check | mask_0) != 0)
+			return (ft_memchr_check_8((char *)s, (char)ch));
+		s += 8;
+		n -= 8;
 	}
-	return (ft_memchr_check_tail((char *)s, (char)c, n));
+	return (ft_memchr_check_tail((char *)s, (char)ch, n));
 }

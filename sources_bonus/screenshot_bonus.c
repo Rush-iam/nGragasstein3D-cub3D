@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/26 14:27:17 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/26 14:27:17 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 18:05:22 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,16 @@ void	write_screenshot_and_exit(t_game *game)
 {
 	int				file_id;
 	char			header[26];
-	const unsigned	filesize = 26 + 3 * game->img.size.x * game->img.size.y;
+	const uint32_t	filesize = 26 + 3 * game->img.size.x * game->img.size.y;
 
 	objects(game);
 	weapon(game, &game->p.weapon);
-	ray_cast(game);
+	ray_cast(game, -1);
 	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
 	draw_walls(game);
 	draw_objects(game);
-	if ((file_id = open("shot.bmp", O_WRONLY | O_CREAT | O_TRUNC)) == -1)
+	file_id = open("shot.bmp", O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+	if (file_id == -1)
 		terminate(game, ERR_BMP, strerror(errno));
 	ft_memcpy(header, "BM", 2);
 	ft_memcpy(header + 2, &filesize, 4);
@@ -43,10 +44,11 @@ void	write_screenshot_data(t_game *game, int file_id)
 {
 	char		*bmp_data;
 	t_upoint	px;
-	unsigned	i;
+	uint32_t	i;
 
-	if ((bmp_data = malloc(3 * game->img.size.x * game->img.size.y +
-						   game->img.size.y * ((4 - (game->img.size.x * 3) % 4) % 4))) == NULL)
+	bmp_data = malloc(3 * game->img.size.x * game->img.size.y + \
+					game->img.size.y * ((4 - (game->img.size.x * 3) % 4) % 4));
+	if (bmp_data == NULL)
 		terminate(game, ERR_BMP, strerror(errno));
 	i = 0;
 	px.y = game->img.size.y;
@@ -55,7 +57,7 @@ void	write_screenshot_data(t_game *game, int file_id)
 		px.x = 0;
 		while (px.x < game->img.size.x)
 		{
-			ft_memcpy(bmp_data + i,
+			ft_memcpy(bmp_data + i, \
 					  &game->img.data[game->img.size.x * px.y + px.x++], 3);
 			i += 3;
 		}

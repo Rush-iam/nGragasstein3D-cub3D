@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/01 22:03:01 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/01 22:03:01 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 17:30:57 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,20 +17,20 @@
 ** if UTF-32 >= 1114112 (0x10FFFF): return error (0 bytes)
 */
 
-int		ft_wchrto8(char *dst_utf8, wchar_t src_utf32)
+int	ft_wchrto8(char *dst_utf8, wchar_t src_utf32)
 {
 	int		bytes;
 	char	mask;
 	int		i;
 
-	bytes = 1;
-	if (src_utf32 < 128)
+	bytes = 0;
+	if (++bytes && src_utf32 < 128)
 		mask = (char)(0b00000000);
-	else if (src_utf32 < 2048 && (bytes += 1))
+	else if (++bytes && src_utf32 < 2048)
 		mask = (char)(0b11000000);
-	else if (src_utf32 < 65536 && (bytes += 2))
+	else if (++bytes && src_utf32 < 65536)
 		mask = (char)(0b11100000);
-	else if (src_utf32 < 1114112 && (bytes += 3))
+	else if (++bytes && src_utf32 < 1114112)
 		mask = (char)(0b11110000);
 	else
 		return (0);

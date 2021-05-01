@@ -16,7 +16,7 @@
 int	ft_file_exists(char *path)
 {
 	int	fd;
-	int check;
+	int	check;
 
 	fd = open(path, O_RDONLY);
 	if (fd == -1)

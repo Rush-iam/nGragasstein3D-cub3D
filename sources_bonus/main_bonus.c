@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/29 15:03:32 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/04 16:24:08 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,19 @@
 
 int	main(int args, char *av[])
 {
-	t_game					game;
-	bool					screenshot_only;
-	static struct timespec	time;
+	t_game			game;
+	bool			screenshot_only;
+	struct timespec	time;
 
-	game = (t_game){0};
+	game = (t_game){};
+	game.color_floor = -1U;
+	game.color_ceil = -1U;
 	game.fade_distance = 8;
-	if (!(game.mlx = mlx_init()))
+	if (ft_assign_ptr(&game.mlx, mlx_init()) == NULL)
 		terminate(&game, ERR_MLX, strerror(errno));
-	parse(args, av, &game, &screenshot_only);
+	screenshot_only = parse(args, av, &game);
 	initialize_game(&game, screenshot_only);
-	if (screenshot_only == true)
+	if (screenshot_only)
 		write_screenshot_and_exit(&game);
 	mlx_do_key_autorepeatoff(game.mlx);
 	mlx_mouse_hide();
@@ -39,65 +41,42 @@ int	main(int args, char *av[])
 	mlx_loop(game.mlx);
 }
 
-void	draw_ceilfloor(t_game *g)
-{
-	const int	pixel_offset = (g->horizon - g->center.y) * (int)g->img.size.x;
-	int 		i;
-
-	if (pixel_offset < 0)
-	{
-		if (-pixel_offset < g->img_pixelcount)
-			ft_memcpy(g->img.data, g->img_bg.data - pixel_offset,
-						(g->img_pixelcount + pixel_offset) * 4);
-		i = ft_max(0, g->img_pixelcount + pixel_offset);
-		while (i < g->img_pixelcount)
-			g->img.data[i++] = g->color_floor;
-	}
-	else
-	{
-		i = ft_min(g->img_pixelcount, pixel_offset);
-		while (i >= 0)
-			g->img.data[i--] = g->color_ceil;
-		if (pixel_offset < g->img_pixelcount)
-			ft_memcpy(g->img.data + pixel_offset, g->img_bg.data,
-						(g->img_pixelcount - pixel_offset) * 4);
-	}
-}
-
 int	game_loop(t_game *game)
 {
 	if (game->p.health == 0)
-		return dead_exit(game);
+		return (dead_exit(game));
 	game_ticks(game);
 	sounds(game);
-	draw_ceilfloor(game);
+	if (game->color_ceil != -1U)
+		draw_ceil_plain(game);
+	if (game->color_floor != -1U)
+		draw_floor_plain(game);
 	draw_walls(game);
 	draw_objects(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
 	draw_effect(game, &game->effect);
 	draw_weapon(game, &game->p.weapon);
 	if (*game->string.text)
-		draw_string(game, &game->string);
+		draw_message(game, &game->string);
 	if (game->map.enabled)
 		draw_map(game);
-	if (game->hud.needs_redraw)
-		draw_hud(game);
+	draw_hud(game);
 	draw_hud_face(game, false);
 	draw_fps(game);
+	return (0);
+}
 //	demo_fillrate(game, 1);
 //	demo_cursor(game, 0xFF88FF);
 //	demo_radar(game, 360);
-	return (0);
-}
 
 void	game_ticks(t_game *game)
 {
 	static struct timespec	time;
-	static unsigned			tick_prev;
+	static uint32_t			tick_prev;
 
 	clock_gettime(CLOCK_MONOTONIC, &time);
 	tick_prev = game->tick;
-	game->tick = TICKS_PER_SEC * time.tv_sec +
+	game->tick = TICKS_PER_SEC * time.tv_sec + \
 				 TICKS_PER_SEC * time.tv_nsec / NANSECS_PER_SEC;
 	game->tick_diff = game->tick - tick_prev;
 	if (game->effect.frame_cur < game->effect.frames)
@@ -110,8 +89,7 @@ void	game_ticks(t_game *game)
 		player_control(game);
 		weapon(game, &game->p.weapon);
 		objects(game);
-//		for (int i = 0; i < 100; ++i)
-		ray_cast(game);
+		ray_cast(game, -1);
 		game->tick_diff--;
 	}
 }
@@ -126,7 +104,8 @@ int	dead_exit(t_game *game)
 		cs_stop_all_sounds(game->audio.ctx);
 		cs_stop_all_sounds(game->audio.ctx7);
 		cs_stop_all_sounds(game->audio.ctx22);
-		sound_play(game, &game->audio.sound[SND_PLAYER_DEATH], T_FPT_NULL);
+		sound_play(game, &game->audio.sound[SND_PLAYER_DEATH], \
+					(t_fpoint){0, 0});
 	}
 	draw_effect(game, &game->effect);
 	if (game->effect.frame_cur > game->effect.frames)

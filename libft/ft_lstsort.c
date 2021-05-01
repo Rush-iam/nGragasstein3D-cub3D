@@ -6,25 +6,24 @@
 /*   By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/24 20:03:25 by ngragas           #+#    #+#             */
-/*   Updated: 2021/02/28 18:39:17 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 16:58:58 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static void	sort(t_list **begin, t_list *cur, int (*cmp)())
+static bool	sort(t_list **begin, t_list *cur, t_list *next, int (*cmp)())
 {
-	int		sorted;
+	bool	sorted;
 	t_list	*prev;
-	t_list	*next;
 
 	prev = NULL;
-	sorted = 1;
-	while ((next = cur->next))
+	sorted = true;
+	while (next)
 	{
 		if ((*cmp)(cur->content, next->content) != 0)
 		{
-			sorted = 0;
+			sorted = false;
 			if (prev)
 				prev->next = next;
 			else
@@ -32,20 +31,22 @@ static void	sort(t_list **begin, t_list *cur, int (*cmp)())
 			cur->next = next->next;
 			next->next = cur;
 			prev = next;
+			next = cur->next;
 			continue ;
 		}
 		prev = cur;
 		cur = next;
+		next = cur->next;
 	}
-	if (!sorted)
-		sort(begin, *begin, cmp);
+	return (sorted);
 }
 
-void		ft_lstsort(t_list **lst, int (*cmp)())
+void	ft_lstsort(t_list **lst, int (*cmp)())
 {
 	if (!cmp || !*lst)
 		return ;
-	sort(lst, *lst, cmp);
+	while (sort(lst, *lst, (*lst)->next, cmp) == false)
+		;
 }
 
 /*

@@ -6,13 +6,13 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 23:31:40 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/16 13:41:21 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 18:16:17 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
 
-int		terminate(t_game *game, int return_value, char *message)
+int	terminate(t_game *game, int return_value, char *message)
 {
 	if (return_value)
 	{
@@ -27,7 +27,7 @@ int		terminate(t_game *game, int return_value, char *message)
 		else if (return_value == ERR_BMP)
 			ft_putendl_fd("Unable to save screenshot", 2);
 	}
-	terminate_free(game);
+	free_resources(game);
 	if (game->map.img.ptr)
 		mlx_destroy_image(game->mlx, game->map.img.ptr);
 	if (game->img.ptr)
@@ -41,38 +41,38 @@ int		terminate(t_game *game, int return_value, char *message)
 	exit(return_value);
 }
 
-void	terminate_free(t_game *game)
+void	free_resources(t_game *g)
 {
-	unsigned	i;
+	uint32_t	i;
 
-	ft_lstclear(&game->objects, terminate_free_object);
-	free(game->column);
-	free(game->angles);
-	if (game->map.grid && (i = 0) == 0)
-		while (i < game->map.size.y)
-			free(game->map.grid[i++]);
-	free(game->map.grid);
-	terminate_free_images(game, game->texture,
-								sizeof(game->texture) / sizeof(*game->texture));
-	terminate_free_images(game, game->sprite,
-								sizeof(game->sprite) / sizeof(*game->sprite));
+	ft_lstclear(&g->objects, terminate_free_object);
+	free(g->column);
+	free(g->angles);
+	if (g->map.grid)
+		ft_free_ptr_array((void **)g->map.grid, g->map.size.y);
+	free_image_array(g, g->texture, sizeof(g->texture) / sizeof(*g->texture));
+	free_image_array(g, g->sprite, sizeof(g->sprite) / sizeof(*g->sprite));
 	i = -1U;
-	while (++i < sizeof(game->p.weapon_img) / sizeof(*game->p.weapon_img))
-		terminate_free_images(game, game->p.weapon_img[i],
-				sizeof(game->p.weapon_img[i]) / sizeof(*game->p.weapon_img[i]));
-	terminate_free_images(game, game->enemyset[0].wait,
-			sizeof(game->enemyset[0].wait) / sizeof(*game->enemyset[0].wait));
-	terminate_free_images(game, game->enemyset[0].attack,
-			sizeof(game->enemyset[0].attack) / sizeof(*game->enemyset[0].attack));
-	terminate_free_images(game, game->enemyset[0].pain,
-			sizeof(game->enemyset[0].pain) / sizeof(*game->enemyset[0].pain));
-	terminate_free_images(game, game->enemyset[0].death,
-			sizeof(game->enemyset[0].death) / sizeof(*game->enemyset[0].death));
+	while (++i < sizeof(g->p.weapon_img) / sizeof(*g->p.weapon_img))
+		free_image_array(g, g->p.weapon_img[i], \
+				sizeof(g->p.weapon_img[i]) / sizeof(*g->p.weapon_img[i]));
+	i = -1U;
+	while (++i < sizeof(g->enemyset[0].walk) / sizeof(*g->enemyset[0].walk))
+		free_image_array(g, g->enemyset[0].walk[i], \
+			sizeof(g->enemyset[0].walk[i]) / sizeof(*g->enemyset[0].walk[i]));
+	free_image_array(g, g->enemyset[0].wait, \
+		sizeof(g->enemyset[0].wait) / sizeof(*g->enemyset[0].wait));
+	free_image_array(g, g->enemyset[0].attack, \
+		sizeof(g->enemyset[0].attack) / sizeof(*g->enemyset[0].attack));
+	free_image_array(g, g->enemyset[0].pain, \
+		sizeof(g->enemyset[0].pain) / sizeof(*g->enemyset[0].pain));
+	free_image_array(g, g->enemyset[0].death, \
+		sizeof(g->enemyset[0].death) / sizeof(*g->enemyset[0].death));
 }
 
-void	terminate_free_images(t_game *game, t_img *arr, unsigned count)
+void	free_image_array(t_game *game, t_img *arr, uint32_t count)
 {
-	unsigned	i;
+	uint32_t	i;
 
 	i = 0;
 	while (i < count)
@@ -94,7 +94,7 @@ void	terminate_free_object(void *object)
 
 void	terminate_audio(t_game *game)
 {
-	unsigned	i;
+	uint32_t	i;
 
 	i = 0;
 	while (i < sizeof(game->audio.music) / sizeof(*game->audio.music))

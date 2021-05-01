@@ -12,14 +12,12 @@
 
 #include "libft.h"
 
-void	ft_lstreverse(t_list **begin_list)
+t_list	*ft_lstreverse(t_list **begin_list)
 {
 	t_list	*cur;
 	t_list	*prev;
 	t_list	*next;
 
-	if (*begin_list == NULL)
-		return ;
 	cur = *begin_list;
 	prev = NULL;
 	while (cur)
@@ -31,4 +29,5 @@ void	ft_lstreverse(t_list **begin_list)
 	}
 	if (prev)
 		*begin_list = prev;
+	return (*begin_list);
 }

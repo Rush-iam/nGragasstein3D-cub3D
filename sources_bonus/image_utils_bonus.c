@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 15:13:44 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/28 16:22:09 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 15:25:52 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 t_img	*img_create(void *mlx_ptr, t_img *dst, t_upoint size)
 {
-	int null;
+	int	null;
 
 	dst->ptr = mlx_new_image(mlx_ptr, size.x, size.y);
 	if (dst->ptr == NULL)
@@ -39,9 +39,9 @@ t_img	*img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres)
 		dst_pix.x = 0;
 		while (dst_pix.x < dst_img.size.x)
 		{
-			src_pix = (t_upoint){src_img->size.x * dst_pix.x / dst_img.size.x,
+			src_pix = (t_upoint){src_img->size.x * dst_pix.x / dst_img.size.x, \
 								src_img->size.y * dst_pix.y / dst_img.size.y};
-			dst_img.data[dst_pix.y * dst_img.size.x + dst_pix.x++] =
+			dst_img.data[dst_pix.y * dst_img.size.x + dst_pix.x++] = \
 					src_img->data[src_pix.y * src_img->size.x + src_pix.x];
 		}
 		dst_pix.y++;
@@ -56,8 +56,8 @@ t_img	*img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres)
 void	img_from_file_scaled(t_game *g, char *path, t_img *dst_img, float scale)
 {
 	load_image_file(g, path, dst_img, "Error loading HUD image file");
-	if (img_resize(g->mlx, dst_img, (t_upoint){dst_img->size.x * scale,
-											   dst_img->size.y * scale}) == NULL)
+	if (img_resize(g->mlx, dst_img, (t_upoint){dst_img->size.x * scale, \
+											  dst_img->size.y * scale}) == NULL)
 		terminate(g, ERR_MEM, strerror(errno));
 }
 

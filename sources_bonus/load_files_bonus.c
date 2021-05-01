@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 16:16:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/28 16:16:36 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 15:45:34 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,11 @@ void	load_image_file(t_game *g, char *path, t_img *dst_img, char *err)
 	if (str_len < 5)
 		terminate(g, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
 	if (ft_memcmp(".xpm", path + str_len - 4, 5) == 0)
-		dst_img->ptr = mlx_xpm_file_to_image(g->mlx, path,
-											 (int *)&dst_img->size.x, (int *)&dst_img->size.y);
+		dst_img->ptr = mlx_xpm_file_to_image(g->mlx, path, \
+						(int *)&dst_img->size.x, (int *)&dst_img->size.y);
 	else if (ft_memcmp(".png", path + str_len - 4, 5) == 0)
-		dst_img->ptr = mlx_png_file_to_image(g->mlx, path,
-											 (int *)&dst_img->size.x, (int *)&dst_img->size.y);
+		dst_img->ptr = mlx_png_file_to_image(g->mlx, path, \
+						(int *)&dst_img->size.x, (int *)&dst_img->size.y);
 	else
 		terminate(g, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
 	if (dst_img->ptr == NULL)
@@ -45,7 +45,7 @@ void	load_audio_file(t_snd *dst, char *path)
 	dst->props = cs_make_def(&dst->file);
 }
 
-void	load_spriteset(t_img dst[], int count, char *path, t_game *game)
+void	load_spriteset(t_img *dst, int count, char *path, t_game *game)
 {
 	int		i;
 	char	*path2;
@@ -53,8 +53,8 @@ void	load_spriteset(t_img dst[], int count, char *path, t_game *game)
 	i = 0;
 	while (i < count)
 	{
-		if ((path2 = ft_strjoin(path,
-								(char []){'0' + i, '.', 'p', 'n', 'g', '\0'})) == NULL)
+		path2 = ft_strjoin(path, (char []){'0' + i, '.', 'p', 'n', 'g', '\0'});
+		if (path2 == NULL)
 			terminate(game, ERR_PARSE, strerror(errno));
 		load_image_file(game, path2, &dst[i], "Can't load enemy sprite file");
 		free(path2);
@@ -66,22 +66,33 @@ void	load_spriteset(t_img dst[], int count, char *path, t_game *game)
 void	load_audioset(t_set *dst, char *path, t_game *game)
 {
 	char	*path2;
-	char	*path3;
 
-	if ((path2 = ft_strjoin(path, "alarm.wav")) == NULL)
+	path2 = ft_strjoin(path, "alarm.wav");
+	if (path2 == NULL)
 		terminate(game, ERR_PARSE, strerror(errno));
 	load_audio_file(&dst->s_alarm, path2);
 	free(path2);
-	if ((path2 = ft_strjoin(path, "attack.wav")) == NULL)
+	path2 = ft_strjoin(path, "attack.wav");
+	if (path2 == NULL)
 		terminate(game, ERR_PARSE, strerror(errno));
 	load_audio_file(&dst->s_attack, path2);
 	free(path2);
-	if ((path2 = ft_strjoin(path, "death_")) == NULL)
+	path2 = ft_strjoin(path, "death_");
+	if (path2 == NULL)
 		terminate(game, ERR_PARSE, strerror(errno));
+	load_audioset_multiple(dst, path2, game);
+	free(path2);
+}
+
+void	load_audioset_multiple(t_set *dst, char *path, t_game *game)
+{
+	char	*path3;
+
 	while (dst->s_death_count < sizeof(dst->s_death) / sizeof(*dst->s_death))
 	{
-		if ((path3 = ft_strjoin(path2,
-								(char []){'0' + dst->s_death_count, '.', 'w', 'a', 'v', 0})) == NULL)
+		path3 = ft_strjoin(path, \
+					(char []){'0' + dst->s_death_count, '.', 'w', 'a', 'v', 0});
+		if (path3 == NULL)
 			terminate(game, ERR_PARSE, strerror(errno));
 		if (ft_file_exists(path3) == false)
 		{
@@ -91,5 +102,4 @@ void	load_audioset(t_set *dst, char *path, t_game *game)
 		load_audio_file(&dst->s_death[dst->s_death_count++], path3);
 		free(path3);
 	}
-	free(path2);
 }

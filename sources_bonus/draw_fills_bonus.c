@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/28 20:59:13 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/30 23:29:02 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	img_clear(t_img *img)
 	ft_bzero(img->data, 4 * img->size.x * img->size.y);
 }
 
-void	img_clear_rgb(t_img *img, unsigned color)
+void	img_clear_rgb(t_img *img, uint32_t color)
 {
 	const int	img_size = img->size.x * img->size.y;
 	int			i;
@@ -27,7 +27,7 @@ void	img_clear_rgb(t_img *img, unsigned color)
 		img->data[i++] = color;
 }
 
-void	img_ceilfloor_rgb(t_img *img, unsigned ceil, unsigned floor)
+void	img_ceilfloor_rgb(t_img *img, uint32_t ceil, uint32_t floor)
 {
 	const int	full_screen = img->size.x * img->size.y;
 	const int	half_screen = full_screen / 2;
@@ -39,47 +39,3 @@ void	img_ceilfloor_rgb(t_img *img, unsigned ceil, unsigned floor)
 	while (i < full_screen)
 		img->data[i++] = floor;
 }
-
-void	img_ceilfloor_rgb_faded(t_img *img, unsigned ceil, unsigned floor, unsigned fade_distance)
-{
-	t_upoint	cur;
-	int			line_color;
-
-	cur.y = 0;
-	while (cur.y < img->size.y)
-	{
-		if (cur.y < img->size.y / 2)
-			line_color = pixel_fade(ceil, 1 - powf(
-			cur.y / (img->size.y / 2.f) / powf(fade_distance, 0.25f), 2.f));
-		else
-			line_color = pixel_fade(floor, 1 - powf(
-			(2 - 2.f * cur.y / img->size.y) / powf(fade_distance, 0.25f), 2.f));
-		cur.x = 0;
-		while (cur.x < img->size.x)
-			img->data[cur.y * img->size.x + cur.x++] = line_color;
-		cur.y++;
-	}
-}
-
-/*
-**void	img_clear_rgb_128(t_img *img, int color)
-**{
-**	const long			int64 = color | ((long)color << 32);
-**	const __int128_t	int128 = int64 | ((__int128_t)int64 << 64);
-**	int					img_size;
-**	int					tail;
-**	int					i;
-**
-**	img_size = img->size.x * img->size.y;
-**	tail = img_size % 4;
-**	img_size -= tail;
-**	i = 0;
-**	while (i < img_size)
-**	{
-**		*(__int128_t *)(img->data + i) = int128;
-**		i += 4;
-**	}
-**	while (tail)
-**		img->data[i + tail--] = color;
-**}
-*/

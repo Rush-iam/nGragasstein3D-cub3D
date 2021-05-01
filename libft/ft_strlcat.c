@@ -16,7 +16,8 @@ size_t	ft_strlcat(char *dst, const char *src, size_t dstsize)
 {
 	char	*cur;
 
-	if ((cur = ft_memchr(dst, '\0', dstsize)) == NULL)
+	cur = ft_memchr(dst, '\0', dstsize);
+	if (cur == NULL)
 		return (ft_strlen(src) + dstsize);
 	dstsize -= cur - dst;
 	while (--dstsize && *src)
