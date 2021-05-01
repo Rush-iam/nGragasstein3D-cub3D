@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/29 15:03:32 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/01 14:30:58 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,38 +39,16 @@ int	main(int args, char *av[])
 	mlx_loop(game.mlx);
 }
 
-void	draw_ceilfloor(t_game *g)
-{
-	const int	pixel_offset = (g->horizon - g->center.y) * (int)g->img.size.x;
-	int 		i;
-
-	if (pixel_offset < 0)
-	{
-		if (-pixel_offset < g->img_pixelcount)
-			ft_memcpy(g->img.data, g->img_bg.data - pixel_offset,
-						(g->img_pixelcount + pixel_offset) * 4);
-		i = ft_max(0, g->img_pixelcount + pixel_offset);
-		while (i < g->img_pixelcount)
-			g->img.data[i++] = g->color_floor;
-	}
-	else
-	{
-		i = ft_min(g->img_pixelcount, pixel_offset);
-		while (i >= 0)
-			g->img.data[i--] = g->color_ceil;
-		if (pixel_offset < g->img_pixelcount)
-			ft_memcpy(g->img.data + pixel_offset, g->img_bg.data,
-						(g->img_pixelcount - pixel_offset) * 4);
-	}
-}
-
 int	game_loop(t_game *game)
 {
 	if (game->p.health == 0)
 		return dead_exit(game);
 	game_ticks(game);
 	sounds(game);
-	draw_ceilfloor(game);
+	if (game->color_ceil != -1U)
+		draw_ceil_plain(game);
+	if (game->color_floor != -1U)
+		draw_floor_plain(game);
 	draw_walls(game);
 	draw_objects(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);

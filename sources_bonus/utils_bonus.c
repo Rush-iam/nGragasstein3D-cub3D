@@ -12,6 +12,13 @@
 
 #include "cub3d_bonus.h"
 
+char	*skip_spaces(char **str)
+{
+	while(**str == ' ')
+		(*str)++;
+	return (*str);
+}
+
 char	*atoi_limited(unsigned *dst_int, const char *src_string, unsigned limit)
 {
 	unsigned long	num;

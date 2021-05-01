@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/29 14:17:48 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/30 15:32:40 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	player_control(t_game *game)
 	game->p.pos.y = fmax(game->p.pos.y, 1);
 	game->p.pos.x = fmin(game->p.pos.x, game->map.size.x - 1);
 	game->p.pos.y = fmin(game->p.pos.y, game->map.size.y - 1);
-	player_control_borders(game);
+//	player_control_borders(game);
 }
 
 void	player_control_rotate(t_game *game)
@@ -38,6 +38,8 @@ void	player_control_rotate(t_game *game)
 		mlx_mouse_move(game->win, game->center.x, game->resolution.y / 2);
 		game->p.angle += game->key.mdir.x / MOUSE_SPEED_X;
 		game->horizon -= game->key.mdir.y / 1.5f;
+		game->horizon = ft_min(3 * game->img.size.y,
+						ft_max(-3 * game->img.size.y, game->horizon));
 	}
 	if (game->key.k[K_TURN_LEFT])
 		game->p.angle -= PL_SPEED / 3.0f;
@@ -83,8 +85,13 @@ void	player_control_jump_n_crouch(t_game *g)
 		else
 			g->z_level_vy = PL_GRAVITY;
 	}
+	else if (g->z_level < 0.0f || g->key.k[K_CROUCH] == true)
+	{
+		g->z_level -=
+				(g->z_level - g->z_level_target - FLOAT_FIX) / PL_CROUCH_SPEED;
+	}
 	else
-		g->z_level -= (g->z_level - g->z_level_target) / PL_CROUCH_SPEED;
+		g->z_level = 0.0f;
 }
 
 void	player_control_weapon(t_game *game)

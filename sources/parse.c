@@ -52,9 +52,9 @@ void	parse_scene(int file_id, char **line, t_game *game)
 		if (**line == 'R')
 			set_resolution(*line, &game->img.size, game);
 		else if (**line == 'C')
-			set_colors(*line, &game->color_ceil, game);
+			set_ceilfloor(*line, &game->color_ceil, game);
 		else if (**line == 'F')
-			set_colors(*line, &game->color_floor, game);
+			set_ceilfloor(*line, &game->color_floor, game);
 		else if (**line == 'N' || **line == 'S' ||
 				**line == 'W' || **line == 'E')
 			set_textures(*line, game);

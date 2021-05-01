@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/27 15:08:54 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/30 22:27:11 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,10 +113,8 @@ void	parse_scene(int file_id, char **line, t_game *game)
 	{
 		if (**line == 'R')
 			set_resolution(*line, &game->resolution, game);
-		else if (**line == 'C')
-			set_colors(*line, &game->color_ceil, game);
-		else if (**line == 'F')
-			set_colors(*line, &game->color_floor, game);
+		else if (**line == 'C' || **line == 'F')
+			set_ceilfloor(*line, game);
 		else if (**line == 'W' || **line == 'S')
 			set_textures(*line, game);
 		else if (**line == 'G')
@@ -126,7 +124,7 @@ void	parse_scene(int file_id, char **line, t_game *game)
 		else if (**line == 'M' || **line == 'A')
 			set_audio(*line, game);
 		else if (**line == 'D')
-			atoi_limited(&game->fade_distance, *line + 1, UINT_MAX);
+			atoi_limited((unsigned *)&game->fade_distance, *line + 1, INT_MAX);
 		else if (**line == 'I' && *game->string.text == '\0')
 			string_add(game, *line + 2, 5, COLOR_WHITE);
 		else if (**line != '#' && **line != '\0')
@@ -171,10 +169,10 @@ void	validate_settings(t_game *game)
 {
 	unsigned	i;
 
-	if (game->color_floor == -1U)
-		terminate(game, ERR_PARSE, "Floor color not found. Format: F R,G,B");
-	if (game->color_ceil == -1U)
-		terminate(game, ERR_PARSE, "Ceil color not found. Format: C R,G,B");
+	if (game->color_floor == -1U && game->texture_floor.ptr == NULL)
+		terminate(game, ERR_PARSE, "Missing Floor color/texture");
+	if (game->color_ceil == -1U && game->texture_ceil.ptr == NULL)
+		terminate(game, ERR_PARSE, "Missing Ceil color/texture");
 	if (game->resolution.x == 0 || game->resolution.y == 0)
 		terminate(game, ERR_PARSE,
 		"Resolution doesn't set. Format: 'R WIDTH HEIGHT'");

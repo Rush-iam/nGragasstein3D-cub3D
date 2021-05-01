@@ -27,7 +27,7 @@ void	set_resolution(const char *res_string, t_upoint *res, t_game *game)
 		terminate(game, ERR_PARSE, "Wrong Resolution setting");
 }
 
-void	set_colors(const char *color_string, unsigned *target, t_game *game)
+void	set_ceilfloor(const char *color_string, unsigned *target, t_game *game)
 {
 	unsigned	r;
 	unsigned	g;

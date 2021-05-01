@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/30 00:15:31 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/01 16:07:39 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,9 @@
 # define MIN_RES	2
 # define MAX_PLAYING_SOUNDS	24
 # define MAX_MESSAGE_LEN 64
-# define MAX_TEXTURES	19
+# define MAX_TEXTURES	17
+# define TEXTURE_CEIL_CELLSCALE 4
+# define TEXTURE_FLOOR_CELLSCALE 4
 # define END_LEVEL_MESSAGE "Well done! Thanks for playing :)"
 # define MUSIC_BG_ID	0
 # define MUSIC_END_ID	1
@@ -134,8 +136,8 @@ typedef struct	s_point
 
 typedef struct	s_upoint
 {
-	unsigned	x;
-	unsigned	y;
+	uint32_t	x;
+	uint32_t	y;
 }				t_upoint;
 
 typedef struct	s_fpoint
@@ -153,7 +155,7 @@ typedef struct	s_ray
 typedef struct	s_img
 {
 	void		*ptr;
-	unsigned	*data;
+	uint32_t	*data;
 	t_upoint	size;
 	float		aspect;
 	float		min_x;
@@ -266,7 +268,7 @@ typedef struct	s_set
 	t_snd		s_alarm;
 	t_snd		s_attack;
 	t_snd		s_death[10];
-	unsigned	s_death_count;
+	uint32_t	s_death_count;
 }				t_set;
 
 typedef struct	s_door
@@ -352,12 +354,14 @@ typedef struct	s_game
 	t_img		img;
 	int			img_pixelcount;
 	t_img		img_bg;
-	unsigned	color_ceil;
-	unsigned	color_floor;
-	unsigned	fade_distance;
-	unsigned	tick;
-	unsigned	tick_diff;
-	t_img		texture[MAX_TEXTURES * 2];
+	uint32_t	color_ceil;
+	uint32_t	color_floor;
+	t_img		texture_ceil;
+	t_img		texture_floor;
+	int			fade_distance;
+	uint32_t	tick;
+	uint32_t	tick_diff;
+	t_img		texture[2 *MAX_TEXTURES];
 	t_img		sprite[sizeof(CHAR_OBJECTS) - 1];
 	t_set		enemyset[1];
 	t_list		*doors;
@@ -367,7 +371,7 @@ typedef struct	s_game
 		t_img		img;
 		t_upoint	size;
 		char		**grid;
-		unsigned	**grid_bfs;
+		uint32_t	**grid_bfs;
 		bool		enabled;
 	}			map;
 	t_point		center;
@@ -377,6 +381,9 @@ typedef struct	s_game
 	float		z_level_target;
 	float		fov;
 	float		*angles;
+	t_fpoint	ray_vector;
+	float		height_step_up;
+	float		height_step_down;
 	float		col_step;
 	float		col_scale;
 	struct		s_column
@@ -386,7 +393,7 @@ typedef struct	s_game
 		t_point		cell;
 		char		dir;
 		int			height;
-		unsigned	texture_id;
+		uint32_t	texture_id;
 		float		texture_pos;
 	}			*column;
 	struct		s_key
@@ -407,29 +414,29 @@ typedef struct	s_game
 		t_img		face[HUD_FACE_LEVELS][HUD_FACE_DIRS];
 		t_img		face_dead;
 		t_point		face_pos;
-		unsigned	face_nexttick;
+		uint32_t	face_nexttick;
 		float		digit_width;
 	}			hud;
 	struct		s_effect
 	{
-		unsigned	frame_cur;
-		unsigned	frames;
+		uint32_t	frame_cur;
+		uint32_t	frames;
 		enum		e_effect
 		{
 			EF_FLASH = 0,
 			EF_FIZZLEFADE
 		}			type;
-		unsigned	color;
+		uint32_t	color;
 		float		max_power;
 	}			effect;
 	struct		s_string
 	{
 		char		text[MAX_MESSAGE_LEN + 1];
 		t_upoint	pos;
-		unsigned	frame_cur;
-		unsigned	frames;
+		uint32_t	frame_cur;
+		uint32_t	frames;
 		bool		fade;
-		unsigned	color;
+		uint32_t	color;
 	}			string;
 	t_img		img_effect;
 	struct		s_sound
@@ -481,7 +488,6 @@ typedef struct	s_game
 int				game_loop(t_game *game);
 void			game_ticks(t_game *game);
 int				dead_exit(t_game *game);
-void			draw_ceilfloor(t_game *g);
 bool			chr_is_wall(char c);
 
 // parse
@@ -493,8 +499,8 @@ void			validate_settings(t_game *game);
 // parse_set
 void			set_resolution		(const char *res_string, t_upoint *res,
 									   t_game *game);
-void			set_colors			(const char *color_string, unsigned *target,
-									   t_game *game);
+void			set_ceilfloor		(char *string, t_game *game);
+void			set_ceilfloor_color(char *string, uint32_t *target, t_game *game);
 void			set_weapons			(char *string, t_game *game);
 void			set_textures		(char *string, t_game *game);
 
@@ -586,6 +592,18 @@ float			ray_intersect_distance(t_game *game, float angle);
 t_ray			ray_intersect_x	(t_game *g, int step_x, float step_y);
 t_ray			ray_intersect_y(t_game *g, float step_x, int step_y);
 
+// draw_ceilfloor
+void	draw_ceil_textured(t_game *g, t_point px);
+int		draw_ceil_texture_faded(t_game *g, t_point px, float *height);
+void	draw_floor_textured(t_game *g, t_point px);
+int		draw_floor_texture_faded(t_game *g, t_point px, float *height);
+
+// draw_ceilfloor_plain
+void	ceilfloor_plain_generate(t_img *img, unsigned ceil, unsigned floor, unsigned fade_distance);
+void	draw_ceil_plain(t_game *g);
+void	draw_floor_plain(t_game *g);
+void	draw_ceilfloor_plain(t_game *g);
+
 // draw_walls
 void			draw_wall_texture_set(t_game *g, struct s_column *col, t_point pt);
 void			draw_door_texture_set(t_game *game, struct s_column *col, char chr);
@@ -637,7 +655,6 @@ int				pixel_fade_contrast(int color, float fade);
 void			img_clear				(t_img *img);
 void			img_clear_rgb			(t_img *img, unsigned color);
 void			img_ceilfloor_rgb	(t_img *img, unsigned ceil, unsigned floor);
-void			img_ceilfloor_rgb_faded(t_img *img, unsigned ceil, unsigned floor, unsigned fade_distance);
 
 // draw_figures
 void			draw_line	(t_img *img, t_point p1, t_point p2, int color);
@@ -651,6 +668,7 @@ void			effect_flash(t_game *game, unsigned color, float power);
 void			effect_fizzlefade(t_game *game, unsigned color);
 
 // utils
+char			*skip_spaces(char **str);
 char			*atoi_limited(unsigned *dst_int, const char *src_string,
 							  unsigned limit);
 void			string_add(t_game *g, char *string, int timer, unsigned color);

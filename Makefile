@@ -6,7 +6,7 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/04/30 00:17:52 by ngragas          ###   ########.fr        #
+#    Updated: 2021/05/01 00:25:37 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,6 +24,8 @@ SRC    :=		main			\
 
 SRC_BONUS :=	demo_tools		\
 				doors			\
+				draw_ceilfloor	\
+				draw_ceilfloor_plain	\
 				draw_effects	\
 				draw_figures	\
 				draw_fills		\

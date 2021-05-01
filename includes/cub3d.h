@@ -130,8 +130,8 @@ void			validate_settings(t_game *game);
 
 void			set_resolution		(const char *res_string, t_upoint *res,
 															t_game *game);
-void			set_colors			(const char *color_string, unsigned *target,
-															t_game *game);
+void			set_ceilfloor			(const char *color_string, unsigned *target,
+										  t_game *game);
 void			set_textures		(char *string, t_game *game);
 void			set_textures_import(char *path, t_img *dst_img, t_game *game);
 

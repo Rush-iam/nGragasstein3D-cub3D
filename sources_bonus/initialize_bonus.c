@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/05 22:37:16 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/29 15:29:07 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/04/30 22:23:17 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,8 +125,9 @@ void	initialize_canvas_images(t_game *g)
 	g->horizon = g->center.y;
 	if (img_create(g->mlx, &g->img_bg, g->img.size) == NULL)
 		terminate(g, ERR_MEM, strerror(errno));
-	img_ceilfloor_rgb_faded(&g->img_bg, g->color_ceil, g->color_floor,
-														g->fade_distance);
+	if (g->color_ceil != -1U || g->color_floor != -1U)
+		ceilfloor_plain_generate(&g->img_bg, g->color_ceil, g->color_floor,
+								 g->fade_distance);
 	if (img_create(g->mlx, &g->img_effect, g->img.size) == NULL)
 		terminate(g, ERR_MEM, strerror(errno));
 }

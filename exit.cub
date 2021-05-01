@@ -4,23 +4,23 @@ F 112,112,112
 D 3
 I Be quiet or RUN!
 
-W0 ./resources/walls/wall_stone_neon.png
-W1 ./resources/walls/wall_42_neon.png
-W2 ./resources/walls/wall_2.png
-W3 ./resources/walls/wall_wood_dark.png
-W4 ./resources/walls/wall_stone_alpaca.png
-W5 ./resources/walls/wall_stone_kapibara.png
-W6 ./resources/walls/wall_stone_medoed.png
-W7 ./resources/walls/wall_metal_1.png
-W8 ./resources/walls/wall_metal_2.png
-W9 ./resources/walls/wall_stone_salamandra.png
-W10 ./resources/walls/wall_metal_3.png
-W11 ./resources/walls/wall_elevator.png
+W0 ./resources/textures/wall_stone_neon.png
+W1 ./resources/textures/wall_42_neon.png
+W2 ./resources/textures/wall_2.png
+W3 ./resources/textures/wall_wood_dark.png
+W4 ./resources/textures/wall_stone_alpaca.png
+W5 ./resources/textures/wall_stone_kapibara.png
+W6 ./resources/textures/wall_stone_medoed.png
+W7 ./resources/textures/wall_metal_1.png
+W8 ./resources/textures/wall_metal_2.png
+W9 ./resources/textures/wall_stone_salamandra.png
+W10 ./resources/textures/wall_metal_3.png
+W11 ./resources/textures/wall_elevator.png
 
-W12 ./resources/walls/door_neon_0.png
-W13 ./resources/walls/door_neon_1.png
-W14 ./resources/walls/door_neon_2.png
-W15 ./resources/walls/door_neon_1.png
+W12 ./resources/textures/door_neon_0.png
+W13 ./resources/textures/door_neon_1.png
+W14 ./resources/textures/door_neon_2.png
+W15 ./resources/textures/door_neon_1.png
 
 G0 ./resources/weapons/knife_neon_
 G1 ./resources/weapons/pistol_neon_
