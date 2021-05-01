@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/30 15:32:40 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/01 18:47:07 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,12 @@ void	player_control(t_game *game)
 	player_control_move(game);
 	player_control_jump_n_crouch(game);
 	player_control_weapon(game);
-	player_control_extra(game);
+	player_control_fov(game);
 	game->p.pos.x = fmax(game->p.pos.x, 1);
 	game->p.pos.y = fmax(game->p.pos.y, 1);
 	game->p.pos.x = fmin(game->p.pos.x, game->map.size.x - 1);
 	game->p.pos.y = fmin(game->p.pos.y, game->map.size.y - 1);
-//	player_control_borders(game);
+	player_control_borders(game);
 }
 
 void	player_control_rotate(t_game *game)
@@ -36,15 +36,15 @@ void	player_control_rotate(t_game *game)
 		game->key.mdir.y = game->key.mdir.y / 2 + game->key.mpos.y -
 						   game->resolution.y / 2;
 		mlx_mouse_move(game->win, game->center.x, game->resolution.y / 2);
-		game->p.angle += game->key.mdir.x / MOUSE_SPEED_X;
-		game->horizon -= game->key.mdir.y / 1.5f;
+		game->p.angle += game->key.mdir.x * game->col_step * MOUSE_SPEED;
+		game->horizon -= game->key.mdir.y * MOUSE_SPEED;
 		game->horizon = ft_min(3 * game->img.size.y,
 						ft_max(-3 * game->img.size.y, game->horizon));
 	}
 	if (game->key.k[K_TURN_LEFT])
-		game->p.angle -= PL_SPEED / 3.0f;
+		game->p.angle -= PL_SPEED / 2.0f;
 	if (game->key.k[K_TURN_RIGHT])
-		game->p.angle += PL_SPEED / 3.0f;
+		game->p.angle += PL_SPEED / 2.0f;
 	if (game->p.angle >= M_PI_F)
 		game->p.angle -= PI2_F;
 	else if (game->p.angle < -M_PI_F)
@@ -52,26 +52,30 @@ void	player_control_rotate(t_game *game)
 	__sincosf(game->p.angle, &game->p.vect.y, &game->p.vect.x);
 }
 
-void	player_control_move(t_game *game)
+void	player_control_move(t_game *g)
 {
-	const float	pl_speed = PL_SPEED - (game->z_level < -0.1f) * PL_SPEED / 2.0f;
+	const int	active = (g->key.k[K_MOVE_FORWARD] || g->key.k[K2_MOVE_FORWARD]
+		|| g->key.k[K_MOVE_BACK] || g->key.k[K2_MOVE_BACK] ||
+	g->key.k[K_MOVE_LEFT] || g->key.k[K_MOVE_RIGHT]) * (1 + g->key.k[K_RUN]);
+	const float	target = fmaxf(0.0f, active - g->key.k[K_CROUCH] / 2.0f);
+	const float	pl_speed = g->p.velocity * PL_SPEED;
 
-	if (game->key.k[K_MOVE_FORWARD])
-		game->p.pos = (t_fpoint){
-		game->p.pos.x + (game->key.k[K_RUN] + 1) * pl_speed * game->p.vect.x,
-		game->p.pos.y + (game->key.k[K_RUN] + 1) * pl_speed * game->p.vect.y};
-	if (game->key.k[K_MOVE_BACK])
-		game->p.pos = (t_fpoint){
-	game->p.pos.x - (game->key.k[K_RUN] + 1) * pl_speed / 1.5f * game->p.vect.x,
-	game->p.pos.y - (game->key.k[K_RUN] + 1) * pl_speed / 1.5f * game->p.vect.y};
-	if (game->key.k[K_MOVE_LEFT])
-		game->p.pos = (t_fpoint){
-		game->p.pos.x + (game->key.k[K_RUN] + 1) * pl_speed * game->p.vect.y,
-		game->p.pos.y - (game->key.k[K_RUN] + 1) * pl_speed * game->p.vect.x};
-	if (game->key.k[K_MOVE_RIGHT])
-		game->p.pos = (t_fpoint){
-		game->p.pos.x - (game->key.k[K_RUN] + 1) * pl_speed * game->p.vect.y,
-		game->p.pos.y + (game->key.k[K_RUN] + 1) * pl_speed * game->p.vect.x};
+	if (fabsf(target - g->p.velocity) > 0.01f)
+		g->p.velocity += (target - g->p.velocity) / 5.0f;
+	else
+		g->p.velocity = target;
+	if (g->key.k[K_MOVE_FORWARD] || g->key.k[K2_MOVE_FORWARD])
+		g->p.pos = (t_fpoint){g->p.pos.x + pl_speed * g->p.vect.x,
+			g->p.pos.y + pl_speed * g->p.vect.y};
+	else if (g->key.k[K_MOVE_BACK] || g->key.k[K2_MOVE_BACK])
+		g->p.pos = (t_fpoint){g->p.pos.x - pl_speed / 1.5f * g->p.vect.x,
+			g->p.pos.y - pl_speed / 1.5f * g->p.vect.y};
+	if (g->key.k[K_MOVE_LEFT])
+		g->p.pos = (t_fpoint){g->p.pos.x + pl_speed * g->p.vect.y,
+			g->p.pos.y - pl_speed * g->p.vect.x};
+	if (g->key.k[K_MOVE_RIGHT])
+		g->p.pos = (t_fpoint){g->p.pos.x - pl_speed * g->p.vect.y,
+			g->p.pos.y + pl_speed * g->p.vect.x};
 }
 
 void	player_control_jump_n_crouch(t_game *g)
@@ -105,37 +109,16 @@ void	player_control_weapon(t_game *game)
 		else if (game->key.k[K_RIFLE])
 			player_set_weapon(game, W_RIFLE);
 	}
-	if (game->key.m[M_SHOOT] && game->p.weapon.lock == false &&
+	if ((game->key.m[M_SHOOT] || game->key.k[K_SHOOT]) &&
+		game->p.weapon.lock == false &&
 		(game->p.ammo || game->p.weapon_cur == W_KNIFE))
 	{
 		game->p.weapon.lock = true;
 		game->p.weapon.tick = ANIM_TICKS - 1;
 	}
-	if (game->key.m[M_SHOOT] == false && game->p.weapon.lock == true
-		&& game->p.weapon.frame == 0)
+	if ((game->key.m[M_SHOOT] == false && game->key.k[K_SHOOT] == false) &&
+		game->p.weapon.lock == true && game->p.weapon.frame == 0)
 		game->p.weapon.lock = false;
-}
-
-void	player_set_fov(t_game *game, float fov, bool reset)
-{
-	int n;
-
-	if (reset)
-		fov = ((game->img.aspect >= 1.77f) - (game->img.aspect < 1.77f)) *
-		  sqrtf(fabsf(M_PI_4_F * (game->img.aspect - 1.77f) / 2.0f)) + M_PI_2_F;
-	game->col_step = tanf(fov / (game->img.size.x - 1));
-	game->col_scale = 1 / game->col_step;
-	n = 0;
-	while (n < (int)game->img.size.x)
-	{
-		game->angles[n] =
-				atanf(game->col_step * (n - game->center.x));
-		n++;
-	}
-	if (reset == false)
-		printf("FOV = %.1f\n", 114 * atanf(game->col_step * game->center.x));
-	if (reset == true || (M_PI_4_F / 4.0f < fov && fov < PI2_F))
-		game->fov = fov;
 }
 
 void	player_control_toggler(t_game *g, int key_code)
@@ -160,14 +143,43 @@ void	player_control_toggler(t_game *g, int key_code)
 		(t_point){g->p.pos.x + g->p.vect.x, g->p.pos.y + g->p.vect.y}, true);
 }
 
-void	player_control_extra(t_game *game)
+void	player_control_fov(t_game *g)
 {
-	if (game->key.k[K_FOV_WIDE])
-		player_set_fov(game, game->fov * FOV_ZOOMSPEED, false);
-	if (game->key.k[K_FOV_TELE])
-		player_set_fov(game, game->fov / FOV_ZOOMSPEED, false);
-	if (game->key.k[K_FOV_RESET])
-		player_set_fov(game, 0, true);
+	if (g->key.k[K_FOV_TELE])
+		g->fov_reset = g->fov / 1.1f;
+	else if (g->key.k[K_FOV_WIDE])
+		g->fov_reset = g->fov * 1.1f;
+	else if (g->key.k[K_FOV_RESET])
+		g->fov_reset = ((g->img.aspect >= 1.77f) - (g->img.aspect < 1.77f)) * \
+			sqrtf(fabsf(M_PI_4_F * (g->img.aspect - 1.77f) / 2.0f)) + M_PI_2_F;
+	if (g->key.m[M_ZOOM_IN] && g->p.weapon_cur != W_KNIFE)
+		g->fov_target = FOV_ZOOM_IN;
+	else if (g->key.m[M_ZOOM_OUT] && g->p.weapon_cur != W_KNIFE)
+		g->fov_target = FOV_ZOOM_OUT;
+	else
+		g->fov_target = g->fov_reset;
+	if (fabsf(g->fov_target - g->fov) > FLOAT_FIX)
+		player_set_fov(g,
+			g->fov + (g->fov_target - g->fov) / FOV_ZOOM_SPEED, false);
+}
+
+//	printf("FOV = %.1f\n", 114 * atanf(game->col_step * game->center.x));
+void	player_set_fov(t_game *game, float fov, bool reset)
+{
+	int n;
+
+	if (reset)
+		fov = game->fov_reset;
+	game->col_step = tanf(fov / (game->img.size.x - 1));
+	game->col_scale = 1 / game->col_step;
+	n = 0;
+	while (n < (int)game->img.size.x)
+	{
+		game->angles[n] = atanf(game->col_step * (n - game->center.x));
+		n++;
+	}
+	if (reset == true || (M_PI_4_F / 4.0f < fov && fov < PI2_F))
+		game->fov = fov;
 }
 
 void	player_control_borders_enemies(t_game *game)

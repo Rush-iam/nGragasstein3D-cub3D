@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/12 16:12:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/27 22:09:39 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/01 18:18:19 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,11 +67,16 @@ void	player_set_weapon(t_game *game, enum e_weapon weapon)
 	game->hud.needs_redraw = true;
 }
 
-void	draw_weapon(t_game *game, struct s_weapon *weapon)
+void	draw_weapon(t_game *g, struct s_weapon *weapon)
 {
-	mlx_put_image_to_window(game->mlx, game->win, game->p.weapon_img
-					[game->p.weapon_cur][weapon->animation[weapon->frame]].ptr,
-			game->p.weapon_pos.x, game->p.weapon_pos.y);
+	const int	offset = g->p.velocity * (ANIM_WEAPON_MAX_OFFSET *\
+						sinf((float)((int)g->tick % (TICKS_PER_SEC * 2 / 3) -\
+						TICKS_PER_SEC / 3) / (TICKS_PER_SEC / 3) * M_PI_F));
+
+	mlx_put_image_to_window(g->mlx, g->win,
+		g->p.weapon_img[g->p.weapon_cur][weapon->animation[weapon->frame]].ptr,
+		g->p.weapon_pos.x - g->key.mdir.x / 4 + offset,
+		g->p.weapon_pos.y + ft_max(0, -g->key.mdir.y / 3) + abs(offset));
 }
 
 void	weapon_sound(t_game *game, enum e_weapon weapon)

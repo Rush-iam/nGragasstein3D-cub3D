@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/01 16:07:39 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/01 18:47:07 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,9 @@
 # define ERR_BMP	5
 
 # define K_MOVE_FORWARD	KEY_W
+# define K2_MOVE_FORWARD KEY_UP
 # define K_MOVE_BACK	KEY_S
+# define K2_MOVE_BACK	KEY_DOWN
 # define K_MOVE_LEFT	KEY_A
 # define K_MOVE_RIGHT	KEY_D
 # define K_TURN_LEFT	KEY_LEFT
@@ -89,6 +91,9 @@
 # define K_PISTOL	KEY_2
 # define K_RIFLE	KEY_3
 # define M_SHOOT	MOUSE_LEFT
+# define K_SHOOT	KEY_CONTROL_RIGHT
+# define M_ZOOM_IN	MOUSE_RIGHT
+# define M_ZOOM_OUT	MOUSE_MIDDLE
 
 # define K_MAP_TOGGLE	KEY_M
 # define K_MOUSE_TOGGLE	KEY_BACKSPACE
@@ -111,12 +116,15 @@
 # define ANIM_KNIFE		(char []){0, 1, 2, 3, 2, 1}
 # define ANIM_PISTOL	(char []){0, 1, 2, 3, 1}
 # define ANIM_RIFLE		(char []){0, 1, 2, 1, 3}
+# define ANIM_WEAPON_MAX_OFFSET	20
 
 # define MAP_COLOR_DECOR	COLOR_GREY
 # define MAP_COLOR_ENEMY	COLOR_ORANGE
 # define MAP_COLOR_PICKUP	COLOR_GREEN
 
-# define FOV_ZOOMSPEED	1.03f
+# define FOV_ZOOM_SPEED	5.0f
+# define FOV_ZOOM_IN	M_PI_4_F
+# define FOV_ZOOM_OUT	M_PI_4_F + M_PI_F
 
 # define PL_SPEED		0.07f
 # define PL_RADIUS		0.4f
@@ -125,7 +133,7 @@
 # define PL_CROUCH_Z	-0.2f
 # define PL_CROUCH_SPEED 5.0f
 # define FLOAT_FIX		0.00001f
-# define MOUSE_SPEED_X	2000.f
+# define MOUSE_SPEED	0.66f
 # define MAP_SCALE		(24 / 2)
 
 typedef struct	s_point
@@ -380,6 +388,8 @@ typedef struct	s_game
 	float		z_level_vy;
 	float		z_level_target;
 	float		fov;
+	float		fov_reset;
+	float		fov_target;
 	float		*angles;
 	t_fpoint	ray_vector;
 	float		height_step_up;
@@ -399,7 +409,7 @@ typedef struct	s_game
 	struct		s_key
 	{
 		bool		k[280];
-		bool		m[10];
+		bool		m[8];
 		t_point		mpos;
 		t_point		mdir;
 		bool		mouse;
@@ -457,6 +467,7 @@ typedef struct	s_game
 		t_fpoint	pos;
 		float		angle;
 		t_fpoint	vect;
+		float		velocity;
 		short		health;
 		short		ammo;
 		int			score;
@@ -530,12 +541,12 @@ int				hook_exit			(t_game *game);
 // control
 void			player_control			(t_game *game);
 void			player_control_rotate	(t_game *game);
-void			player_control_move		(t_game *game);
+void			player_control_move		(t_game *g);
 void			player_control_jump_n_crouch(t_game *g);
 void			player_control_weapon(t_game *game);
 void			player_set_fov			(t_game *game, float fov, bool reset);
 void			player_control_toggler	(t_game *g, int key_code);
-void			player_control_extra	(t_game *game);
+void			player_control_fov	(t_game *g);
 void			player_control_borders	(t_game *g);
 void			player_control_borders_diag(t_game *g);
 void			player_set_weapon(t_game *game, enum e_weapon weapon);
@@ -555,7 +566,7 @@ void			door_sound(t_game *game, t_door *door, t_snd *sound);
 
 // weapons
 void			weapon(t_game *game, struct s_weapon *weapon);
-void			draw_weapon(t_game *game, struct s_weapon *weapon);
+void			draw_weapon(t_game *g, struct s_weapon *weapon);
 void			weapon_shoot(t_game *g, t_object *target);
 
 // objects

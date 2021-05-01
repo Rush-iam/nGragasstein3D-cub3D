@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 15:57:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/28 15:57:36 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/01 18:15:06 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,20 +17,25 @@ void	draw_hud(t_game *g)
 	char		num_str[11];
 	const float	y_offset = g->hud.bar.size.y * HUD_VALUES_OFFSET_Y;
 
-	hud_digits_bake(&g->hud, hud_num_to_str(num_str, g->p.score, 6),
-					(t_upoint){g->hud.bar.size.x * HUD_SCORE_X, y_offset});
-	hud_digits_bake(&g->hud, hud_num_to_str(num_str, 1, 1),
-					(t_upoint){g->hud.bar.size.x * HUD_FLOOR_X, y_offset});
-	hud_digits_bake(&g->hud, hud_num_to_str(num_str, 1, 1),
-					(t_upoint){g->hud.bar.size.x * HUD_LIVES_X, y_offset});
-	hud_digits_bake(&g->hud, hud_num_to_str(num_str, g->p.health, 3),
-					(t_upoint){g->hud.bar.size.x * HUD_HEALTH_X, y_offset});
-	hud_digits_bake(&g->hud, hud_num_to_str(num_str, g->p.ammo, 2),
-					(t_upoint){g->hud.bar.size.x * HUD_AMMO_X, y_offset});
-	mlx_put_image_to_window(g->mlx, g->win, g->hud.bar.ptr, 0, g->img.size.y);
-	mlx_put_image_to_window(g->mlx, g->win, g->hud.weapon[g->p.weapon_cur].ptr,
-							g->hud.bar.size.x * HUD_WEAPON_X,
-							g->img.size.y + g->hud.bar.size.y * HUD_WEAPON_Y);
+	if (g->hud.needs_redraw == true)
+	{
+		hud_digits_bake(&g->hud, hud_num_to_str(num_str, g->p.score, 6),
+						(t_upoint){g->hud.bar.size.x * HUD_SCORE_X, y_offset});
+		hud_digits_bake(&g->hud, hud_num_to_str(num_str, 1, 1),
+						(t_upoint){g->hud.bar.size.x * HUD_FLOOR_X, y_offset});
+		hud_digits_bake(&g->hud, hud_num_to_str(num_str, 1, 1),
+						(t_upoint){g->hud.bar.size.x * HUD_LIVES_X, y_offset});
+		hud_digits_bake(&g->hud, hud_num_to_str(num_str, g->p.health, 3),
+						(t_upoint){g->hud.bar.size.x * HUD_HEALTH_X, y_offset});
+		hud_digits_bake(&g->hud, hud_num_to_str(num_str, g->p.ammo, 2),
+						(t_upoint){g->hud.bar.size.x * HUD_AMMO_X, y_offset});
+	}
+	mlx_put_image_to_window(g->mlx, g->win,
+		g->hud.bar.ptr, 0, g->img.size.y);
+	mlx_put_image_to_window(g->mlx, g->win,
+		g->hud.weapon[g->p.weapon_cur].ptr,
+		g->hud.bar.size.x * HUD_WEAPON_X,
+		g->img.size.y + g->hud.bar.size.y * HUD_WEAPON_Y);
 	draw_hud_face(g, true);
 	g->hud.needs_redraw = false;
 }

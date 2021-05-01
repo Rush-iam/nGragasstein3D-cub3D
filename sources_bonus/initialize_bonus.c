@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/05 22:37:16 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/30 22:23:17 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/01 16:51:40 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ void	initialize_game(t_game *game, bool screenshot_only)
 	if (!(game->angles = malloc(game->img.size.x * sizeof(*game->angles))))
 		terminate(game, ERR_MEM, "Memory allocation failed (ray angles)");
 	__sincosf(game->p.angle, &game->p.vect.y, &game->p.vect.x);
+	game->fov_reset = ((game->img.aspect >= 1.77f) - (game->img.aspect < 1.77f))
+		* sqrtf(fabsf(M_PI_4_F * (game->img.aspect - 1.77f) / 2.0f)) + M_PI_2_F;
 	player_set_fov(game, 0, true);
 	game->z_level = 0.0f;
 	game->key.mouse = true;

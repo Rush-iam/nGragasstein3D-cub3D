@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/01 14:30:58 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/01 18:12:26 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,7 @@ int	game_loop(t_game *game)
 		draw_string(game, &game->string);
 	if (game->map.enabled)
 		draw_map(game);
-	if (game->hud.needs_redraw)
-		draw_hud(game);
+	draw_hud(game);
 	draw_hud_face(game, false);
 	draw_fps(game);
 //	demo_fillrate(game, 1);
