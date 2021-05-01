@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:45 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/01 23:09:36 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/01 23:12:50 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ t_ray	ray_intersect_x(t_game *g, int stx, float sty)
 	y = g->p.pos.y + sty * ((stx > 0) - stx * (g->p.pos.x - (int)g->p.pos.x));
 	while ((unsigned)y < g->map.size.y && (unsigned)x < g->map.size.x)
 	{
-		chr = g->map.grid[(int)y][x];
+		chr = g->map.grid[(unsigned)y][x];
 		if (chr == '.' || chr == CHAR_SOLID_MAP)
 			;
 		else if (chr_is_wall(chr))
@@ -105,7 +105,7 @@ t_ray	ray_intersect_y(t_game *g, float stx, int sty)
 	x = g->p.pos.x + stx * ((sty > 0) - sty * (g->p.pos.y - (int)g->p.pos.y));
 	while ((unsigned)y < g->map.size.y && (unsigned)x < g->map.size.x)
 	{
-		chr = g->map.grid[y][(int)x];
+		chr = g->map.grid[y][(unsigned)x];
 		if (chr == '.' || chr == CHAR_SOLID_MAP)
 			;
 		else if (chr_is_wall(chr))
