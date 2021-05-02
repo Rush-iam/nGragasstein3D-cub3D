@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/26 14:27:17 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/26 14:27:17 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 20:31:26 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	write_screenshot_and_exit(t_game *game)
 	img_ceilfloor_rgb(&game->img, game->color_ceil, game->color_floor);
 	draw_walls(game);
 	draw_objects(game);
-	if ((file_id = open("shot.bmp", O_WRONLY | O_CREAT | O_TRUNC)) == -1)
+	if ((file_id = open("shot.bmp", O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU)) == -1)
 		terminate(game, ERR_BMP, strerror(errno));
 	ft_memcpy(header, "BM", 2);
 	ft_memcpy(header + 2, &filesize, 4);

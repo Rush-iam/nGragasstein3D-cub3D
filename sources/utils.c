@@ -6,13 +6,14 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/06 16:20:11 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/05 16:57:11 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 20:29:37 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-char	*atoi_limited(unsigned *dst_int, const char *src_string, unsigned limit)
+char	*atoi_limited(unsigned int *dst_int, const char *src_string, \
+															unsigned int limit)
 {
 	unsigned long	num;
 
@@ -30,13 +31,13 @@ char	*atoi_limited(unsigned *dst_int, const char *src_string, unsigned limit)
 			while (ft_isdigit(*src_string))
 				src_string++;
 	}
-	*dst_int = (num > UINT_MAX) ? UINT_MAX : num;
+	*dst_int = ft_umin(UINT_MAX, num);
 	while (*src_string == ' ')
 		src_string++;
 	return ((char *)src_string);
 }
 
-int		terminate(t_game *game, int return_value, char *message)
+int	terminate(t_game *game, int return_value, char *message)
 {
 	if (return_value)
 	{
@@ -62,16 +63,10 @@ int		terminate(t_game *game, int return_value, char *message)
 
 void	terminate_free(t_game *game)
 {
-	unsigned	i;
+	unsigned int	i;
 
 	ft_lstclear(&game->objects, free);
-	if (game->column)
-	{
-		i = 0;
-		while (i < game->img.size.x)
-			free(game->column[i++]);
-		free(game->column);
-	}
+	free(game->column);
 	if (game->map.grid)
 	{
 		i = 0;
@@ -90,15 +85,16 @@ void	terminate_free(t_game *game)
 
 void	write_screenshot_and_exit(t_game *game)
 {
-	int				file_id;
-	char			header[26];
-	const unsigned	filesize = 26 + 3 * game->img.size.x * game->img.size.y;
+	int					file_id;
+	char				header[26];
+	const unsigned int	filesize = 26 + 3 * game->img.size.x * game->img.size.y;
 
 	img_ceilfloor_fill_rgb(&game->img, game->color_ceil, game->color_floor);
 	ray_cast(game);
 	draw_walls(game);
 	draw_objects(game);
-	if ((file_id = open("shot.bmp", O_WRONLY | O_CREAT | O_TRUNC)) == -1)
+	file_id = open("shot.bmp", O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+	if (file_id == -1)
 		terminate(game, ERR_BMP, strerror(errno));
 	ft_memcpy(header, "BM", 2);
 	ft_memcpy(header + 2, &filesize, 4);
@@ -115,12 +111,13 @@ void	write_screenshot_and_exit(t_game *game)
 
 void	write_screenshot_data(t_game *game, int file_id)
 {
-	char		*bmp_data;
-	t_upoint	px;
-	unsigned	i;
+	char			*bmp_data;
+	t_upoint		px;
+	unsigned int	i;
 
-	if ((bmp_data = malloc(3 * game->img.size.x * game->img.size.y +
-			game->img.size.y * ((4 - (game->img.size.x * 3) % 4) % 4))) == NULL)
+	bmp_data = malloc(3 * game->img.size.x * game->img.size.y + \
+					game->img.size.y * ((4 - (game->img.size.x * 3) % 4) % 4));
+	if (bmp_data == NULL)
 		terminate(game, ERR_BMP, strerror(errno));
 	i = 0;
 	px.y = game->img.size.y;
@@ -129,7 +126,7 @@ void	write_screenshot_data(t_game *game, int file_id)
 		px.x = 0;
 		while (px.x < game->img.size.x)
 		{
-			ft_memcpy(bmp_data + i,
+			ft_memcpy(bmp_data + i, \
 						&game->img.data[game->img.size.x * px.y + px.x++], 3);
 			i += 3;
 		}

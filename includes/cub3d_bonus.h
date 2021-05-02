@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/02 15:11:06 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 19:49:16 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 # include "get_next_line.h"
 # include "x_events.h"
 
-# define WIN_TITLE	"nGragasstein 3D"
+# define TITLE	"nGragasstein 3D"
 # define MAX_SCREENSHOT	(t_point){20000, 20000}
 # define MIN_RES	2
 # define MAX_PLAYING_SOUNDS	24
@@ -527,7 +527,7 @@ void			set_map_object_add(t_game *game, char chr, unsigned type,
 void			set_map_check_cell	(t_game *game, char **map, t_upoint pt);
 
 // initialize
-void			initialize_game(t_game *game, bool screenshot_only);
+void			initialize_game(t_game *g, bool screenshot_only);
 void			initialize_window(t_game *g, bool screenshot_only);
 void			initialize_canvas_images(t_game *g);
 void			initialize_hud_images(t_game *g);

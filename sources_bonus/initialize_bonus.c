@@ -58,7 +58,7 @@ void	initialize_window(t_game *g, bool screenshot_only)
 	if (screenshot_only == false)
 	{
 		g->win = mlx_new_window(
-				g->mlx, g->resolution.x, g->resolution.y, WIN_TITLE);
+				g->mlx, g->resolution.x, g->resolution.y, TITLE);
 		if (g->win == NULL)
 			terminate(g, ERR_MEM, strerror(errno));
 		mlx_mouse_move(g->win, g->resolution.x / 2, g->resolution.y / 2);

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:57:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/02 19:02:37 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 20:20:37 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,7 @@
 # include "get_next_line.h"
 # include "x_events.h"
 
-# define WIN_TITLE	"cub3D by nGragas"
-# define MAX_WIN_X	2560
-# define MAX_WIN_Y	1440
+# define TITLE	"cub3D by nGragas"
 # define MAX_SCREENSHOT_X 20000
 # define MAX_SCREENSHOT_Y 20000
 # define MIN_RES	2
@@ -113,14 +111,14 @@ typedef struct s_game
 		unsigned int	height;
 		double			texture_pos;
 		char			dir;
-	}				**column;
+	}				*column;
 	unsigned int	color_ceil;
 	unsigned int	color_floor;
 	t_img			texture[5];
 	t_list			*objects;
 }	t_game;
 
-void		initialize_game		(t_game *game, bool screenshot_only);
+void		initialize_game		(t_game *g, bool screenshot_only);
 void		initialize_game_2	(t_game *game);
 void		player_set_fov		(t_game *game, float fov, bool reset);
 int			game_loop			(t_game *game);
@@ -147,7 +145,7 @@ int			hook_key_release	(int key_code, t_game *game);
 int			hook_exit			(t_game *game);
 
 void		ray_cast		(t_game *game);
-void		ray_intersect	(t_game *game, double cur_angle, unsigned int ray);
+void		ray_intersect	(t_game *g, double angle, unsigned int ray);
 t_fpoint	ray_intersect_x	(t_game *game, t_fpoint step);
 t_fpoint	ray_intersect_y	(t_game *game, t_fpoint step);
 

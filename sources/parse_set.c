@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/28 18:43:41 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/04 15:57:36 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 20:10:15 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,14 @@ void	set_resolution(const char *res_string, t_upoint *res, t_game *game)
 		terminate(game, ERR_PARSE, "Wrong Resolution setting");
 }
 
-void	set_ceilfloor(const char *color_string, unsigned *target, t_game *game)
+void	set_ceilfloor(const char *color_string, unsigned int *target,
+																t_game *game)
 {
-	unsigned	r;
-	unsigned	g;
-	unsigned	b;
+	unsigned int	r;
+	unsigned int	g;
+	unsigned int	b;
 
-	if (*target != (unsigned)-1)
+	if (*target != -1U)
 		terminate(game, ERR_PARSE, "Duplicated F or C color setting");
 	color_string++;
 	color_string = atoi_limited(&r, color_string, UCHAR_MAX);
@@ -81,26 +82,21 @@ void	set_textures(char *string, t_game *game)
 
 void	set_textures_import(char *string, t_img *texture, t_game *game)
 {
-	int				null;
+	int				n;
 	const size_t	str_len = ft_strlen(string);
 
 	if (str_len < 5)
 		terminate(game, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
 	if (ft_memcmp(".xpm", string + str_len - 4, 5) == 0)
-	{
-		if (!(texture->ptr = mlx_xpm_file_to_image(game->mlx, string,
-							(int *)&texture->size.x, (int *)&texture->size.y)))
-			terminate(game, ERR_PARSE, "Can't load texture file");
-	}
+		texture->ptr = mlx_xpm_file_to_image(game->mlx, string, \
+							(int *)&texture->size.x, (int *)&texture->size.y);
 	else if (ft_memcmp(".png", string + str_len - 4, 5) == 0)
-	{
-		if (!(texture->ptr = mlx_png_file_to_image(game->mlx, string,
-							(int *)&texture->size.x, (int *)&texture->size.y)))
-			terminate(game, ERR_PARSE, "Can't load texture file");
-	}
+		texture->ptr = mlx_png_file_to_image(game->mlx, string, \
+							(int *)&texture->size.x, (int *)&texture->size.y);
 	else
 		terminate(game, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
-	texture->data = (unsigned *)mlx_get_data_addr(texture->ptr, &null, &null,
-																		&null);
+	if (texture->ptr == NULL)
+		terminate(game, ERR_PARSE, "Can't load texture file");
+	texture->data = (unsigned int *)mlx_get_data_addr(texture->ptr, &n, &n, &n);
 	texture->aspect = texture->size.x / texture->size.y;
 }
