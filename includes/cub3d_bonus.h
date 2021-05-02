@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/02 19:49:16 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 20:58:34 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@
 # include "x_events.h"
 
 # define TITLE	"nGragasstein 3D"
-# define MAX_SCREENSHOT	(t_point){20000, 20000}
+# define MAX_SCREENSHOT_X 20000
+# define MAX_SCREENSHOT_Y 20000
 # define MIN_RES	2
 # define MAX_PLAYING_SOUNDS	24
 # define MAX_MESSAGE_LEN 64
@@ -60,11 +61,10 @@
 # define HUD_FACE_LEVELS	7
 # define HUD_FACE_DIRS		3
 
-# define T_FPT_NULL	(t_fpoint){0.0f, 0.0f}
 # define M_PI_F		(float)M_PI
 # define M_PI_2_F	(float)M_PI_2
 # define M_PI_4_F	(float)M_PI_4
-# define PI2_F		(2.0f * M_PI_F)
+# define PI2_F		6.28318530718f
 # define NANSECS_PER_SEC	1000000000
 # define TICKS_PER_SEC		60
 
@@ -113,9 +113,9 @@
 
 # define SHOT_FRAME_ID	2
 # define ANIM_TICKS		5
-# define ANIM_KNIFE		(char []){0, 1, 2, 3, 2, 1}
-# define ANIM_PISTOL	(char []){0, 1, 2, 3, 1}
-# define ANIM_RIFLE		(char []){0, 1, 2, 1, 3}
+# define ANIM_KNIFE		"\0\1\2\3\2\1"
+# define ANIM_PISTOL	"\0\1\2\3\1"
+# define ANIM_RIFLE		"\0\1\2\1\3"
 # define ANIM_WEAPON_MAX_OFFSET	20
 
 # define MAP_COLOR_DECOR	COLOR_GREY
@@ -124,7 +124,8 @@
 
 # define FOV_ZOOM_SPEED	5.0f
 # define FOV_ZOOM_IN	M_PI_4_F
-# define FOV_ZOOM_OUT	M_PI_4_F + M_PI_F
+# define FOV_ZOOM_OUT	2.35619449019f
+// # define FOV_ZOOM_OUT	M_PI_4_F + M_PI_F
 
 # define PL_SPEED		0.07f
 # define PL_RADIUS		0.4f
@@ -134,33 +135,33 @@
 # define PL_CROUCH_SPEED 5.0f
 # define FLOAT_FIX		0.00001f
 # define MOUSE_SPEED	0.66f
-# define MAP_SCALE		(32 / 2)
+# define MAP_SCALE		16
 
-typedef struct	s_point
+typedef struct s_point
 {
 	int	x;
 	int	y;
 }				t_point;
 
-typedef struct	s_upoint
+typedef struct s_upoint
 {
 	uint32_t	x;
 	uint32_t	y;
 }				t_upoint;
 
-typedef struct	s_fpoint
+typedef struct s_fpoint
 {
 	float		x;
 	float		y;
 }				t_fpoint;
 
-typedef struct	s_ray
+typedef struct s_ray
 {
 	t_fpoint	pos;
 	t_point		cell;
 }				t_ray;
 
-typedef struct	s_img
+typedef struct s_img
 {
 	void		*ptr;
 	uint32_t	*data;
@@ -171,7 +172,7 @@ typedef struct	s_img
 	bool		*alpha_y;
 }				t_img;
 
-typedef struct	s_snd
+typedef struct s_snd
 {
 	cs_loaded_sound_t	file;
 	cs_play_sound_def_t	props;
@@ -179,24 +180,45 @@ typedef struct	s_snd
 
 # define CHAR_ELEVATOR		";"
 # define CHAR_ELEVATOR_ON	"<"
-# define CHAR_WALLS		"0123456789:" CHAR_ELEVATOR CHAR_ELEVATOR_ON
+# define CHAR_WALLS		"0123456789:;<"
 # define CHAR_DECOR		"^*$(),!@%#&?[]{}_~`"
 # define CHAR_PICKUP	"+HhAaZzXx"
 # define CHAR_ENEMY		"nswe"
 # define CHAR_SOLID		"$(),!@%#&?[]"
 # define CHAR_SOLID_MAP	'"'
-# define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP
+# define CHAR_OBJECTS	"^*$(),!@%#&?[]{}_~`+HhAaZzXx"
 # define CHAR_DOOR_1_H	"-"
 # define CHAR_DOOR_1_V	"|"
-# define CHAR_DOOR_1	CHAR_DOOR_1_H CHAR_DOOR_1_V
+# define CHAR_DOOR_1	"-|"
 # define CHAR_DOOR_2_H	">"
 # define CHAR_DOOR_2_V	"v"
-# define CHAR_DOOR_2	CHAR_DOOR_2_H CHAR_DOOR_2_V
-# define CHAR_DOORS_H	CHAR_DOOR_1_H CHAR_DOOR_2_H
-# define CHAR_DOORS_V	CHAR_DOOR_1_V CHAR_DOOR_2_V
+# define CHAR_DOOR_2	">v"
+# define CHAR_DOORS_H	"->"
+# define CHAR_DOORS_V	"|v"
 # define CHAR_DOOR_SECRET	"="
-# define CHAR_DOORS		CHAR_DOOR_1 CHAR_DOOR_2 CHAR_ELEVATOR
-# define CHAR_ALLOWED	" .NSWE" CHAR_WALLS CHAR_DOORS CHAR_OBJECTS CHAR_ENEMY CHAR_DOOR_SECRET
+# define CHAR_DOORS		"-|>v;"
+# define CHARS " .NSWE0123456789:;<-|>v;^*$(),!@%#&?[]{}_~`+HhAaZzXxnswe="
+//# define CHAR_ELEVATOR		";"
+//# define CHAR_ELEVATOR_ON	"<"
+//# define CHAR_WALLS		"0123456789:" CHAR_ELEVATOR CHAR_ELEVATOR_ON
+//# define CHAR_DECOR		"^*$(),!@%#&?[]{}_~`"
+//# define CHAR_PICKUP	"+HhAaZzXx"
+//# define CHAR_ENEMY		"nswe"
+//# define CHAR_SOLID		"$(),!@%#&?[]"
+//# define CHAR_SOLID_MAP	'"'
+//# define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP
+//# define CHAR_DOOR_1_H	"-"
+//# define CHAR_DOOR_1_V	"|"
+//# define CHAR_DOOR_1	CHAR_DOOR_1_H CHAR_DOOR_1_V
+//# define CHAR_DOOR_2_H	">"
+//# define CHAR_DOOR_2_V	"v"
+//# define CHAR_DOOR_2	CHAR_DOOR_2_H CHAR_DOOR_2_V
+//# define CHAR_DOORS_H	CHAR_DOOR_1_H CHAR_DOOR_2_H
+//# define CHAR_DOORS_V	CHAR_DOOR_1_V CHAR_DOOR_2_V
+//# define CHAR_DOOR_SECRET	"="
+//# define CHAR_DOORS		CHAR_DOOR_1 CHAR_DOOR_2 CHAR_ELEVATOR
+//# define CHAR_ALLOWED	" .NSWE" CHAR_WALLS CHAR_DOORS CHAR_OBJECTS CHAR_ENEMY
+//	CHAR_DOOR_SECRET
 # define TEXTURE_DOOR_1		13
 # define TEXTURE_DOOR_1_W	14
 # define TEXTURE_DOOR_2		15
@@ -249,7 +271,8 @@ enum	e_sound
 
 # define START_HEALTH	100
 # define START_AMMO		0
-# define START_WEAPONS	W_KNIFE_MASK | W_PISTOL_MASK
+# define START_WEAPONS	0b011
+//# define START_WEAPONS	W_KNIFE_MASK | W_PISTOL_MASK
 
 # define ENEMY_HEALTH		25
 # define ENEMY_FOV_HALF		M_PI_2_F
@@ -266,7 +289,7 @@ enum	e_sound
 # define DOOR_ANIM_TICKS	60
 # define DOOR_TIMER_TICKS	300
 
-typedef struct	s_set
+typedef struct s_set
 {
 	t_img		wait[8];
 	t_img		walk[8][4];
@@ -279,7 +302,7 @@ typedef struct	s_set
 	uint32_t	s_death_count;
 }				t_set;
 
-typedef struct	s_door
+typedef struct s_door
 {
 	t_point				cell;
 	bool				opening;
@@ -293,7 +316,7 @@ typedef struct	s_door
 	bool				end_level;
 }				t_door;
 
-typedef struct	s_object
+typedef struct s_object
 {
 	t_img		*sprite;
 	t_fpoint	pos;
@@ -358,7 +381,7 @@ typedef struct	s_object
 	}			*e;
 }				t_object;
 
-typedef struct	s_game
+typedef struct s_game
 {
 	void		*mlx;
 	void		*win;
@@ -553,7 +576,7 @@ void			player_set_fov			(t_game *game, float fov, bool reset);
 void			player_control_borders	(t_game *g);
 void			player_control_borders_diag(t_game *g);
 void			player_control_borders_enemies(t_game *game);
-void			player_set_weapon(t_game *game, enum e_weapon weapon);
+void			player_set_weapon(t_game *g, enum e_weapon weapon);
 
 // sounds
 void			initialize_sounds(t_game *g);
@@ -582,7 +605,7 @@ int				objects_sort		(t_object *obj1, t_object *obj2);
 bool			pickup(t_game *game, enum e_objtype type);
 void			pickup_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img);
 void			pickup_get(t_game *game, enum e_objtype item);
-void			pickup_sound(t_game *game, enum e_objtype item);
+void			pickup_sound(t_game *g, enum e_objtype item);
 
 // enemies
 void			enemy(t_game *game, t_object *obj);

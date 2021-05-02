@@ -105,7 +105,7 @@ int	dead_exit(t_game *game)
 		cs_stop_all_sounds(game->audio.ctx);
 		cs_stop_all_sounds(game->audio.ctx7);
 		cs_stop_all_sounds(game->audio.ctx22);
-		sound_play(game, &game->audio.sound[SND_PLAYER_DEATH], T_FPT_NULL);
+		sound_play(game, &game->audio.sound[SND_PLAYER_DEATH], (t_fpoint){0, 0});
 	}
 	draw_effect(game, &game->effect);
 	if (game->effect.frame_cur > game->effect.frames)

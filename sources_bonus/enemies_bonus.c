@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:53:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/02 15:41:47 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 16:06:54 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,7 +159,7 @@ void	enemy_shoot(t_game *g, t_object *obj)
 	g->p.health -= damage;
 	g->p.health = ft_max(0, g->p.health);
 	if (damage >= (ENEMY_DMG_MIN + ENEMY_DMG_MAX) / 2)
-		sound_play(g, &g->audio.sound[SND_PLAYER_PAIN], T_FPT_NULL);
+		sound_play(g, &g->audio.sound[SND_PLAYER_PAIN], (t_fpoint){0, 0});
 	g->effect = (struct s_effect){15, 30, EF_FLASH, COLOR_RED, damage / 100.0f};
 	g->hud.needs_redraw = true;
 }

@@ -81,7 +81,7 @@ void	music_play(t_game *game, t_snd *music)
 			cs_stop_sound(game->audio.playing[i].snd);
 		i++;
 	}
-	sound_play(game, music, T_FPT_NULL)->looped = true;
+	sound_play(game, music, (t_fpoint){0, 0})->looped = true;
 }
 
 void	sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound)

@@ -121,7 +121,7 @@ void	set_map_check_cell(t_game *game, char **map, t_upoint pt)
 {
 	const char	*dirs = "ESWN";
 
-	if (ft_strchr(CHAR_ALLOWED, map[pt.y][pt.x]) == NULL)
+	if (ft_strchr(CHARS, map[pt.y][pt.x]) == NULL)
 		terminate(game, ERR_PARSE, "Wrong map character");
 	if (map[pt.y][pt.x] == ' ' || chr_is_wall(map[pt.y][pt.x]))
 		return ;

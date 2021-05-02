@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/05 22:37:16 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/01 19:51:06 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 19:49:16 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	initialize_window(t_game *g, bool screenshot_only)
 	t_point	max_res;
 
 	if (screenshot_only)
-		max_res = MAX_SCREENSHOT;
+		max_res = (t_point){MAX_SCREENSHOT_X, MAX_SCREENSHOT_Y};
 	else
 	{
 		mlx_get_screen_size(&max_res.x, &max_res.y);

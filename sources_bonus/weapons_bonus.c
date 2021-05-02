@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/12 16:12:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/01 18:18:19 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 20:48:33 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,33 +38,33 @@ void	weapon(t_game *game, struct s_weapon *weapon)
 	}
 }
 
-void	player_set_weapon(t_game *game, enum e_weapon weapon)
+void	player_set_weapon(t_game *g, enum e_weapon weapon)
 {
-	if (game->p.weapons_mask == 0 || (weapon != W_KNIFE && game->p.ammo == 0) ||
-		(weapon == W_PISTOL && (game->p.weapons_mask & W_PISTOL_MASK) == 0) ||
-		(weapon == W_RIFLE && (game->p.weapons_mask & W_RIFLE_MASK) == 0))
+	if (g->p.weapons_mask == 0 || (weapon != W_KNIFE && g->p.ammo == 0) ||
+		(weapon == W_PISTOL && (g->p.weapons_mask & W_PISTOL_MASK) == 0) ||
+		(weapon == W_RIFLE && (g->p.weapons_mask & W_RIFLE_MASK) == 0))
 		return ;
-	game->p.weapon_cur = weapon;
-	if (game->p.weapon_cur == W_KNIFE)
+	g->p.weapon_cur = weapon;
+	if (g->p.weapon_cur == W_KNIFE)
 	{
-		ft_memcpy(game->p.weapon.animation, ANIM_KNIFE, sizeof(ANIM_KNIFE));
-		game->p.weapon.frames = sizeof(ANIM_KNIFE);
+		ft_memcpy(g->p.weapon.animation, ANIM_KNIFE, sizeof(ANIM_KNIFE) - 1);
+		g->p.weapon.frames = sizeof(ANIM_KNIFE) - 1;
 	}
-	else if (game->p.weapon_cur == W_PISTOL)
+	else if (g->p.weapon_cur == W_PISTOL)
 	{
-		ft_memcpy(game->p.weapon.animation, ANIM_PISTOL, sizeof(ANIM_PISTOL));
-		game->p.weapon.frames = sizeof(ANIM_PISTOL);
+		ft_memcpy(g->p.weapon.animation, ANIM_PISTOL, sizeof(ANIM_PISTOL) - 1);
+		g->p.weapon.frames = sizeof(ANIM_PISTOL) - 1;
 	}
-	else if (game->p.weapon_cur == W_RIFLE)
+	else if (g->p.weapon_cur == W_RIFLE)
 	{
-		ft_memcpy(game->p.weapon.animation, ANIM_RIFLE, sizeof(ANIM_RIFLE));
-		game->p.weapon.frames = sizeof(ANIM_RIFLE);
+		ft_memcpy(g->p.weapon.animation, ANIM_RIFLE, sizeof(ANIM_RIFLE) - 1);
+		g->p.weapon.frames = sizeof(ANIM_RIFLE) - 1;
 	}
-	game->p.weapon.ticks = game->p.weapon.frames * ANIM_TICKS;
-	game->p.weapon_pos = (t_upoint){
-		game->center.x - game->p.weapon_img[game->p.weapon_cur][0].size.x / 2,
-		game->img.size.y - game->p.weapon_img[game->p.weapon_cur][0].size.y};
-	game->hud.needs_redraw = true;
+	g->p.weapon.ticks = g->p.weapon.frames * ANIM_TICKS;
+	g->p.weapon_pos = (t_upoint){
+			g->center.x - g->p.weapon_img[g->p.weapon_cur][0].size.x / 2,
+			g->img.size.y - g->p.weapon_img[g->p.weapon_cur][0].size.y};
+	g->hud.needs_redraw = true;
 }
 
 void	draw_weapon(t_game *g, struct s_weapon *weapon)
@@ -82,11 +82,11 @@ void	draw_weapon(t_game *g, struct s_weapon *weapon)
 void	weapon_sound(t_game *game, enum e_weapon weapon)
 {
 	if (weapon == W_KNIFE)
-		sound_play(game, &game->audio.sound[SND_KNIFE], T_FPT_NULL);
+		sound_play(game, &game->audio.sound[SND_KNIFE], (t_fpoint){0, 0});
 	else if (weapon == W_PISTOL)
-		sound_play(game, &game->audio.sound[SND_PISTOL], T_FPT_NULL);
+		sound_play(game, &game->audio.sound[SND_PISTOL], (t_fpoint){0, 0});
 	else if (weapon == W_RIFLE)
-		sound_play(game, &game->audio.sound[SND_RIFLE], T_FPT_NULL);
+		sound_play(game, &game->audio.sound[SND_RIFLE], (t_fpoint){0, 0});
 }
 
 void	weapon_shoot(t_game *g, t_object *target)
