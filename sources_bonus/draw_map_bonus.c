@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:13 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/27 15:52:36 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 15:48:35 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,9 @@ void	draw_map(t_game *game)
 	}
 	draw_map_player(game);
 	draw_map_objects(game);
-	mlx_put_image_to_window(game->mlx, game->win, game->map.img.ptr, 0, 0);
+	mlx_put_image_to_window(game->mlx, game->win, game->map.img.ptr,
+		game->center.x - game->map.img.size.x / 2,
+		game->center.y - game->map.img.size.y / 2);
 }
 
 void	draw_map_player(t_game *g)

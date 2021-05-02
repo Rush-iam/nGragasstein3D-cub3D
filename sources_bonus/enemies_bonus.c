@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:53:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/28 16:47:15 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 15:41:47 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,12 +73,12 @@ void	enemy_move(t_game *game, t_object *obj)
 	if ((int)obj->pos.x == move_int.x && (int)obj->pos.y == move_int.y)
 	{
 		if (obj->e->path->next || obj->e->see)
-			ft_lstpop(&obj->e->path);
+			free(ft_lstpop(&obj->e->path));
 		else if (fabsf(obj->e->target.x - obj->pos.x) < 0.1f &&
 				  fabsf(obj->e->target.y - obj->pos.y) < 0.1f)
 		{
 			obj->e->tick = obj->e->ticks;
-			ft_lstpop(&obj->e->path);
+			free(ft_lstpop(&obj->e->path));
 		}
 	}
 }
@@ -91,7 +91,7 @@ void	enemy_logic(t_game *game, t_object *obj)
 	if (obj->e->state != ST_DEATH && (fabsf(obj->e->p_to_angle) < ENEMY_FOV_HALF
 										|| game->p.weapon_noise == true))
 		obj->e->see = ray_intersect_distance(game, obj->atan_diff) > obj->distance_real;
-	if (obj->e->state == ST_WAIT && obj->e->see == false)
+	if (obj->e->state == ST_WAIT && !obj->e->see && !obj->e->alarmed)
 		return ;
 	if (obj->e->see == true)
 	{
@@ -119,7 +119,8 @@ void	enemy_logic(t_game *game, t_object *obj)
 		else if (obj->e->see == true && obj->e->state == ST_ATTACK)
 			enemy_set_state(game, obj,
 			(enum e_objstate[]){ST_ATTACK, ST_WALK, ST_WALK}[arc4random() % 3]);
-		else if (obj->e->see == false && obj->e->state == ST_ATTACK)
+		else if (obj->e->see == false &&
+			(obj->e->state == ST_ATTACK || obj->e->state == ST_WAIT))
 			enemy_set_state(game, obj, ST_WALK);
 		else if (obj->e->see == false && obj->e->state == ST_WALK && obj->e->path)
 			enemy_set_state(game, obj, ST_WALK);
@@ -175,7 +176,7 @@ void	enemy_set_state(t_game *g, t_object *obj, enum e_objstate state)
 	else if (state == ST_WALK)
 	{
 		obj->e->imgset = g->enemyset[obj->e->type].walk[0];
-		obj->e->frames = 4 + arc4random() % (int)obj->distance_real & ~1;
+		obj->e->frames = 4 + arc4random() % ((int)obj->distance_real + 1) & ~1;
 		if (!obj->e->path || (obj->e->path_target.x != (int)obj->e->target.x ||
 								obj->e->path_target.y != (int)obj->e->target.y))
 		{

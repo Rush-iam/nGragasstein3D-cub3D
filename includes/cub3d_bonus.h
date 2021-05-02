@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/02 14:55:44 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 15:11:06 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,7 @@
 # define PL_CROUCH_SPEED 5.0f
 # define FLOAT_FIX		0.00001f
 # define MOUSE_SPEED	0.66f
-# define MAP_SCALE		(24 / 2)
+# define MAP_SCALE		(32 / 2)
 
 typedef struct	s_point
 {

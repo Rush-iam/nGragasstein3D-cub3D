@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/26 15:20:37 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/02 15:18:37 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 15:27:24 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,13 @@ void	doors(t_game *game)
 			if (door->ticks_to_close > 0)
 				--door->ticks_to_close;
 			if (door->ticks_to_close == 0 &&
-				(int)door->opener_pos->x != door->cell.x &&
-				(int)door->opener_pos->y != door->cell.y)
+				((int)door->opener_pos->x == door->cell.x &&
+				(int)door->opener_pos->y == door->cell.y) == false &&
+				((int)game->p.pos.x == door->cell.x &&
+				(int)game->p.pos.y == door->cell.y) == false)
 			{
 				door->opening = false;
-				sound_play(game, &game->audio.sound[SND_DOOR_CLOSE],
-						   (t_fpoint){door->cell.x + 0.5, door->cell.y + 0.5});
+				door_sound(game, door);
 			}
 		}
 		else if (door->part_opened > 0.0f)

@@ -133,10 +133,10 @@ bool	pathfind_init(struct s_map *map, t_point target, t_list **queue, t_point **
 
 int		pathfind_nears(struct s_map *map, t_point pt, t_point *nears)
 {
-	t_point	check;
-	int		i;
-	t_point	dirs[] = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
-	int		counter;
+	const t_point	dirs[] = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
+	t_point			check;
+	int				i;
+	int				counter;
 
 	i = 0;
 	counter = 0;
@@ -154,12 +154,12 @@ int		pathfind_nears(struct s_map *map, t_point pt, t_point *nears)
 
 void	*pathfind_construct(t_list **path, t_point from, struct s_map *map)
 {
-	t_point		check;
-	t_point		*pt;
-	t_list		*lst;
-	t_point		dirs[] = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
-	int			i;
-	const int	rnd = arc4random() % 4;
+	t_point			check;
+	t_point			*pt;
+	t_list			*lst;
+	const t_point	dirs[] = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
+	const int		rnd = arc4random() % 4;
+	int				i;
 
 	i = 0;
 	while (i < 4)
