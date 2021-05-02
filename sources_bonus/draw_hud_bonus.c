@@ -87,7 +87,7 @@ char	*hud_num_to_str(char num_str[11], unsigned num, int length)
 	return (num_str);
 }
 
-void	hud_digits_bake(struct s_hud *hud, char num_str[], t_upoint pos)
+void	hud_digits_bake(struct s_hud *hud, char *num_str, t_upoint pos)
 {
 	int			i;
 	int			src_x_offset;

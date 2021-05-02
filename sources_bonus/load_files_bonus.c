@@ -45,7 +45,7 @@ void	load_audio_file(t_snd *dst, char *path)
 	dst->props = cs_make_def(&dst->file);
 }
 
-void	load_spriteset(t_img dst[], int count, char *path, t_game *game)
+void	load_spriteset(t_img *dst, int count, char *path, t_game *game)
 {
 	int		i;
 	char	*path2;

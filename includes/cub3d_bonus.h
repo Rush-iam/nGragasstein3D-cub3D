@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/02 20:58:34 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 00:53:46 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,6 +172,7 @@ typedef struct s_img
 	bool		*alpha_y;
 }				t_img;
 
+typedef cs_playing_sound_t	t_playing_snd;
 typedef struct s_snd
 {
 	cs_loaded_sound_t	file;
@@ -181,43 +182,31 @@ typedef struct s_snd
 # define CHAR_ELEVATOR		";"
 # define CHAR_ELEVATOR_ON	"<"
 # define CHAR_WALLS		"0123456789:;<"
+//# define CHAR_WALLS		"0123456789:" CHAR_ELEVATOR CHAR_ELEVATOR_ON
 # define CHAR_DECOR		"^*$(),!@%#&?[]{}_~`"
 # define CHAR_PICKUP	"+HhAaZzXx"
 # define CHAR_ENEMY		"nswe"
 # define CHAR_SOLID		"$(),!@%#&?[]"
 # define CHAR_SOLID_MAP	'"'
 # define CHAR_OBJECTS	"^*$(),!@%#&?[]{}_~`+HhAaZzXx"
+//# define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP
 # define CHAR_DOOR_1_H	"-"
 # define CHAR_DOOR_1_V	"|"
 # define CHAR_DOOR_1	"-|"
+//# define CHAR_DOOR_1	CHAR_DOOR_1_H CHAR_DOOR_1_V
 # define CHAR_DOOR_2_H	">"
 # define CHAR_DOOR_2_V	"v"
 # define CHAR_DOOR_2	">v"
+//# define CHAR_DOOR_2	CHAR_DOOR_2_H CHAR_DOOR_2_V
 # define CHAR_DOORS_H	"->"
+//# define CHAR_DOORS_H	CHAR_DOOR_1_H CHAR_DOOR_2_H
 # define CHAR_DOORS_V	"|v"
+//# define CHAR_DOORS_V	CHAR_DOOR_1_V CHAR_DOOR_2_V
 # define CHAR_DOOR_SECRET	"="
 # define CHAR_DOORS		"-|>v;"
-# define CHARS " .NSWE0123456789:;<-|>v;^*$(),!@%#&?[]{}_~`+HhAaZzXxnswe="
-//# define CHAR_ELEVATOR		";"
-//# define CHAR_ELEVATOR_ON	"<"
-//# define CHAR_WALLS		"0123456789:" CHAR_ELEVATOR CHAR_ELEVATOR_ON
-//# define CHAR_DECOR		"^*$(),!@%#&?[]{}_~`"
-//# define CHAR_PICKUP	"+HhAaZzXx"
-//# define CHAR_ENEMY		"nswe"
-//# define CHAR_SOLID		"$(),!@%#&?[]"
-//# define CHAR_SOLID_MAP	'"'
-//# define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP
-//# define CHAR_DOOR_1_H	"-"
-//# define CHAR_DOOR_1_V	"|"
-//# define CHAR_DOOR_1	CHAR_DOOR_1_H CHAR_DOOR_1_V
-//# define CHAR_DOOR_2_H	">"
-//# define CHAR_DOOR_2_V	"v"
-//# define CHAR_DOOR_2	CHAR_DOOR_2_H CHAR_DOOR_2_V
-//# define CHAR_DOORS_H	CHAR_DOOR_1_H CHAR_DOOR_2_H
-//# define CHAR_DOORS_V	CHAR_DOOR_1_V CHAR_DOOR_2_V
-//# define CHAR_DOOR_SECRET	"="
 //# define CHAR_DOORS		CHAR_DOOR_1 CHAR_DOOR_2 CHAR_ELEVATOR
-//# define CHAR_ALLOWED	" .NSWE" CHAR_WALLS CHAR_DOORS CHAR_OBJECTS CHAR_ENEMY
+# define CHARS " .NSWE0123456789:;<-|>v;^*$(),!@%#&?[]{}_~`+HhAaZzXxnswe="
+//# define CHARS	" .NSWE" CHAR_WALLS CHAR_DOORS CHAR_OBJECTS CHAR_ENEMY
 //	CHAR_DOOR_SECRET
 # define TEXTURE_DOOR_1		13
 # define TEXTURE_DOOR_1_W	14
@@ -304,16 +293,16 @@ typedef struct s_set
 
 typedef struct s_door
 {
-	t_point				cell;
-	bool				opening;
-	float				part_opened;
-	t_fpoint			*opener_pos;
-	time_t				ticks_to_close;
-	cs_playing_sound_t	*sound;
-	bool				secret;
-	char				secret_texture_id;
-	t_point				secret_target;
-	bool				end_level;
+	t_point			cell;
+	bool			opening;
+	float			part_opened;
+	t_fpoint		*opener_pos;
+	time_t			ticks_to_close;
+	t_playing_snd	*sound;
+	bool			secret;
+	char			secret_texture_id;
+	t_point			secret_target;
+	bool			end_level;
 }				t_door;
 
 typedef struct s_object
@@ -478,15 +467,15 @@ typedef struct s_game
 	t_img		img_effect;
 	struct		s_sound
 	{
-		cs_context_t*	ctx;
-		cs_context_t*	ctx7;
-		cs_context_t*	ctx22;
+		cs_context_t	*ctx;
+		cs_context_t	*ctx7;
+		cs_context_t	*ctx22;
 		t_snd			music[2];
 		t_snd			sound[21];
 		struct			s_playing_sound
 		{
-			cs_playing_sound_t	*snd;
-			t_fpoint			sourcepos;
+			t_playing_snd	*snd;
+			t_fpoint		sourcepos;
 		}				playing[MAX_PLAYING_SOUNDS];
 	}			audio;
 	struct		s_player
@@ -523,38 +512,39 @@ typedef struct s_game
 }				t_game;
 
 // main
-int				game_loop(t_game *game);
-void			game_ticks(t_game *game);
-int				dead_exit(t_game *game);
-bool			chr_is_wall(char c);
+int				game_loop	(t_game *game);
+void			game_ticks	(t_game *game);
+int				dead_exit	(t_game *game);
+bool			chr_is_wall	(char c);
 
 // parse
 void			parse(int args, char **av, t_game *game, bool *screenshot_only);
-void			parse_scene		(int file_id, char **line, t_game *game);
+void			parse_scene(int file_id, char **line, t_game *game);
 void			parse_map(int file_id, char *line, t_list *map, t_game *game);
 void			validate_settings(t_game *game);
 
 // parse_set
 void			set_resolution		(const char *res_string, t_game *game);
 void			set_ceilfloor		(char *string, t_game *game);
-void			set_ceilfloor_color(char *string, uint32_t *target, t_game *game);
+void			set_ceilfloor_color	(char *string, uint32_t *target, \
+												   t_game *game);
 void			set_weapons			(char *string, t_game *game);
 void			set_textures		(char *string, t_game *game);
 
 // parse_set_map
 void			set_map				(t_game *game, t_list *map);
 void			set_map_process		(t_game *game);
-void			set_map_door_add(t_game *game, t_upoint pt);
-void			set_map_object_add(t_game *game, char chr, unsigned type,
-								   t_upoint pt);
+void			set_map_door_add	(t_game *game, t_upoint pt);
+void			set_map_object_add	(t_game *game, char chr, unsigned type, \
+										t_upoint pt);
 void			set_map_check_cell	(t_game *game, char **map, t_upoint pt);
 
 // initialize
-void			initialize_game(t_game *g, bool screenshot_only);
-void			initialize_window(t_game *g, bool screenshot_only);
+void			initialize_game			(t_game *g, bool screenshot_only);
+void			initialize_window		(t_game *g, bool screenshot_only);
 void			initialize_canvas_images(t_game *g);
-void			initialize_hud_images(t_game *g);
-void			initialize_face_images(t_game *g);
+void			initialize_hud_images	(t_game *g);
+void			initialize_face_images	(t_game *g);
 void			initialize_weapons_and_faded_walls(t_game *g);
 
 // hooks
@@ -569,159 +559,177 @@ void			player_control			(t_game *game);
 void			player_control_rotate	(t_game *game);
 void			player_control_move		(t_game *g);
 void			player_control_jump_n_crouch(t_game *g);
-void			player_control_weapon(t_game *game);
 void			player_control_toggler	(t_game *g, int key_code);
-void			player_control_fov	(t_game *g);
+void			player_control_weapon	(t_game *game);
+void			player_set_weapon		(t_game *g, enum e_weapon weapon);
+void			player_control_fov		(t_game *g);
 void			player_set_fov			(t_game *game, float fov, bool reset);
 void			player_control_borders	(t_game *g);
 void			player_control_borders_diag(t_game *g);
 void			player_control_borders_enemies(t_game *game);
-void			player_set_weapon(t_game *g, enum e_weapon weapon);
 
 // sounds
 void			initialize_sounds(t_game *g);
-void			sounds(t_game *game);
-cs_playing_sound_t *	sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos);
-void			music_play(t_game *game, t_snd *music);
-void			sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound);
+void			sounds			(t_game *game);
+t_playing_snd	*sound_play	(t_game *game, t_snd *sound, t_fpoint sourcepos);
+void			music_play		(t_game *game, t_snd *music);
+void			sound_adjust_pan(struct s_player *pl, \
+									struct s_playing_sound sound);
 
 // doors
-void			doors(t_game *game);
-t_door			*door_find(t_game *game, t_point cell);
-void			door_open(t_game *g, t_point cell, t_fpoint	*opener_pos, bool by_player);
-void			door_sound(t_game *game, t_door *door);
+void			doors		(t_game *game);
+t_door			*door_find	(t_game *game, t_point cell);
+void			door_open	(t_game *g, t_point cell, t_fpoint	*opener_pos, \
+								bool by_player);
+void			door_sound	(t_game *game, t_door *door);
 
 // weapons
-void			weapon(t_game *game, struct s_weapon *weapon);
-void			draw_weapon(t_game *g, struct s_weapon *weapon);
+void			weapon		(t_game *game, struct s_weapon *weapon);
+void			draw_weapon	(t_game *g, struct s_weapon *weapon);
 void			weapon_shoot(t_game *g, t_object *target);
 
 // objects
-void			objects				(t_game *g);
-void			object_add(t_game *game, t_list **dst, void *obj);
-int				objects_sort		(t_object *obj1, t_object *obj2);
+void			objects		(t_game *g);
+void			object_add	(t_game *game, t_list **dst, void *obj);
+int				objects_sort(t_object *obj1, t_object *obj2);
 
 // pickup
-bool			pickup(t_game *game, enum e_objtype type);
-void			pickup_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img);
-void			pickup_get(t_game *game, enum e_objtype item);
+bool			pickup		(t_game *game, enum e_objtype type);
+void			pickup_drop	(t_game *game, t_fpoint pos, enum e_objtype type, \
+								t_img *img);
+void			pickup_get	(t_game *game, enum e_objtype item);
 void			pickup_sound(t_game *g, enum e_objtype item);
 
 // enemies
-void			enemy(t_game *game, t_object *obj);
-void			enemy_logic(t_game *game, t_object *obj);
-void			enemy_sprite(t_game *game, t_object *obj);
-void			enemy_shoot(t_game *g, t_object *obj);
-void			enemy_set_state(t_game *g, t_object *obj, enum e_objstate state);
-void			enemy_sound(t_game *game, t_object *obj, enum e_sound sound_type);
+void			enemy			(t_game *game, t_object *obj);
+void			enemy_logic		(t_game *game, t_object *obj);
+void			enemy_sprite	(t_game *game, t_object *obj);
+void			enemy_shoot		(t_game *g, t_object *obj);
+void			enemy_set_state	(t_game *g, t_object *obj, \
+									enum e_objstate state);
+void			enemy_sound		(t_game *game, t_object *obj, \
+									enum e_sound sound_type);
 
 // pathfind
-void			bfs_grid_initialize(t_game *g);
-void			bfs_grid_update(t_game *g);
-void			*pathfind(t_list **path, t_point from, t_point to, struct s_map *map);
-bool			pathfind_init(struct s_map *map, t_point target, t_list **queue, t_point **pt);
-void			*pathfind_deinit(t_list **queue, t_point *pt);
-int				pathfind_nears(struct s_map *map, t_point pt, t_point *nears);
-void			*pathfind_construct(t_list **path, t_point from, struct s_map *map);
+void			bfs_grid_initialize	(t_game *g);
+void			bfs_grid_update		(t_game *g);
+void			*pathfind			(t_list **path, t_point from, t_point to, \
+									struct s_map *map);
+bool			pathfind_init		(struct s_map *map, t_point target, \
+									t_list **queue, t_point **pt);
+void			*pathfind_deinit	(t_list **queue, t_point *pt);
+int				pathfind_nears	(struct s_map *map, t_point pt, t_point *nears);
+void			*pathfind_construct	(t_list **path, t_point from, \
+									struct s_map *map);
 
 // raycasting
-void			ray_cast		(t_game *game);
-struct s_column	ray_intersect	(t_game *g, float tan_angle, t_point step);
+void			ray_cast			(t_game *game);
+struct s_column	ray_intersect		(t_game *g, float tan_angle, t_point step);
 float			ray_intersect_distance(t_game *game, float angle);
-t_ray			ray_intersect_x	(t_game *g, int stx, float sty);
-t_ray			ray_intersect_y(t_game *g, float stx, int sty);
+t_ray			ray_intersect_x		(t_game *g, int stx, float sty);
+t_ray			ray_intersect_y		(t_game *g, float stx, int sty);
 
 // draw_ceilfloor
-void	draw_ceil_textured(t_game *g, t_point px);
-int		draw_ceil_texture_faded(t_game *g, t_point px, float *height);
-void	draw_floor_textured(t_game *g, t_point px);
-int		draw_floor_texture_faded(t_game *g, t_point px, float *height);
+void			draw_ceil_textured		(t_game *g, t_point px);
+int				draw_ceil_texture_faded	(t_game *g, t_point px, float *height);
+void			draw_floor_textured		(t_game *g, t_point px);
+int				draw_floor_texture_faded(t_game *g, t_point px, float *height);
 
 // draw_ceilfloor_plain
-void	ceilfloor_plain_generate(t_img *img, unsigned ceil, unsigned floor, unsigned fade_distance);
-void	draw_ceil_plain(t_game *g);
-void	draw_floor_plain(t_game *g);
-void	draw_ceilfloor_plain(t_game *g);
+void			ceilfloor_plain_generate(t_img *img, uint32_t ceil, \
+										uint32_t floor, uint32_t fade_distance);
+void			draw_ceil_plain			(t_game *g);
+void			draw_floor_plain		(t_game *g);
+void			draw_ceilfloor_plain	(t_game *g);
 
 // draw_walls
-void			draw_wall_texture_set(t_game *g, struct s_column *col, t_point pt);
+void			draw_wall_texture_set	(t_game *g, struct s_column *col, \
+											t_point pt);
 void			draw_wall_texture_set_pos(struct s_column *col);
-void			draw_door_texture_set(t_game *game, struct s_column *col, char chr);
-void			draw_walls		(t_game *g);
-void			draw_wall_scaled(t_game *g, t_img src, t_point cur, int z_offset);
-void			draw_wall_scaled_f(t_game *g, t_img src, t_point cur, int z_offset);
-void			draw_wall_solid	(t_game *game, unsigned x, float fade);
+void			draw_door_texture_set	(t_game *game, struct s_column *col, \
+											char chr);
+void			draw_walls				(t_game *g);
+void			draw_wall_scaled		(t_game *g, t_img src, t_point cur, \
+											int z_offset);
+void			draw_wall_scaled_f		(t_game *g, t_img src, t_point cur, \
+											int z_offset);
+void			draw_wall_solid			(t_game *game, uint32_t x, float fade);
 
 // draw_objects
 void			draw_object_properties(t_game *game, t_object *obj);
-void			draw_objects(t_game *game);
-void			draw_sprite(t_game *game, t_object *obj);
-void			draw_sprite_scaled(t_game *g, t_object *obj, t_point min, t_point max);
-void			draw_sprite_scaled_f(t_game *g, t_object *obj, t_point min, t_point max);
+void			draw_objects		(t_game *game);
+void			draw_sprite			(t_game *game, t_object *obj);
+void			draw_sprite_scaled	(t_game *g, t_object *obj, t_point min, \
+											t_point max);
+void			draw_sprite_scaled_f(t_game *g, t_object *obj, t_point min, \
+											t_point max);
 
 // draw_hud
-void			draw_hud(t_game *g);
-void			draw_hud_face(t_game *g, bool force_redraw);
-char			*hud_num_to_str(char num_str[11], unsigned num, int length);
-void			hud_digits_bake(struct s_hud *hud, char num_str[], t_upoint pos);
-void			draw_fps(t_game *game);
+void			draw_hud		(t_game *g);
+void			draw_hud_face	(t_game *g, bool force_redraw);
+char			*hud_num_to_str	(char num_str[11], uint32_t num, int length);
+void			hud_digits_bake(struct s_hud *hud, char *num_str, t_upoint pos);
+void			draw_fps		(t_game *game);
 
 // draw_map
 void			initialize_map_hud	(t_game *game);
-void			draw_map		(t_game *game);
-void			draw_map_player	(t_game *g);
-void			draw_map_objects(t_game *game);
+void			draw_map			(t_game *game);
+void			draw_map_player		(t_game *g);
+void			draw_map_objects	(t_game *game);
 
 // load_files
-void			load_image_file(t_game *g, char *path, t_img *dst_img, char *err);
-void			load_audio_file(t_snd *dst, char *path);
-void			load_audioset(t_set *dst, char *path, t_game *game);
-void			load_spriteset(t_img dst[], int count, char *path, t_game *game);
+void			load_image_file	(t_game *g, char *path, t_img *dst_img, \
+									char *err);
+void			load_audio_file	(t_snd *dst, char *path);
+void			load_audioset	(t_set *dst, char *path, t_game *game);
+void			load_spriteset(t_img *dst, int count, char *path, t_game *game);
 
 // image_utils
 t_img			*img_create(void *mlx_ptr, t_img *dst, t_upoint size);
 t_img			*img_resize(void *mlx_ptr, t_img *src_img, t_upoint dstres);
-void			img_from_file_scaled(t_game *g, char *path, t_img *dst_img, float scale);
+void			img_from_file_scaled(t_game *g, char *path, t_img *dst_img, \
+										float scale);
 void			img_alpha_columns_get(t_img *img);
 t_img			img_faded_copy(void *mlx_ptr, t_img *img);
 
 // draw_pixels
-void			pixel_put	(t_img *img, unsigned x, unsigned y, int color);
-int				pixel_fade	(int color, float fade);
-int				pixel_alpha	(int color, float alpha);
+void			pixel_put		(t_img *img, uint32_t x, uint32_t y, int color);
+int				pixel_fade		(int color, float fade);
+int				pixel_alpha		(int color, float alpha);
 int				pixel_fade_contrast(int color, float fade);
 
 // draw_fills
-void			img_clear				(t_img *img);
-void			img_clear_rgb			(t_img *img, unsigned color);
-void			img_ceilfloor_rgb	(t_img *img, unsigned ceil, unsigned floor);
+void			img_clear		(t_img *img);
+void			img_clear_rgb	(t_img *img, uint32_t color);
+void			img_ceilfloor_rgb(t_img *img, uint32_t ceil, uint32_t floor);
 
 // draw_figures
 void			draw_line	(t_img *img, t_point p1, t_point p2, int color);
 void			draw_square	(t_img *img, t_point center, int size, int color);
-void			draw_square_fill(t_img *img, t_point top_left, int size, int color);
+void			draw_square_fill(t_img *img, t_point top_left, int size, \
+									int color);
 void			draw_4pts	(t_img *img, t_point *pts, int color);
 
 // effects
-void			draw_effect(t_game *game, struct s_effect *ef);
-void			effect_flash(t_game *game, unsigned color, float power);
-void			effect_fizzlefade(t_game *game, unsigned color);
+void			draw_effect		(t_game *game, struct s_effect *ef);
+void			effect_flash	(t_game *game, uint32_t color, float power);
+void			effect_fizzlefade(t_game *game, uint32_t color);
 
 // utils
 char			*skip_spaces(char **str);
-char			*atoi_limited(unsigned *dst_int, const char *src_string,
-							  unsigned limit);
-void			string_add(t_game *g, char *string, int timer, unsigned color);
+char			*atoi_limited(uint32_t *dst_int, const char *src_string, \
+									uint32_t limit);
+void			string_add(t_game *g, char *string, int timer, uint32_t color);
 void			draw_string(t_game *g, struct s_string *s);
 
 // screenshot
 void			write_screenshot_and_exit	(t_game *game);
-void			write_screenshot_data	(t_game *game, int file_id);
+void			write_screenshot_data		(t_game *game, int file_id);
 
 // terminate
 int				terminate		(t_game *game, int return_value, char *message);
 void			terminate_free	(t_game *game);
-void			terminate_free_images(t_game *game, t_img *arr, unsigned count);
+void			terminate_free_images(t_game *game, t_img *arr, uint32_t count);
 void			terminate_free_object(void *object);
 void			terminate_audio(t_game *game);
 
