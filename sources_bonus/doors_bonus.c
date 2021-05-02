@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/26 15:20:37 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/02 20:44:58 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 01:33:28 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,10 @@ void	doors(t_game *game)
 				door->secret_target.y != door->cell.y))
 			{
 				game->map.grid[door->cell.y][door->cell.x] = '.';
-				door->cell.x += (door->secret_target.x > door->cell.x) - (door->secret_target.x < door->cell.x);
-				door->cell.y += (door->secret_target.y > door->cell.y) - (door->secret_target.y < door->cell.y);
+				door->cell.x += (door->secret_target.x > door->cell.x) - \
+								(door->secret_target.x < door->cell.x);
+				door->cell.y += (door->secret_target.y > door->cell.y) - \
+								(door->secret_target.y < door->cell.y);
 				game->map.grid[door->cell.y][door->cell.x] = '=';
 				if (door->cell.x != door->secret_target.x ||
 					door->cell.y != door->secret_target.y)
@@ -86,8 +88,8 @@ void	door_open(t_game *g, t_point cell, t_fpoint *opener_pos, bool by_player)
 		|| g->map.grid[cell.y][cell.x] == *CHAR_DOOR_SECRET)
 	{
 		door = door_find(g, cell);
-		if ((door->opener_pos && (int)door->opener_pos->x == door->cell.x &&
-			(int)door->opener_pos->y == door->cell.y) ||
+		if ((door->opener_pos && (int)door->opener_pos->x == door->cell.x && \
+								(int)door->opener_pos->y == door->cell.y) || \
 			(door->secret && door->opening) ||
 			(by_player == false && door->opening == true))
 			return ;

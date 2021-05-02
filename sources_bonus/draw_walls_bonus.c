@@ -24,7 +24,7 @@ void	draw_texture_set(t_game *g, struct s_column *col)
 	}
 	else if (ft_memchr(CHAR_DOORS, chr, sizeof(CHAR_DOORS) - 1))
 		draw_door_texture_set(g, col, chr);
-	else if (chr == *CHAR_DOOR_SECRET)
+	else if (chr == *CHAR_SECRET)
 	{
 		col->texture_id = door_find(g, col->cell)->secret_texture_id + \
 			(col->dir == 'W' || col->dir == 'E') * faded_offset;

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/01 22:01:41 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 00:59:56 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,19 @@
 
 int	main(int args, char *av[])
 {
-	t_game					game;
-	bool					screenshot_only;
-	static struct timespec	time;
+	t_game			game;
+	bool			screenshot_only;
+	struct timespec	time;
 
 	game = (t_game){0};
 	game.color_floor = -1U;
 	game.color_ceil = -1U;
 	game.fade_distance = 8;
-	if (!(game.mlx = mlx_init()))
+	if (ft_assign_ptr(&game.mlx, mlx_init()) == NULL)
 		terminate(&game, ERR_MLX, strerror(errno));
 	parse(args, av, &game, &screenshot_only);
 	initialize_game(&game, screenshot_only);
-	if (screenshot_only == true)
+	if (screenshot_only)
 		write_screenshot_and_exit(&game);
 	mlx_do_key_autorepeatoff(game.mlx);
 	mlx_mouse_hide();
@@ -44,7 +44,7 @@ int	main(int args, char *av[])
 int	game_loop(t_game *game)
 {
 	if (game->p.health == 0)
-		return dead_exit(game);
+		return (dead_exit(game));
 	game_ticks(game);
 	sounds(game);
 	if (game->color_ceil != -1U)
@@ -63,20 +63,20 @@ int	game_loop(t_game *game)
 	draw_hud(game);
 	draw_hud_face(game, false);
 	draw_fps(game);
+	return (0);
+}
 //	demo_fillrate(game, 1);
 //	demo_cursor(game, 0xFF88FF);
 //	demo_radar(game, 360);
-	return (0);
-}
 
 void	game_ticks(t_game *game)
 {
 	static struct timespec	time;
-	static unsigned			tick_prev;
+	static uint32_t			tick_prev;
 
 	clock_gettime(CLOCK_MONOTONIC, &time);
 	tick_prev = game->tick;
-	game->tick = TICKS_PER_SEC * time.tv_sec +
+	game->tick = TICKS_PER_SEC * time.tv_sec + \
 				 TICKS_PER_SEC * time.tv_nsec / NANSECS_PER_SEC;
 	game->tick_diff = game->tick - tick_prev;
 	if (game->effect.frame_cur < game->effect.frames)
@@ -89,7 +89,6 @@ void	game_ticks(t_game *game)
 		player_control(game);
 		weapon(game, &game->p.weapon);
 		objects(game);
-//		for (int i = 0; i < 100; ++i)
 		ray_cast(game);
 		game->tick_diff--;
 	}
@@ -105,7 +104,8 @@ int	dead_exit(t_game *game)
 		cs_stop_all_sounds(game->audio.ctx);
 		cs_stop_all_sounds(game->audio.ctx7);
 		cs_stop_all_sounds(game->audio.ctx22);
-		sound_play(game, &game->audio.sound[SND_PLAYER_DEATH], (t_fpoint){0, 0});
+		sound_play(game, &game->audio.sound[SND_PLAYER_DEATH], \
+					(t_fpoint){0, 0});
 	}
 	draw_effect(game, &game->effect);
 	if (game->effect.frame_cur > game->effect.frames)

@@ -6,7 +6,7 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/05/03 00:49:33 by ngragas          ###   ########.fr        #
+#    Updated: 2021/05/03 00:49:45 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,8 @@ SRC    :=		main			\
 				raycasting		\
 				utils
 
-SRC_BONUS :=	demo_tools		\
+SRC_BONUS :=	control_borders	\
+				demo_tools		\
 				doors			\
 				draw_ceilfloor	\
 				draw_ceilfloor_plain	\

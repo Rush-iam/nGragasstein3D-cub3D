@@ -85,7 +85,7 @@ t_ray	ray_intersect_x(t_game *g, int stx, float sty)
 				ray_intersect_door(g, y, sty, (t_point){x, y}))
 			return ((t_ray){(t_fpoint){x + stx / 2.0f + (stx < 0),
 				y + sty / 2.0f}, (t_point){x, y}});
-		else if (chr == *CHAR_DOOR_SECRET && \
+		else if (chr == *CHAR_SECRET && \
 			ray_intersect_secret(g, &y, &sty, (t_point){x, y}))
 			return ((t_ray)
 				{(t_fpoint){x + stx * sty + (stx < 0), y}, (t_point){x, y}});
@@ -114,7 +114,7 @@ t_ray	ray_intersect_y(t_game *g, float stx, int sty)
 			ray_intersect_door(g, x, stx, (t_point){x, y}))
 			return ((t_ray){(t_fpoint){x + stx / 2.0f,
 				y + sty / 2.0f + (sty < 0)}, (t_point){x, y}});
-		else if (chr == *CHAR_DOOR_SECRET && \
+		else if (chr == *CHAR_SECRET && \
 			ray_intersect_secret(g, &x, &stx, (t_point){x, y}))
 			return ((t_ray)
 				{(t_fpoint){x, y + sty * stx + (sty < 0)}, (t_point){x, y}});

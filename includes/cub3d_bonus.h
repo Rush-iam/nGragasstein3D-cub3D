@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 00:53:46 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 01:20:31 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,12 +202,12 @@ typedef struct s_snd
 //# define CHAR_DOORS_H	CHAR_DOOR_1_H CHAR_DOOR_2_H
 # define CHAR_DOORS_V	"|v"
 //# define CHAR_DOORS_V	CHAR_DOOR_1_V CHAR_DOOR_2_V
-# define CHAR_DOOR_SECRET	"="
+# define CHAR_SECRET	"="
 # define CHAR_DOORS		"-|>v;"
 //# define CHAR_DOORS		CHAR_DOOR_1 CHAR_DOOR_2 CHAR_ELEVATOR
 # define CHARS " .NSWE0123456789:;<-|>v;^*$(),!@%#&?[]{}_~`+HhAaZzXxnswe="
 //# define CHARS	" .NSWE" CHAR_WALLS CHAR_DOORS CHAR_OBJECTS CHAR_ENEMY
-//	CHAR_DOOR_SECRET
+//	CHAR_SECRET
 # define TEXTURE_DOOR_1		13
 # define TEXTURE_DOOR_1_W	14
 # define TEXTURE_DOOR_2		15
@@ -560,12 +560,17 @@ void			player_control_rotate	(t_game *game);
 void			player_control_move		(t_game *g);
 void			player_control_jump_n_crouch(t_game *g);
 void			player_control_toggler	(t_game *g, int key_code);
+
+// control_extra
 void			player_control_weapon	(t_game *game);
-void			player_set_weapon		(t_game *g, enum e_weapon weapon);
 void			player_control_fov		(t_game *g);
 void			player_set_fov			(t_game *game, float fov, bool reset);
+
+// control_borders
 void			player_control_borders	(t_game *g);
 void			player_control_borders_diag(t_game *g);
+void			player_control_borders_diag_2(t_game *g, t_point plus, \
+												t_point minus);
 void			player_control_borders_enemies(t_game *game);
 
 // sounds
@@ -585,6 +590,7 @@ void			door_sound	(t_game *game, t_door *door);
 
 // weapons
 void			weapon		(t_game *game, struct s_weapon *weapon);
+void			weapon_set	(t_game *g, enum e_weapon weapon);
 void			draw_weapon	(t_game *g, struct s_weapon *weapon);
 void			weapon_shoot(t_game *g, t_object *target);
 
