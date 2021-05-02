@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/01 23:55:02 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 14:55:44 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,6 +284,7 @@ typedef struct	s_door
 	t_point				cell;
 	bool				opening;
 	float				part_opened;
+	t_fpoint			*opener_pos;
 	time_t				ticks_to_close;
 	cs_playing_sound_t	*sound;
 	bool				secret;
@@ -564,7 +565,7 @@ void			sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound);
 // doors
 void			doors(t_game *game);
 t_door			*door_find(t_game *game, t_point cell);
-void			door_open(t_game *g, t_point cell, bool by_player);
+void			door_open(t_game *g, t_point cell, t_fpoint	*opener_pos, bool by_player);
 void			door_sound(t_game *game, t_door *door);
 
 // weapons

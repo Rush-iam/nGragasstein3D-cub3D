@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/26 15:20:37 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/01 21:43:30 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 15:18:37 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,8 @@ void	doors(t_game *game)
 			if (door->ticks_to_close > 0)
 				--door->ticks_to_close;
 			if (door->ticks_to_close == 0 &&
-				((int)game->p.pos.x == door->cell.x &&
-				 (int)game->p.pos.y == door->cell.y) == false)
+				(int)door->opener_pos->x != door->cell.x &&
+				(int)door->opener_pos->y != door->cell.y)
 			{
 				door->opening = false;
 				sound_play(game, &game->audio.sound[SND_DOOR_CLOSE],
@@ -77,7 +77,7 @@ t_door	*door_find(t_game *game, t_point cell)
 	return (NULL);
 }
 
-void	door_open(t_game *g, t_point cell, bool by_player)
+void	door_open(t_game *g, t_point cell, t_fpoint *opener_pos, bool by_player)
 {
 	t_door	*door;
 
@@ -85,7 +85,10 @@ void	door_open(t_game *g, t_point cell, bool by_player)
 		|| g->map.grid[cell.y][cell.x] == *CHAR_DOOR_SECRET)
 	{
 		door = door_find(g, cell);
-		if (door->secret && door->opening)
+		if ((door->opener_pos && (int)door->opener_pos->x == door->cell.x &&
+			(int)door->opener_pos->y == door->cell.y) ||
+			(door->secret && door->opening) ||
+			(by_player == false && door->opening == true))
 			return ;
 		if (door->secret)
 			door->secret_target = (t_point){
@@ -99,9 +102,10 @@ void	door_open(t_game *g, t_point cell, bool by_player)
 			g->map.grid[cell.y][cell.x] = *CHAR_ELEVATOR_ON;
 			music_play(g, &g->audio.music[MUSIC_END_ID]);
 		}
+		door->opener_pos = opener_pos;
 		if (by_player)
 			door->opening ^= true;
-		else
+		else if (door->opening == false)
 			door->opening = true;
 		if (door->secret == true || door->end_level == true)
 			door->ticks_to_close = -1;

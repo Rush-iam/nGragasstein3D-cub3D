@@ -142,7 +142,8 @@ void	player_control_toggler(t_game *g, int key_code)
 		g->map.enabled = !g->map.enabled;
 	if (key_code == K_USE)
 		door_open(g,
-		(t_point){g->p.pos.x + g->p.vect.x, g->p.pos.y + g->p.vect.y}, true);
+		(t_point){g->p.pos.x + g->p.vect.x, g->p.pos.y + g->p.vect.y},
+		&g->p.pos, true);
 }
 
 void	player_control_fov(t_game *g)

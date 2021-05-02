@@ -69,7 +69,7 @@ void	enemy_move(t_game *game, t_object *obj)
 	obj->pos.x += cosf(obj->e->path_angle) * move_speed;
 	obj->pos.y += sinf(obj->e->path_angle) * move_speed;
 	if (game->map.grid[move_int.y][move_int.x] != '.')
-		door_open(game, move_int, false);
+		door_open(game, move_int, &obj->pos, false);
 	if ((int)obj->pos.x == move_int.x && (int)obj->pos.y == move_int.y)
 	{
 		if (obj->e->path->next || obj->e->see)
