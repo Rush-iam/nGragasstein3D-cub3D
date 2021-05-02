@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/18 19:53:14 by ngragas           #+#    #+#             */
-/*   Updated: 2020/11/18 23:04:33 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 17:25:18 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,13 @@
 
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 {
-	char		*newstr;
-	unsigned	index;
+	char			*newstr;
+	unsigned int	index;
 
 	if (!f)
 		return (NULL);
-	if (!(newstr = malloc(ft_strlen(s) + 1)))
+	newstr = malloc(ft_strlen(s) + 1);
+	if (newstr == NULL)
 		return (NULL);
 	index = 0;
 	while (*s)

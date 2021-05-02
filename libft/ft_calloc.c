@@ -18,7 +18,8 @@ void	*ft_calloc(size_t count, size_t size)
 	size_t	total;
 
 	total = count * size;
-	if (!(block = malloc(total)))
+	block = malloc(total);
+	if (block == NULL)
 		return (NULL);
 	ft_bzero(block, total);
 	return (block);

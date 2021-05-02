@@ -1,18 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_toupper.c                                       :+:      :+:    :+:   */
+/*   ft_free_ptr_array.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/04 22:06:30 by ngragas           #+#    #+#             */
-/*   Updated: 2020/11/04 22:13:24 by ngragas          ###   ########.fr       */
+/*   Created: 2021/05/02 17:12:33 by ngragas           #+#    #+#             */
+/*   Updated: 2021/05/02 17:13:36 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int	ft_toupper(int c)
+void	*ft_free_ptr_array(void **array, unsigned int count)
 {
-	return (c - 32 * ('a' <= c && c <= 'z'));
+	unsigned int	i;
+
+	i = 0;
+	while (i < count)
+		free(array[i++]);
+	free(array);
+	return (NULL);
 }

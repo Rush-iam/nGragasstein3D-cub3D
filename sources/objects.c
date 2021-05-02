@@ -53,7 +53,7 @@ void	draw_sprite(t_game *game, t_object *obj, double angle)
 
 	obj->size.x = game->col_scale / obj->distance;
 	obj->size.y = obj->size.x * obj->sprite->aspect;
-	start_x = game-> + tan(angle) / game->col_step - obj->size.x / 2;
+	start_x = game->col_center + tan(angle) / game->col_step - obj->size.x / 2;
 	cur_x = start_x;
 	max_x = cur_x + obj->size.x;
 	if (cur_x < 0)

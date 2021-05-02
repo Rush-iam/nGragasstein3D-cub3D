@@ -10,7 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-int			ft_min(int a, int b)
+#include "libft.h"
+
+int	ft_min(int a, int b)
 {
 	if (a < b)
 		return (a);
@@ -18,7 +20,7 @@ int			ft_min(int a, int b)
 		return (b);
 }
 
-int			ft_max(int a, int b)
+int	ft_max(int a, int b)
 {
 	if (a > b)
 		return (a);
@@ -26,7 +28,7 @@ int			ft_max(int a, int b)
 		return (b);
 }
 
-unsigned	ft_umin(unsigned a, unsigned b)
+uint32_t	ft_umin(uint32_t a, uint32_t b)
 {
 	if (a < b)
 		return (a);
@@ -34,7 +36,7 @@ unsigned	ft_umin(unsigned a, unsigned b)
 		return (b);
 }
 
-unsigned	ft_umax(unsigned a, unsigned b)
+uint32_t	ft_umax(uint32_t a, uint32_t b)
 {
 	if (a > b)
 		return (a);

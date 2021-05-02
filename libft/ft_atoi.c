@@ -20,7 +20,9 @@ int	ft_atoi(const char *str)
 	num = 0;
 	while (('\t' <= *str && *str <= '\r') || *str == ' ')
 		str++;
-	sign = (*str == '-' || *str == '+') ? 44 - *str++ : 1;
+	sign = 1;
+	if (*str == '-' || *str == '+')
+		sign = 44 - *str++;
 	while ('0' <= *str && *str <= '9')
 		num = num * 10 + sign * (*str++ - '0');
 	return (num);

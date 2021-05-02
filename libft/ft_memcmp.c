@@ -40,7 +40,7 @@ static int	ft_memcmp_check_16(const void *s1, const void *s2)
 		return (ft_memcmp_check_8(s1 + 8, s2 + 8));
 }
 
-int			ft_memcmp(const void *s1, const void *s2, size_t n)
+int	ft_memcmp(const void *s1, const void *s2, size_t n)
 {
 	while (n >= 16)
 	{

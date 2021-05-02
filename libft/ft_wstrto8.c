@@ -27,9 +27,8 @@ size_t	ft_wstrto8(char *dst_utf8, const wchar_t *src_utf32, size_t n)
 	count = 0;
 	while (*src_utf32 && count < n)
 	{
-		if (*src_utf32 < 128)
-			char_size = 1;
-		else if (*src_utf32 < 2048)
+		char_size = 1;
+		if (*src_utf32 < 2048)
 			char_size = 2;
 		else if (*src_utf32 < 65536)
 			char_size = 3;
@@ -44,6 +43,7 @@ size_t	ft_wstrto8(char *dst_utf8, const wchar_t *src_utf32, size_t n)
 			dst_utf8 += ft_wchrto8(dst_utf8, *src_utf32);
 		src_utf32++;
 	}
-	dst_utf8 ? *dst_utf8 = '\0' : 0;
+	if (dst_utf8)
+		*dst_utf8 = '\0';
 	return (count);
 }

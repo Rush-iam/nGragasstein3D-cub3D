@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/03 18:58:52 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/06 22:39:55 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/02 18:45:53 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,15 +35,16 @@ int		main(int args, char *av[])
 
 void	initialize_game(t_game *game, bool screenshot)
 {
-	const t_upoint	max_res = (screenshot == true) ? MAX_SCREENSHOT : MAX_WIN;
-	int				n;
+	t_upoint	max_res;
+	int			n;
 
-	if (game->img.size.x < MIN_RES)
-		game->img.size.x = MIN_RES;
-	if (game->img.size.x > max_res.x)
-		game->img.size.x = max_res.x;
-	if (game->img.size.y > max_res.y)
-		game->img.size.y = max_res.y;
+	if (screenshot)
+		max_res = (t_upoint){MAX_SCREENSHOT_X, MAX_SCREENSHOT_Y};
+	else
+		max_res = (t_upoint){MAX_WIN_X, MAX_WIN_Y};
+	game->img.size.x = ft_umax(MIN_RES, game->img.size.x);
+	game->img.size.x = ft_umin(max_res.x, game->img.size.x);
+	game->img.size.y = ft_umin(max_res.y, game->img.size.y);
 	game->img.aspect = (double)game->img.size.x / game->img.size.y;
 	if (screenshot == false)
 		if (!(game->win = mlx_new_window(
