@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/28 18:43:41 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/02 20:10:15 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 22:06:25 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ void	set_resolution(const char *res_string, t_upoint *res, t_game *game)
 	if (res->x)
 		terminate(game, ERR_PARSE, "Duplicated Resolution setting");
 	res_string++;
+	if (*res_string != ' ')
+		terminate(game, ERR_PARSE, "Add space after Resolution identifier");
 	res_string = atoi_limited(&res->x, res_string, UINT_MAX);
 	if (res_string == NULL)
 		terminate(game, ERR_PARSE, "Resolution X setting is wrong");
@@ -35,8 +37,10 @@ void	set_ceilfloor(const char *color_string, unsigned int *target,
 	unsigned int	b;
 
 	if (*target != -1U)
-		terminate(game, ERR_PARSE, "Duplicated F or C color setting");
+		terminate(game, ERR_PARSE, "Duplicated F/C color identifier");
 	color_string++;
+	if (*color_string != ' ')
+		terminate(game, ERR_PARSE, "Add space after F/C identifier");
 	color_string = atoi_limited(&r, color_string, UCHAR_MAX);
 	if (color_string == NULL)
 		terminate(game, ERR_PARSE, "F/C color Red is wrong (range: 0-255)");
@@ -73,7 +77,10 @@ void	set_textures(char *string, t_game *game)
 	else
 		terminate(game, ERR_PARSE, "Wrong texture setting. Valid: NO/SO/WE/EA");
 	if (game->texture[id].ptr != NULL)
-		terminate(game, ERR_PARSE, "Duplicated texture setting");
+		terminate(game, ERR_PARSE, "Duplicated sprite/texture identifier");
+	if ((id == SPRITE && string[1] != ' ') || \
+		(id != SPRITE && string[2] != ' '))
+		terminate(game, ERR_PARSE, "Add space after texture identifier");
 	string += 2;
 	while (*string == ' ')
 		string++;
