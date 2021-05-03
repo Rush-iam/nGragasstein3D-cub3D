@@ -15,12 +15,13 @@ W7 ./resources/textures/wall_metal_1.png
 W8 ./resources/textures/wall_metal_2.png
 W9 ./resources/textures/wall_stone_salamandra.png
 W10 ./resources/textures/wall_metal_3.png
-W11 ./resources/textures/wall_elevator.png
+W11 ./resources/textures/wall_elevator_down.png
+W12 ./resources/textures/wall_elevator_up.png
 
-W12 ./resources/textures/door_neon_0.png
-W13 ./resources/textures/door_neon_1.png
-W14 ./resources/textures/door_neon_2.png
-W15 ./resources/textures/door_neon_1.png
+W13 ./resources/textures/door_neon_0.png
+W14 ./resources/textures/door_neon_1.png
+W15 ./resources/textures/door_neon_2.png
+W16 ./resources/textures/door_neon_1.png
 
 G0 ./resources/weapons/knife_neon_
 G1 ./resources/weapons/pistol_neon_
@@ -45,6 +46,7 @@ S15 ./resources/enemies/guard/attack_1.png
 S16 ./resources/sprites/puddle.png
 S17 ./resources/sprites/cake.png
 S18 ./resources/sprites/guard_dead.png
+
 S19 ./resources/sprites/health_xl.png
 S20 ./resources/sprites/health_l.png
 S21 ./resources/sprites/health_m.png
@@ -56,25 +58,29 @@ S26 ./resources/sprites/bonus_m.png
 S27 ./resources/sprites/bonus_s.png
 
 M0 ./resources/music/01 Around the Corner!.wav
+M1 ./resources/music/17 End of Level.wav
+
 E0 ./resources/enemies/mutant/
 
 A0 ./resources/sounds/player_noaction.wav
 A1 ./resources/sounds/player_pain.wav
 A2 ./resources/sounds/player_death.wav
-A3 ./resources/sounds/door_open.wav
-A4 ./resources/sounds/door_close.wav
-A5 ./resources/sounds/weapon_knife.wav
-A6 ./resources/sounds/weapon_pistol.wav
-A7 ./resources/sounds/weapon_rifle.wav
-A8 ./resources/sounds/pickup_ammo.wav
-A9 ./resources/sounds/pickup_rifle.wav
-A10 ./resources/sounds/pickup_health_m.wav
-A11 ./resources/sounds/pickup_health_l.wav
-A12 ./resources/sounds/pickup_health_xl.wav
-A13 ./resources/sounds/pickup_bonus_s.wav
-A14 ./resources/sounds/pickup_bonus_m.wav
-A15 ./resources/sounds/pickup_bonus_l.wav
-A16 ./resources/sounds/pickup_bonus_xl.wav
+A3 ./resources/sounds/door_secret.wav
+A4 ./resources/sounds/elevator.wav
+A5 ./resources/sounds/door_open.wav
+A6 ./resources/sounds/door_close.wav
+A7 ./resources/sounds/weapon_knife.wav
+A8 ./resources/sounds/weapon_pistol.wav
+A9 ./resources/sounds/weapon_rifle.wav
+A10 ./resources/sounds/pickup_ammo.wav
+A11 ./resources/sounds/pickup_rifle.wav
+A12 ./resources/sounds/pickup_health_m.wav
+A13 ./resources/sounds/pickup_health_l.wav
+A14 ./resources/sounds/pickup_health_xl.wav
+A15 ./resources/sounds/pickup_bonus_s.wav
+A16 ./resources/sounds/pickup_bonus_m.wav
+A17 ./resources/sounds/pickup_bonus_l.wav
+A18 ./resources/sounds/pickup_bonus_xl.wav
 
   7777777777777                     0000000000001000000000000
   7nnnnnnnnnnn77878777777777777777770.......................0

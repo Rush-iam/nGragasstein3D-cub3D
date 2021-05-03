@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 21:08:19 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 21:32:53 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@
 
 # define FOV_ZOOM_SPEED	5.0f
 # define FOV_ZOOM_IN	M_PI_4_F
-# define FOV_ZOOM_OUT	2.35619449019f
+# define FOV_ZOOM_OUT	4.0f
 // # define FOV_ZOOM_OUT	M_PI_4_F + M_PI_F
 
 # define PL_SPEED		0.07f

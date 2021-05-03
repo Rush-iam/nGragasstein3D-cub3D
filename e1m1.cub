@@ -48,6 +48,7 @@ S15 ./resources/sprites/bones.png
 S16 ./resources/sprites/puddle.png
 S17 ./resources/sprites/pot.png
 S18 ./resources/sprites/guard_dead.png
+
 S19 ./resources/sprites/health_xl.png
 S20 ./resources/sprites/health_l.png
 S21 ./resources/sprites/health_m.png

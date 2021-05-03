@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:53:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 21:04:13 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 21:05:19 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,15 @@ void	enemy(t_game *game, t_object *obj)
 	enemy_logic(game, obj);
 	if (obj->e->state == ST_WALK)
 	{
-		if (!obj->e->path || \
-			(obj->e->path_target.x != (int)obj->e->target.x || \
-			obj->e->path_target.y != (int)obj->e->target.y))
+		if (!obj->e->path || (obj->e->path_target.x != (int)obj->e->target.x \
+			|| obj->e->path_target.y != (int)obj->e->target.y))
 		{
 			pathfind(&obj->e->path, (t_point){obj->pos.x, obj->pos.y}, \
 					(t_point){obj->e->target.x, obj->e->target.y}, &game->map);
 			obj->e->path_target = (t_point){obj->e->target.x, obj->e->target.y};
 		}
-		enemy_move(game, obj, *(t_point *)obj->e->path->content);
+		if (obj->e->path)
+			enemy_move(game, obj, *(t_point *)obj->e->path->content);
 	}
 	enemy_sprite(game, obj);
 }
