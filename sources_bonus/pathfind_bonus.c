@@ -6,108 +6,46 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/13 22:01:43 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/26 16:05:35 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 17:25:44 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
 
-void	bfs_grid_initialize(t_game *g)
-{
-	unsigned	y;
-	unsigned	x;
-
-	g->map.grid_bfs = malloc(sizeof(*g->map.grid_bfs) * g->map.size.y);
-	if (g->map.grid_bfs == NULL)
-		terminate(g, ERR_MEM, "Memory allocation failed (bfs rows)");
-	y = 0;
-	while (y < g->map.size.y)
-	{
-		g->map.grid_bfs[y] = malloc(sizeof(**g->map.grid_bfs) * g->map.size.x);
-		if (g->map.grid_bfs[y] == NULL)
-			terminate(g, ERR_MEM, "Memory allocation failed (bfs cols)");
-		x = 0;
-		while (x < g->map.size.x)
-		{
-			if (g->map.grid[y][x] != '.' &&
-				ft_strchr(CHAR_DOORS, g->map.grid[y][x]) == NULL)
-				g->map.grid_bfs[y][x] = -1U;
-			else
-				g->map.grid_bfs[y][x] = 0;
-			x++;
-		}
-		y++;
-	}
-}
-
-void	bfs_grid_update(t_game *g)
-{
-	unsigned	y;
-	unsigned	x;
-
-	y = 0;
-	while (y < g->map.size.y)
-	{
-		x = 0;
-		while (x < g->map.size.x)
-		{
-			if (g->map.grid[y][x] != '.' && ft_memchr(CHAR_DOORS,
-					g->map.grid[y][x], sizeof(CHAR_DOORS) - 1) == NULL)
-				g->map.grid_bfs[y][x] = -1U;
-			else
-				g->map.grid_bfs[y][x] = 0;
-			x++;
-		}
-		y++;
-	}
-}
-
 void	*pathfind(t_list **path, t_point from, t_point to, struct s_map *map)
 {
 	t_list	*queue;
-	t_list	*near_lst;
 	t_point	*pt;
 	t_point	nears[4];
 	int		i;
 
 	ft_lstclear(path, free);
-	if (pathfind_init(map, to, &queue, &pt) == true)
-		while (queue)
+	if (!pathfind_init(map, to, &queue, &pt))
+		return (NULL);
+	while (queue)
+	{
+		pt = ft_lstpop(&queue);
+		i = pathfind_nears_get(map, *pt, nears);
+		while (--i >= 0)
 		{
-			pt = ft_lstpop(&queue);
-			i = pathfind_nears(map, *pt, nears);
-			while (--i >= 0)
-				if (map->grid_bfs[nears[i].y][nears[i].x] == 0)
-				{
-					map->grid_bfs[nears[i].y][nears[i].x] =
-							map->grid_bfs[pt->y][pt->x] + 1;
-					if (nears[i].x == from.x && nears[i].y == from.y)
-					{
-						pathfind_deinit(&queue, pt);
-						return (pathfind_construct(path, from, map));
-					}
-					near_lst = ft_lstnew(malloc(sizeof(*nears)));
-					if (near_lst == NULL || near_lst->content == NULL)
-						return (pathfind_deinit(&queue, pt));
-					*(t_point *)near_lst->content = nears[i];
-					ft_lstadd_back(&queue, near_lst);
-				}
-			free(pt);
+			if (pathfind_nears_check(&queue, map, *pt, nears[i]) == false)
+				return (pathfind_deinit(&queue, pt));
+			if (nears[i].x == from.x && nears[i].y == from.y)
+			{
+				pathfind_deinit(&queue, pt);
+				return (pathfind_construct(path, from, map));
+			}
 		}
+		free(pt);
+	}
 	return (NULL);
 }
 
-void	*pathfind_deinit(t_list **queue, t_point *pt)
+bool	pathfind_init(struct s_map *map, t_point target, t_list **queue,
+					  t_point **pt)
 {
-	ft_lstclear(queue, free);
-	free(pt);
-	return (NULL);
-}
-
-bool	pathfind_init(struct s_map *map, t_point target, t_list **queue, t_point **pt)
-{
-	unsigned	y;
-	unsigned	x;
+	uint32_t	y;
+	uint32_t	x;
 
 	if (ft_malloc_ptr((void **)pt, sizeof(**pt)) == NULL)
 		return (NULL);
@@ -131,7 +69,25 @@ bool	pathfind_init(struct s_map *map, t_point target, t_list **queue, t_point **
 	return (true);
 }
 
-int		pathfind_nears(struct s_map *map, t_point pt, t_point *nears)
+bool	pathfind_nears_check(t_list **queue, struct s_map *map, t_point pt_from,
+							 t_point pt_near)
+{
+	t_list	*near_lst;
+
+	if (map->grid_bfs[pt_near.y][pt_near.x] == 0)
+	{
+		map->grid_bfs[pt_near.y][pt_near.x] = \
+				map->grid_bfs[pt_from.y][pt_from.x] + 1;
+		near_lst = ft_lstnew(malloc(sizeof(pt_near)));
+		if (near_lst == NULL || near_lst->content == NULL)
+			return (false);
+		*(t_point *)near_lst->content = pt_near;
+		ft_lstadd_back(queue, near_lst);
+	}
+	return (true);
+}
+
+int	pathfind_nears_get(struct s_map *map, t_point pt, t_point *nears)
 {
 	const t_point	dirs[] = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
 	t_point			check;
@@ -143,8 +99,8 @@ int		pathfind_nears(struct s_map *map, t_point pt, t_point *nears)
 	while (i < 4)
 	{
 		check = (t_point){pt.x + dirs[i].x, pt.y + dirs[i].y};
-		if ((unsigned)check.x < map->size.x &&
-				(unsigned)check.y < map->size.y &&
+		if ((uint32_t)check.x < map->size.x && \
+				(uint32_t)check.y < map->size.y && \
 				map->grid_bfs[check.y][check.x] == 0)
 			nears[counter++] = check;
 		i++;
@@ -152,39 +108,9 @@ int		pathfind_nears(struct s_map *map, t_point pt, t_point *nears)
 	return (counter);
 }
 
-void	*pathfind_construct(t_list **path, t_point from, struct s_map *map)
+void	*pathfind_deinit(t_list **queue, t_point *pt)
 {
-	t_point			check;
-	t_point			*pt;
-	t_list			*lst;
-	const t_point	dirs[] = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
-	const int		rnd = arc4random() % 4;
-	int				i;
-
-	i = 0;
-	while (i < 4)
-	{
-		check = (t_point){from.x + dirs[(i + rnd) % 4].x,
-							from.y + dirs[(i + rnd) % 4].y};
-		if (map->grid_bfs[check.y][check.x] &&
-			map->grid_bfs[check.y][check.x] < map->grid_bfs[from.y][from.x])
-		{
-			if (ft_malloc_ptr((void *)&pt, sizeof(*pt)) == NULL)
-				return (pathfind_deinit(path, NULL));
-			*pt = check;
-			lst = ft_lstnew(pt);
-			if (lst == NULL)
-				return (pathfind_deinit(path, pt));
-			ft_lstadd_front(path, lst);
-			from = check;
-			if (map->grid_bfs[from.y][from.x] == 1)
-			{
-				ft_lstreverse(path);
-				return (path);
-			}
-			return (pathfind_construct(path, from, map));
-		}
-		i++;
-	}
+	ft_lstclear(queue, free);
+	free(pt);
 	return (NULL);
 }

@@ -20,14 +20,14 @@ bool	pickup(t_game *game, enum e_objtype type)
 		return (false);
 	if (game->p.health >= 100 && (type == T_HEALTH_M || type == T_HEALTH_L))
 		return (false);
-	if ((game->p.ammo == 0 && (type == T_AMMO || type == T_AMMO_ENEMY)) ||
-		type == T_RIFLE)
+	if ((game->p.ammo == 0 && (type == T_AMMO || type == T_AMMO_ENEMY)) \
+		|| type == T_RIFLE)
 	{
 		pickup_get(game, type);
 		if (game->p.weapons_mask & W_RIFLE_MASK)
-			player_set_weapon(game, W_RIFLE);
+			weapon_set(game, W_RIFLE);
 		else
-			player_set_weapon(game, W_PISTOL);
+			weapon_set(game, W_PISTOL);
 	}
 	else
 		pickup_get(game, type);
@@ -44,7 +44,8 @@ void	pickup_drop(t_game *game, t_fpoint pos, enum e_objtype type, t_img *img)
 {
 	t_object	*obj;
 
-	if ((obj = ft_calloc(1, sizeof(t_object))) == NULL)
+	obj = ft_calloc(1, sizeof(*obj));
+	if (obj == NULL)
 		terminate(game, ERR_MEM, "Memory allocation failed (object)");
 	obj->pos = pos;
 	if (img == NULL)

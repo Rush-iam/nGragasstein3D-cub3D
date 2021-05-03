@@ -17,7 +17,7 @@ void	img_clear(t_img *img)
 	ft_bzero(img->data, 4 * img->size.x * img->size.y);
 }
 
-void	img_clear_rgb(t_img *img, unsigned color)
+void	img_clear_rgb(t_img *img, uint32_t color)
 {
 	const int	img_size = img->size.x * img->size.y;
 	int			i;
@@ -27,7 +27,7 @@ void	img_clear_rgb(t_img *img, unsigned color)
 		img->data[i++] = color;
 }
 
-void	img_ceilfloor_rgb(t_img *img, unsigned ceil, unsigned floor)
+void	img_ceilfloor_rgb(t_img *img, uint32_t ceil, uint32_t floor)
 {
 	const int	full_screen = img->size.x * img->size.y;
 	const int	half_screen = full_screen / 2;

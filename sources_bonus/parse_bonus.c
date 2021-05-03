@@ -6,13 +6,13 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/30 22:27:11 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 16:18:55 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
 
-void	parse(int args, char **av, t_game *game, bool *screenshot_only)
+bool	parse(int args, char **av, t_game *game)
 {
 	int		file_id;
 	char	*line;
@@ -24,83 +24,21 @@ void	parse(int args, char **av, t_game *game, bool *screenshot_only)
 	av++;
 	if (ft_strlen(*av) < 5 || ft_memcmp(".cub", *av + ft_strlen(*av) - 4, 5))
 		terminate(game, ERR_ARGS, "Wrong scene filename");
-	if ((file_id = open(*av, O_RDONLY)) == -1)
+	file_id = open(*av, O_RDONLY);
+	if (file_id == -1)
 		terminate(game, ERR_ARGS, strerror(errno));
 	parse_scene(file_id, &line, game);
 	validate_settings(game);
-	parse_map(file_id, line, game->objects, game);
-	if (close(file_id) == -1)
-		terminate(game, ERR_PARSE, strerror(errno));
-	*screenshot_only = false;
+	parse_map(file_id, line, ft_lstnew(line), game);
+	close(file_id);
 	if (args == 3)
 	{
 		if (ft_strncmp("--save", *(av + 1), 7) == 0)
-			*screenshot_only = true;
+			return (true);
 		else
 			terminate(game, ERR_ARGS, "Invalid option");
 	}
-}
-
-void	set_enemies(char *string, t_game *g)
-{
-	unsigned	id;
-	int			i;
-	char		*path;
-
-	if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
-		terminate(g, ERR_PARSE, "Enemy ID is wrong (Exx)");
-	if (id >= sizeof(g->enemyset) / sizeof(*g->enemyset))
-		terminate(g, ERR_PARSE, "Enemy ID out of array range");
-	if (g->enemyset[id].death[0].ptr != NULL)
-		terminate(g, ERR_PARSE, "Duplicated enemy spriteset setting");
-	if ((path = ft_strjoin(string, "wait_")) == NULL)
-		terminate(g, ERR_PARSE, strerror(errno));
-	load_spriteset(g->enemyset[id].wait, 8, path, g);
-	if ((path = ft_strjoin(string, "attack_")) == NULL)
-		terminate(g, ERR_PARSE, strerror(errno));
-	load_spriteset(g->enemyset[id].attack, 3, path, g);
-	if ((path = ft_strjoin(string, "death_")) == NULL)
-		terminate(g, ERR_PARSE, strerror(errno));
-	load_spriteset(g->enemyset[id].death, 5, path, g);
-	if ((path = ft_strjoin(string, "pain_")) == NULL)
-		terminate(g, ERR_PARSE, strerror(errno));
-	load_spriteset(g->enemyset[id].pain, 2, path, g);
-	load_audioset(&g->enemyset[id], string, g);
-	i = 0;
-	while (i < 8)
-	{
-		if ((path = ft_strjoin(string,
-					(char []){'w', 'a', 'l', 'k', '_', '0' + i, '\0'})) == NULL)
-			terminate(g, ERR_PARSE, strerror(errno));
-		load_spriteset(g->enemyset[id].walk[i], 4, path, g);
-		i++;
-	}
-}
-
-void	set_audio(char *string, t_game *game)
-{
-	unsigned	id;
-
-	if (*string == 'M')
-	{
-		if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
-			terminate(game, ERR_PARSE, "Music ID is wrong (Mxx)");
-		if (id >= sizeof(game->audio.music) / sizeof(*game->audio.music))
-			terminate(game, ERR_PARSE, "Music ID out of array range");
-		if (game->audio.music[id].file.channels[0] != NULL)
-			terminate(game, ERR_PARSE, "Duplicated music setting");
-		 load_audio_file(&game->audio.music[id], string);
-	}
-	else if (*string == 'A')
-	{
-		if ((string = atoi_limited(&id, string + 1, 100)) == NULL)
-			terminate(game, ERR_PARSE, "Sound ID is wrong (Axx)");
-		if (id >= sizeof(game->audio.sound) / sizeof(*game->audio.sound))
-			terminate(game, ERR_PARSE, "Sound ID out of array range");
-		if (game->audio.sound[id].file.channels[0] != NULL)
-			terminate(game, ERR_PARSE, "Duplicated sound setting");
-		load_audio_file(&game->audio.sound[id], string);
-	}
+	return (false);
 }
 
 void	parse_scene(int file_id, char **line, t_game *game)
@@ -110,23 +48,7 @@ void	parse_scene(int file_id, char **line, t_game *game)
 	status = get_next_line(file_id, line);
 	while (status >= 0)
 	{
-		if (**line == 'R')
-			set_resolution(*line, game);
-		else if (**line == 'C' || **line == 'F')
-			set_ceilfloor(*line, game);
-		else if (**line == 'W' || **line == 'S')
-			set_textures(*line, game);
-		else if (**line == 'G')
-			set_weapons(*line, game);
-		else if (**line == 'E')
-			set_enemies(*line, game);
-		else if (**line == 'M' || **line == 'A')
-			set_audio(*line, game);
-		else if (**line == 'D')
-			atoi_limited((unsigned *)&game->fade_distance, *line + 1, INT_MAX);
-		else if (**line == 'I' && *game->string.text == '\0')
-			string_add(game, *line + 2, 5, COLOR_WHITE);
-		else if (**line != '#' && **line != '\0')
+		if (!parse_line(*line, game))
 			return ;
 		free(*line);
 		if (status == 0)
@@ -137,45 +59,67 @@ void	parse_scene(int file_id, char **line, t_game *game)
 		terminate(game, ERR_PARSE, "Can't load scene file");
 }
 
+bool	parse_line(char *line, t_game *game)
+{
+	if (*line == 'R')
+		set_resolution(line, game);
+	else if (*line == 'C' || *line == 'F')
+		set_ceilfloor(line, game);
+	else if (*line == 'W' || *line == 'S')
+		load_walls_and_sprites(line, game);
+	else if (*line == 'G')
+		load_weapons(line, game);
+	else if (*line == 'E')
+		load_enemyset(line, game);
+	else if (*line == 'M' || *line == 'A')
+		load_music_and_sounds(line, game);
+	else if (*line == 'D')
+		atoi_limited((unsigned *)&game->fade_distance, line + 1, INT_MAX);
+	else if (*line == 'I' && *game->string.text == '\0')
+		message_add(game, line + 2, 5, COLOR_WHITE);
+	else if (*line != '#' && *line != '\0')
+		return (false);
+	return (true);
+}
+
 void	parse_map(int file_id, char *line, t_list *map, t_game *game)
 {
 	t_list		*line_lst;
 	int			status;
-	unsigned	line_len;
 
-	if ((map = ft_lstnew(line)) == NULL)
+	if (map == NULL)
 		terminate(game, ERR_MEM, "Memory allocation failed (map first row)");
 	game->map.size = (t_upoint){ft_strlen(line), 1};
-	while ((status = get_next_line(file_id, &line)) >= 0 && *line != '\0')
+	status = get_next_line(file_id, &line);
+	while (status >= 0 && *line != '\0')
 	{
-		if ((line_lst = ft_lstnew(line)) == NULL)
+		line_lst = ft_lstnew(line);
+		if (line_lst == NULL)
 			terminate(game, ERR_MEM, "Memory allocation failed (map rows)");
 		ft_lstadd_front(&map, line_lst);
-		if (game->map.size.x < (line_len = ft_strlen(line)))
-			game->map.size.x = line_len;
+		game->map.size.x = ft_umax(ft_strlen(line), game->map.size.x);
 		game->map.size.y++;
+		status = get_next_line(file_id, &line);
 	}
+	free(line);
 	if (status == -1)
 		terminate(game, ERR_PARSE, "Can't load scene file");
-	free(line);
 	if (status != 0)
 		terminate(game, ERR_PARSE, "Empty lines in map are not allowed");
-	if ((game->map.grid = malloc(sizeof(char *) * game->map.size.y)) == NULL)
-		terminate(game, ERR_MEM, "Memory allocation failed (map rows)");
 	set_map(game, map);
 }
 
 void	validate_settings(t_game *game)
 {
-	unsigned	i;
+	uint32_t	i;
 
 	if (game->color_floor == -1U && game->texture_floor.ptr == NULL)
 		terminate(game, ERR_PARSE, "Missing Floor color/texture");
 	if (game->color_ceil == -1U && game->texture_ceil.ptr == NULL)
 		terminate(game, ERR_PARSE, "Missing Ceil color/texture");
 	if (game->resolution.x == 0 || game->resolution.y == 0)
-		terminate(game, ERR_PARSE,
-		"Resolution doesn't set. Format: 'R WIDTH HEIGHT'");
+		terminate(game, ERR_PARSE, \
+						"Resolution doesn't set. Format: 'R WIDTH HEIGHT'");
 	i = 0;
 	while (i < sizeof(game->texture) / sizeof(*game->texture) / 2)
 		if (game->texture[i++].ptr == NULL)

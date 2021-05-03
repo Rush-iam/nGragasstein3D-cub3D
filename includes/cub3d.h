@@ -162,7 +162,7 @@ void		draw_sprite_scaled	(t_img *img, t_object *obj, unsigned x, \
 char		*atoi_limited	(unsigned int *dst_int, const char *src_string, \
 														unsigned int limit);
 int			terminate		(t_game *game, int return_value, char *message);
-void		terminate_free	(t_game *game);
+void		free_resources	(t_game *g);
 void		write_screenshot_and_exit	(t_game *game);
 void		write_screenshot_data	(t_game *game, int file_id);
 

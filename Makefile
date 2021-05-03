@@ -6,7 +6,7 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/05/03 14:22:19 by ngragas          ###   ########.fr        #
+#    Updated: 2021/05/03 18:28:19 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,21 +26,28 @@ SRC_BONUS :=	control_borders	\
 				control_extra	\
 				demo_tools		\
 				doors			\
+				doors_extra		\
 				draw_ceilfloor	\
-				draw_ceilfloor_plain	\
+				draw_ceilfloor_plain \
 				draw_effects	\
 				draw_figures	\
 				draw_fills		\
 				draw_hud		\
+				draw_message	\
 				draw_objects	\
 				draw_pixels		\
 				draw_map		\
+				draw_texture_set \
 				enemies			\
 				hooks			\
 				initialize		\
+				initialize_images \
 				image_utils		\
 				load_files		\
+				load_resources	\
 				pathfind		\
+				pathfind_bfs_grid \
+				pathfind_construct \
 				pickups			\
 				sounds			\
 				screenshot		\
@@ -79,6 +86,8 @@ MLX_DIR = minilibx_opengl/
 MLX = $(MLX_DIR)libmlx.a
 
 CUTE_SOUND = cute_sound/
+CUTE_SOUND_C = $(CUTE_SOUND)cute_sound.c
+CUTE_SOUND_O = $(CUTE_SOUND_C:.c=.o)
 
 all: switch_clean
 	$(MAKE) $(NAME) -j8
@@ -87,10 +96,12 @@ $(LIB): FORCE
 	$(MAKE) -C $(LIB_DIR)
 $(MLX): FORCE
 	$(MAKE) -C $(MLX_DIR) CFLAGS=-DSTRINGPUTX11\ -Ofast\ -g\ -Wno-deprecated
-$(NAME): $(LIB) $(MLX) $(OBJ)
+$(NAME): $(LIB) $(MLX) $(OBJ) $(CUTE_SOUND_O)
 	$(CC) $(CFLAGS) $(OBJ) -o $@ -lft -L$(LIB_DIR) \
 	-lmlx -L$(MLX_DIR) -I$(MLX_DIR) -framework OpenGL -framework AppKit -lz \
-	-I$(CUTE_SOUND) -framework AudioUnit
+	$(CUTE_SOUND_O) -I$(CUTE_SOUND) -framework AudioUnit
+$(CUTE_SOUND_O): $(CUTE_SOUND_C)
+	$(CC) $(CFLAGS)-c $< -o $@ -I$(CUTE_SOUND)
 $(OBJ): | $(OBJ_DIR)
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)

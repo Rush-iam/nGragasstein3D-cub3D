@@ -114,6 +114,6 @@ void	player_control_toggler(t_game *g, int key_code)
 	if (key_code == K_MAP_TOGGLE)
 		g->map.enabled = !g->map.enabled;
 	if (key_code == K_USE)
-		door_open(g, (t_point){g->p.pos.x + g->p.vect.x, \
-								g->p.pos.y + g->p.vect.y}, &g->p.pos, true);
+		door_open_try(g, (t_point){g->p.pos.x + g->p.vect.x, \
+									g->p.pos.y + g->p.vect.y}, &g->p.pos, true);
 }

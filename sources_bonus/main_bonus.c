@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:33:07 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 14:22:09 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 18:18:27 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,13 @@ int	main(int args, char *av[])
 	bool			screenshot_only;
 	struct timespec	time;
 
-	game = (t_game){0};
+	game = (t_game){};
 	game.color_floor = -1U;
 	game.color_ceil = -1U;
 	game.fade_distance = 8;
 	if (ft_assign_ptr(&game.mlx, mlx_init()) == NULL)
 		terminate(&game, ERR_MLX, strerror(errno));
-	parse(args, av, &game, &screenshot_only);
+	screenshot_only = parse(args, av, &game);
 	initialize_game(&game, screenshot_only);
 	if (screenshot_only)
 		write_screenshot_and_exit(&game);
@@ -57,7 +57,7 @@ int	game_loop(t_game *game)
 	draw_effect(game, &game->effect);
 	draw_weapon(game, &game->p.weapon);
 	if (*game->string.text)
-		draw_string(game, &game->string);
+		draw_message(game, &game->string);
 	if (game->map.enabled)
 		draw_map(game);
 	draw_hud(game);
@@ -89,7 +89,7 @@ void	game_ticks(t_game *game)
 		player_control(game);
 		weapon(game, &game->p.weapon);
 		objects(game);
-		ray_cast(game);
+		ray_cast(game, -1);
 		game->tick_diff--;
 	}
 }

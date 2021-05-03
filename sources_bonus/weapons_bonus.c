@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/12 16:12:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 14:22:18 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 18:33:58 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	weapon(t_game *game, struct s_weapon *weapon)
 			weapon->tick = 0;
 			weapon->frame = 0;
 			if (game->p.ammo == 0 && game->p.weapon_cur != W_KNIFE)
-				player_set_weapon(game, W_KNIFE);
+				weapon_set(game, W_KNIFE);
 		}
 		weapon->frame = weapon->frames * weapon->tick / weapon->ticks;
 		if (game->p.weapon_shot == false && weapon->frame == SHOT_FRAME_ID)
@@ -40,8 +40,8 @@ void	weapon(t_game *game, struct s_weapon *weapon)
 
 void	weapon_set(t_game *g, enum e_weapon weapon)
 {
-	if (g->p.weapons_mask == 0 || (weapon != W_KNIFE && g->p.ammo == 0) ||
-		(weapon == W_PISTOL && (g->p.weapons_mask & W_PISTOL_MASK) == 0) ||
+	if (g->p.weapons_mask == 0 || (weapon != W_KNIFE && g->p.ammo == 0) || \
+		(weapon == W_PISTOL && (g->p.weapons_mask & W_PISTOL_MASK) == 0) || \
 		(weapon == W_RIFLE && (g->p.weapons_mask & W_RIFLE_MASK) == 0))
 		return ;
 	g->p.weapon_cur = weapon;
@@ -61,21 +61,22 @@ void	weapon_set(t_game *g, enum e_weapon weapon)
 		g->p.weapon.frames = sizeof(ANIM_RIFLE) - 1;
 	}
 	g->p.weapon.ticks = g->p.weapon.frames * ANIM_TICKS;
-	g->p.weapon_pos = (t_upoint){
-			g->center.x - g->p.weapon_img[g->p.weapon_cur][0].size.x / 2,
+	g->p.weapon_pos = (t_upoint){\
+			g->center.x - g->p.weapon_img[g->p.weapon_cur][0].size.x / 2, \
 			g->img.size.y - g->p.weapon_img[g->p.weapon_cur][0].size.y};
 	g->hud.needs_redraw = true;
 }
 
 void	draw_weapon(t_game *g, struct s_weapon *weapon)
 {
-	const int	offset = g->p.velocity * (ANIM_WEAPON_MAX_OFFSET *\
-						sinf((float)((int)g->tick % (TICKS_PER_SEC * 2 / 3) -\
+	const int	offset = g->p.velocity * (ANIM_WEAPON_MAX_OFFSET * \
+						sinf((float)((int)g->tick % (TICKS_PER_SEC * 2 / 3) - \
 						TICKS_PER_SEC / 3) / (TICKS_PER_SEC / 3) * M_PI_F));
 
-	mlx_put_image_to_window(g->mlx, g->win,
-		g->p.weapon_img[g->p.weapon_cur][weapon->animation[weapon->frame]].ptr,
-		g->p.weapon_pos.x - g->key.mdir.x / 4 + offset,
+	mlx_put_image_to_window(g->mlx, g->win, \
+		g->p.weapon_img[g->p.weapon_cur] \
+						[weapon->animation[weapon->frame]].ptr, \
+		g->p.weapon_pos.x - g->key.mdir.x / 4 + offset, \
 		g->p.weapon_pos.y + ft_max(0, -g->key.mdir.y / 3) + abs(offset));
 }
 
@@ -91,7 +92,7 @@ void	weapon_sound(t_game *game, enum e_weapon weapon)
 
 void	weapon_shoot(t_game *g, t_object *target)
 {
-	unsigned	damage;
+	uint32_t	damage;
 
 	weapon_sound(g, g->p.weapon_cur);
 	if (g->p.weapon_cur != W_KNIFE)
@@ -99,15 +100,15 @@ void	weapon_shoot(t_game *g, t_object *target)
 	if (target && (g->p.weapon_cur != W_KNIFE || target->distance_real < 1.0f))
 	{
 		if (g->p.weapon_cur == W_KNIFE)
-			damage = DMG_KNIFE_MIN + arc4random() %
-					(1 + DMG_KNIFE_MAX - DMG_KNIFE_MIN);
+			damage = DMG_KNIFE_MIN + arc4random() % \
+						(1 + DMG_KNIFE_MAX - DMG_KNIFE_MIN);
 		else
-			damage = DMG_SHOT_MIN + arc4random() %
-					(1 + DMG_SHOT_MAX - DMG_SHOT_MIN);
+			damage = DMG_SHOT_MIN + arc4random() % \
+						(1 + DMG_SHOT_MAX - DMG_SHOT_MIN);
 		target->e->health -= damage;
 		if (target->e->health <= 0)
 		{
-			pickup_drop(g, target->pos, T_AMMO_ENEMY,
+			pickup_drop(g, target->pos, T_AMMO_ENEMY, \
 						&g->sprite[sizeof(CHAR_DECOR) - 1 + T_AMMO - 1]);
 			enemy_set_state(g, target, ST_DEATH);
 			g->p.score += VAL_SCORE_KILL;

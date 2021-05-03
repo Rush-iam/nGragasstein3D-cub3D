@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/11 18:14:51 by ngragas           #+#    #+#             */
-/*   Updated: 2021/03/19 23:40:45 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 15:00:34 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,19 +28,19 @@ void	draw_effect(t_game *game, struct s_effect *ef)
 	}
 }
 
-void	effect_flash(t_game *game, unsigned color, float power)
+void	effect_flash(t_game *game, uint32_t color, float power)
 {
 	img_clear_rgb(&game->img_effect, color | ((int)(255 - 255 * power) << 24));
 	mlx_put_image_to_window(game->mlx, game->win, game->img_effect.ptr, 0, 0);
 }
 
-void	effect_fizzlefade(t_game *game, unsigned color)
+void	effect_fizzlefade(t_game *game, uint32_t color)
 {
-	static unsigned	rndval = 1;
-	unsigned		lsb;
+	static uint32_t	rndval = 1;
+	uint32_t		lsb;
 	t_point			pos;
-	unsigned		i;
-	unsigned		scale;
+	uint32_t		i;
+	uint32_t		scale;
 
 	scale = ft_max(game->center.x, game->img.size.y) / 256 + 1;
 	img_clear_rgb(&game->img_effect, 0xFF000000);

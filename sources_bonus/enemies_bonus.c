@@ -69,7 +69,7 @@ void	enemy_move(t_game *game, t_object *obj)
 	obj->pos.x += cosf(obj->e->path_angle) * move_speed;
 	obj->pos.y += sinf(obj->e->path_angle) * move_speed;
 	if (game->map.grid[move_int.y][move_int.x] != '.')
-		door_open(game, move_int, &obj->pos, false);
+		door_open_try(game, move_int, &obj->pos, false);
 	if ((int)obj->pos.x == move_int.x && (int)obj->pos.y == move_int.y)
 	{
 		if (obj->e->path->next || obj->e->see)
@@ -90,7 +90,7 @@ void	enemy_logic(t_game *game, t_object *obj)
 	obj->e->see = false;
 	if (obj->e->state != ST_DEATH && (fabsf(obj->e->p_to_angle) < ENEMY_FOV_HALF
 										|| game->p.weapon_noise == true))
-		obj->e->see = ray_intersect_distance(game, obj->atan_diff) > obj->distance_real;
+		obj->e->see = enemy_ray_intersect_distance(game, obj->atan_diff) > obj->distance_real;
 	if (obj->e->state == ST_WAIT && !obj->e->see && !obj->e->alarmed)
 		return ;
 	if (obj->e->see == true)
@@ -142,6 +142,26 @@ void	enemy_logic(t_game *game, t_object *obj)
 		enemy_shoot(game, obj);
 		obj->e->shot = true;
 	}
+}
+
+float	enemy_ray_intersect_distance(t_game *game, float angle)
+{
+	t_ray		x1;
+	t_ray		y1;
+	t_fpoint	distance;
+	const float	tan_cur_angle = tanf(angle);
+
+	if (angle < -M_PI_2_F || angle >= M_PI_2_F)
+		x1 = ray_intersect_x(game, -1, -tan_cur_angle);
+	else
+		x1 = ray_intersect_x(game, 1, tan_cur_angle);
+	if (angle >= 0.0f)
+		y1 = ray_intersect_y(game, 1 / tan_cur_angle, 1);
+	else
+		y1 = ray_intersect_y(game, -1 / tan_cur_angle, -1);
+	distance.x = hypotf(x1.pos.x - game->p.pos.x, x1.pos.y - game->p.pos.y);
+	distance.y = hypotf(y1.pos.x - game->p.pos.x, y1.pos.y - game->p.pos.y);
+	return (fminf(distance.x, distance.y));
 }
 
 void	enemy_shoot(t_game *g, t_object *obj)

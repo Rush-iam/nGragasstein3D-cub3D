@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 23:32:43 by ngragas           #+#    #+#             */
-/*   Updated: 2021/04/28 19:17:07 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 15:15:11 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,14 @@ void	draw_object_properties(t_game *game, t_object *obj)
 	if (obj->distance > 0.1f)
 	{
 		obj->render.size.y = (int)(game->col_scale / obj->distance) & ~1;
-		obj->render.size.x = (int)
+		obj->render.size.x = (int) \
 							(obj->render.size.y * obj->sprite->aspect) & ~1;
-		obj->render.start_0 = game->center.x + tanf(obj->angle_to_p) /
+		obj->render.start_0 = game->center.x + tanf(obj->angle_to_p) / \
 									game->col_step - obj->render.size.x / 2;
-		obj->render.start.x = obj->render.start_0 +
-									obj->render.size.x * obj->sprite->min_x;
-		obj->render.end.x = obj->render.start_0 +
-									obj->render.size.x * obj->sprite->max_x;
+		obj->render.start.x = obj->render.start_0 + \
+								obj->render.size.x * obj->sprite->min_x;
+		obj->render.end.x = obj->render.start_0 + \
+								obj->render.size.x * obj->sprite->max_x;
 		obj->render.start.y = game->horizon - obj->render.size.y / 2;
 		obj->render.end.y = obj->render.start.y + obj->render.size.y;
 	}
@@ -64,7 +64,7 @@ void	draw_sprite(t_game *game, t_object *obj)
 		max.x--;
 	if (min.x == max.x)
 		return ;
-	min.y = ft_max(0, obj->render.start.y + z_offset);
+	min.y = ft_max(-1, obj->render.start.y + z_offset);
 	max.y = ft_min(game->img.size.y, obj->render.end.y + z_offset);
 	obj->render.step = (t_fpoint){
 		(float)obj->sprite->size.x / obj->render.size.x,
@@ -82,24 +82,24 @@ void	draw_sprite_scaled(t_game *g, t_object *obj, t_point min, t_point max)
 	t_fpoint	cur_src;
 	int			src_pixel;
 
-	cur_src.y = fmaxf(0.0f, obj->render.step.y * ((int)obj->render.size.y / 2 -
+	cur_src.y = fmaxf(0.f, obj->render.step.y * ((int)obj->render.size.y / 2 - \
 								g->horizon - g->z_level * obj->render.size.y));
-	while (min.y < max.y)
+	while (++min.y < max.y)
 	{
-		x = min.x;
+		x = min.x - 1;
 		cur_src.x = x_src;
-		if (obj->sprite->alpha_y[(unsigned)cur_src.y] == false)
-			while (x < max.x)
+		if (obj->sprite->alpha_y[(uint32_t)cur_src.y] == false)
+		{
+			while (++x < max.x)
 			{
-				src_pixel = obj->sprite->data[(unsigned)cur_src.y *
-							obj->sprite->size.x + (unsigned)cur_src.x];
+				src_pixel = obj->sprite->data[(uint32_t)cur_src.y * \
+									obj->sprite->size.x + (uint32_t)cur_src.x];
 				if ((src_pixel >> 24) == 0)
 					g->img.data[min.y * g->img.size.x + x] = src_pixel;
 				cur_src.x += obj->render.step.x;
-				x++;
 			}
+		}
 		cur_src.y += obj->render.step.y;
-		min.y++;
 	}
 }
 
@@ -108,66 +108,26 @@ void	draw_sprite_scaled_f(t_game *g, t_object *obj, t_point min, t_point max)
 	const float	x_src = obj->render.step.x * (min.x - obj->render.start_0);
 	int			x;
 	t_fpoint	cur_src;
-	int			src_pixel;
-	const float	fade = 1.5f * g->fade_distance / obj->distance;
+	int			pix;
+	const float	f = 1.5f * g->fade_distance / obj->distance;
 
-	cur_src.y = fmaxf(0.0f, obj->render.step.y *
+	cur_src.y = fmaxf(0.0f, obj->render.step.y * \
 							((int)obj->render.size.y / 2 - g->horizon));
-	while (min.y < max.y)
+	while (++min.y < max.y)
 	{
-		x = min.x;
+		x = min.x - 1;
 		cur_src.x = x_src;
-		if (obj->sprite->alpha_y[(unsigned)cur_src.y] == false)
-			while (x < max.x)
+		if (obj->sprite->alpha_y[(uint32_t)cur_src.y] == false)
+		{
+			while (++x < max.x)
 			{
-				src_pixel = obj->sprite->data[(unsigned)cur_src.y *
-							obj->sprite->size.x + (unsigned)cur_src.x];
-				if ((src_pixel >> 24) == 0)
-		g->img.data[min.y * g->img.size.x + x] = pixel_fade(src_pixel, fade);
+				pix = obj->sprite->data[(uint32_t)cur_src.y * \
+						obj->sprite->size.x + (uint32_t)cur_src.x];
+				if ((pix >> 24) == 0)
+					g->img.data[min.y * g->img.size.x + x] = pixel_fade(pix, f);
 				cur_src.x += obj->render.step.x;
-				x++;
 			}
+		}
 		cur_src.y += obj->render.step.y;
-		min.y++;
 	}
 }
-
-//void	draw_sprite_scaled2(t_img *img, t_object *obj, t_point min, t_point max)
-//{
-//	const double	x_src = obj->render.step.x * (min.x - obj->render.start_0);
-//	t_upoint 		cur;
-//	t_fpoint		cur_src;
-//	int				src_pixel;
-//	const unsigned	half = ft_umin(img->size.y / 2, obj->render.size.y / 2);
-//	const float		half_src = (float)obj->sprite->size.y / 2.f;
-//
-//	cur_src.y = 0;
-//	cur.y = 0;
-//	while (cur.y < half)
-//	{
-//		cur.x = min.x;
-//		cur_src.x = x_src;
-//		if (obj->sprite->alpha_y[(int)(half_src - cur_src.y)] == false)
-//			while (cur.x < (unsigned)max.x)
-//			{
-//				if (((src_pixel = obj->sprite->data[(int)(half_src - cur_src.y) *
-//					obj->sprite->size.x + (int)cur_src.x]) >> 24) == 0)
-//					img->data[(img->size.y / 2 - cur.y) * img->size.x + cur.x] = src_pixel;
-//				cur_src.x += obj->render.step.x;
-//				cur.x++;
-//			}
-//		cur.x = min.x;
-//		cur_src.x = x_src;
-//		if (obj->sprite->alpha_y[(int)(half_src + cur_src.y)] == false)
-//			while (cur.x < (unsigned)max.x)
-//			{
-//				if (((src_pixel = obj->sprite->data[(int)(half_src + cur_src.y) *
-//					obj->sprite->size.x + (int)cur_src.x]) >> 24) == 0)
-//					img->data[(img->size.y / 2 + cur.y) * img->size.x + cur.x] = src_pixel;
-//				cur_src.x += obj->render.step.x;
-//				cur.x++;
-//			}
-//		cur_src.y += obj->render.step.y;
-//		cur.y++;
-//	}
-//}

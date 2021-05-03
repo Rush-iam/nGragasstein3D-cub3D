@@ -52,7 +52,7 @@ int	terminate(t_game *game, int return_value, char *message)
 		else if (return_value == ERR_BMP)
 			ft_putendl_fd("Unable to save screenshot", 2);
 	}
-	terminate_free(game);
+	free_resources(game);
 	if (game->img.ptr)
 		mlx_destroy_image(game->mlx, game->img.ptr);
 	if (game->win)
@@ -61,24 +61,24 @@ int	terminate(t_game *game, int return_value, char *message)
 	exit(return_value);
 }
 
-void	terminate_free(t_game *game)
+void	free_resources(t_game *g)
 {
 	unsigned int	i;
 
-	ft_lstclear(&game->objects, free);
-	free(game->column);
-	if (game->map.grid)
+	ft_lstclear(&g->objects, free);
+	free(g->column);
+	if (g->map.grid)
 	{
 		i = 0;
-		while (i < game->map.size.y)
-			free(game->map.grid[i++]);
-		free(game->map.grid);
+		while (i < g->map.size.y)
+			free(g->map.grid[i++]);
+		free(g->map.grid);
 	}
 	i = 0;
-	while (i < sizeof(game->texture) / sizeof(t_img))
+	while (i < sizeof(g->texture) / sizeof(t_img))
 	{
-		if (game->texture[i].ptr)
-			mlx_destroy_image(game->mlx, game->texture[i].ptr);
+		if (g->texture[i].ptr)
+			mlx_destroy_image(g->mlx, g->texture[i].ptr);
 		i++;
 	}
 }

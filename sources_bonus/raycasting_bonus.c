@@ -6,53 +6,51 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:45 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 14:22:18 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 18:04:27 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
 
-void		ray_cast(t_game *game)
+void	ray_cast(t_game *game, int ray)
 {
-	int		ray;
-	float	angle;
+	float		angle;
+	t_point		step;
+	t_fpoint	distance;
+	t_ray		x1;
+	t_ray		y1;
 
-	ray = 0;
-	while (ray < (int)game->img.size.x)
+	while (++ray < (int)game->img.size.x)
 	{
 		angle = game->p.angle + game->angles[ray];
-		game->column[ray] = ray_intersect(game, tanf(angle),
-			(t_point){1 - (angle < -M_PI_2_F || angle >= M_PI_2_F) * 2,
-			1 - (sinf(angle) < 0.0f) * 2});
-		ray++;
+		step.x = 1 - (angle < -M_PI_2_F || angle >= M_PI_2_F) * 2;
+		step.y = 1 - (sinf(angle) < 0.0f) * 2;
+		angle = tanf(angle);
+		x1 = ray_intersect_x(game, step.x, step.x * angle);
+		y1 = ray_intersect_y(game, step.y / angle, step.y);
+		distance.x = game->p.vect.x * (x1.pos.x - game->p.pos.x) + \
+						game->p.vect.y * (x1.pos.y - game->p.pos.y);
+		distance.y = game->p.vect.x * (y1.pos.x - game->p.pos.x) + \
+						game->p.vect.y * (y1.pos.y - game->p.pos.y);
+		if (distance.x < distance.y)
+			game->column[ray] = (struct s_column){distance.x, x1.pos, x1.cell, \
+								"EW"[x1.cell.x < (int)game->p.pos.x], 0, 0, 0};
+		else
+			game->column[ray] = (struct s_column){distance.y, y1.pos, y1.cell, \
+								"SN"[y1.cell.y < (int)game->p.pos.y], 0, 0, 0};
 	}
 }
 
-struct s_column	ray_intersect(t_game *game, float tan_cur_angle, t_point step)
-{
-	const t_ray	x1 = ray_intersect_x(game, step.x, step.x * tan_cur_angle);
-	const t_ray	y1 = ray_intersect_y(game, step.y / tan_cur_angle, step.y);
-	const float	distance_x = game->p.vect.x * (x1.pos.x - game->p.pos.x) +
-							game->p.vect.y * (x1.pos.y - game->p.pos.y);
-	const float	distance_y = game->p.vect.x * (y1.pos.x - game->p.pos.x) +
-							game->p.vect.y * (y1.pos.y - game->p.pos.y);
-
-	if (distance_x < distance_y)
-		return ((struct s_column){distance_x, x1.pos, x1.cell,
-				"EW"[x1.cell.x < (int)game->p.pos.x], 0, 0, 0});
-	else
-		return ((struct s_column){distance_y, y1.pos, y1.cell,
-				"SN"[y1.cell.y < (int)game->p.pos.y], 0, 0, 0});
-}
-
-static inline bool	ray_intersect_door(t_game *g, float x, float st_x, t_point pt)
+static inline bool	ray_intersect_door(t_game *g, float x, float st_x,
+																	t_point pt)
 {
 	const float	check = x + st_x / 2.0f - (int)x;
 
 	return (door_find(g, pt)->part_opened <= check && check < 1.0f);
 }
 
-static inline bool	ray_intersect_secret(t_game *g, float *x, float *st_x, t_point pt)
+static inline bool	ray_intersect_secret(t_game *g, float *x, float *st_x,
+																	t_point pt)
 {
 	const float	part_opened = door_find(g, pt)->part_opened;
 	const float	check = *x + *st_x * part_opened - (int)*x;
@@ -124,32 +122,16 @@ t_ray	ray_intersect_y(t_game *g, float stx, int sty)
 	return ((t_ray){(t_fpoint){x, y + (sty < 0)}, (t_point){x, y}});
 }
 
-float	ray_intersect_distance(t_game *game, float angle)
-{
-	t_ray		x1;
-	t_ray		y1;
-	t_fpoint	distance;
-	const float	tan_cur_angle = tanf(angle);
-
-	x1 = (angle < -M_PI_2_F || angle >= M_PI_2_F) ?
-		 ray_intersect_x(game, -1, -tan_cur_angle) :
-		 ray_intersect_x(game, 1, tan_cur_angle);
-	y1 = (angle >= 0) ?
-		 ray_intersect_y(game, 1 / tan_cur_angle, 1) :
-		 ray_intersect_y(game, -1 / tan_cur_angle, -1);
-	distance.x = hypotf(x1.pos.x - game->p.pos.x, x1.pos.y - game->p.pos.y);
-	distance.y = hypotf(y1.pos.x - game->p.pos.x, y1.pos.y - game->p.pos.y);
-	return (fminf(distance.x, distance.y));
-}
-
 // DDA intersection:
 //
-//bool	ray_intersect_door_x(t_game *g, t_point step, t_fpoint dist_step, t_ray *ray)
+//bool	ray_intersect_door_x(t_game *g, t_point step, t_fpoint dist_step,
+// 																t_ray *ray)
 //{
 //	t_fpoint	check;
 //
 //	check.x = ray->cell.x + step.x / 2.0f;
-////	check.y = ray->cell.y + (dist_step.x - fabsf(g->p.vect.x)) / fabsf(g->p.vect.y) / 2.0f;
+////	check.y = ray->cell.y + (dist_step.x - fabsf(g->p.vect.x)) /
+/// 										fabsf(g->p.vect.y) / 2.0f;
 //	if (!(0.0f < check.y && check.y < door_find(g, ray->cell)->part_opened))
 //	{
 //		ray->pos.x += dist_step.x / 2.0f;
@@ -159,7 +141,8 @@ float	ray_intersect_distance(t_game *game, float angle)
 //		return (false);
 //}
 //
-//t_ray	ray_intersect_get(t_game *g, t_point step, t_fpoint dist_step, t_ray ray)
+//t_ray	ray_intersect_get(t_game *g, t_point step, t_fpoint dist_step,
+// 																t_ray ray)
 //{
 //	while ((unsigned)ray.cell.x < g->map.size.x &&
 //			(unsigned)ray.cell.y < g->map.size.y)
@@ -189,7 +172,8 @@ float	ray_intersect_distance(t_game *game, float angle)
 //}
 //
 //
-//struct s_column	ray_intersect_dda(t_game *g, float tan_angle, t_point negative)
+//struct s_column	ray_intersect_dda(t_game *g, float tan_angle,
+// 															t_point negative)
 //{
 //	const t_point	step = {!negative.x - negative.x, !negative.y - negative.y};
 //	t_fpoint		dist_step;

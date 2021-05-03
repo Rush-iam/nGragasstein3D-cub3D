@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/30 19:26:18 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/01 15:57:23 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 14:57:46 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,7 @@ void	draw_ceil_textured(t_game *g, t_point px)
 			fabsf((g->p.pos.y + angle.y / height) / TEXTURE_CEIL_CELLSCALE)};
 		pt = (t_fpoint){pt.x - (int)pt.x, pt.y - (int)pt.y};
 		g->img.data[px.y * g->img.size.x + px.x] = src.data[
-			src.size.x * (int)(pt.y * src.size.y) + \
-			(int)(pt.x * src.size.x)];
+			src.size.x * (int)(pt.y * src.size.y) + (int)(pt.x * src.size.x)];
 		height += g->height_step_up;
 	}
 }
@@ -52,8 +51,8 @@ int	draw_ceil_texture_faded(t_game *g, t_point px, float *height)
 	while (px.y && (int)dist >= g->fade_distance)
 	{
 		px.y--;
-		pt = (t_fpoint){
-				fabsf(g->p.pos.x + angle.x * dist) / TEXTURE_CEIL_CELLSCALE,
+		pt = (t_fpoint){\
+				fabsf(g->p.pos.x + angle.x * dist) / TEXTURE_CEIL_CELLSCALE, \
 				fabsf(g->p.pos.y + angle.y * dist) / TEXTURE_CEIL_CELLSCALE};
 		pt = (t_fpoint){pt.x - (int)pt.x, pt.y - (int)pt.y};
 		g->img.data[px.y * g->img.size.x + px.x] = pixel_fade(src.data[\
@@ -84,13 +83,12 @@ void	draw_floor_textured(t_game *g, t_point px)
 	while (px.y < (int)g->img.size.y)
 	{
 		height += g->height_step_down;
-		pt = (t_fpoint){
-				fabsf(g->p.pos.x + angle.x / height) / TEXTURE_FLOOR_CELLSCALE,
-				fabsf(g->p.pos.y + angle.y / height) / TEXTURE_FLOOR_CELLSCALE};
+		pt = (t_fpoint){\
+			fabsf(g->p.pos.x + angle.x / height) / TEXTURE_FLOOR_CELLSCALE, \
+			fabsf(g->p.pos.y + angle.y / height) / TEXTURE_FLOOR_CELLSCALE};
 		pt = (t_fpoint){pt.x - (int)pt.x, pt.y - (int)pt.y};
-		g->img.data[px.y * g->img.size.x + px.x] = src.data[\
-			src.size.x * (int)(pt.y * src.size.y) + \
-			(int)(pt.x * src.size.x)];
+		g->img.data[px.y * g->img.size.x + px.x] = src.data[
+			src.size.x * (int)(pt.y * src.size.y) + (int)(pt.x * src.size.x)];
 		px.y++;
 	}
 }
@@ -105,9 +103,9 @@ int	draw_floor_texture_faded(t_game *g, t_point px, float *height)
 	dist = g->col_scale / *height;
 	while (px.y < (int)g->img.size.y && (int)dist >= g->fade_distance)
 	{
-		pt = (t_fpoint){
-				fabsf(g->p.pos.x + angle.x * dist) / TEXTURE_FLOOR_CELLSCALE,
-				fabsf(g->p.pos.y + angle.y * dist) / TEXTURE_FLOOR_CELLSCALE};
+		pt = (t_fpoint){\
+			fabsf(g->p.pos.x + angle.x * dist) / TEXTURE_FLOOR_CELLSCALE, \
+			fabsf(g->p.pos.y + angle.y * dist) / TEXTURE_FLOOR_CELLSCALE};
 		pt = (t_fpoint){pt.x - (int)pt.x, pt.y - (int)pt.y};
 		g->img.data[px.y * g->img.size.x + px.x] = pixel_fade(src.data[\
 			src.size.x * (int)(pt.y * src.size.y) + \

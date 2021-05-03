@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 14:22:18 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 18:32:46 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -518,8 +518,9 @@ int				dead_exit	(t_game *game);
 bool			chr_is_wall	(char c);
 
 // parse
-void			parse(int args, char **av, t_game *game, bool *screenshot_only);
+bool			parse(int args, char **av, t_game *game);
 void			parse_scene(int file_id, char **line, t_game *game);
+bool			parse_line(char *line, t_game *game);
 void			parse_map(int file_id, char *line, t_list *map, t_game *game);
 void			validate_settings(t_game *game);
 
@@ -528,8 +529,21 @@ void			set_resolution		(const char *res_string, t_game *game);
 void			set_ceilfloor		(char *string, t_game *game);
 void			set_ceilfloor_color	(char *string, uint32_t *target, \
 												   t_game *game);
-void			set_weapons			(char *string, t_game *game);
-void			set_textures		(char *string, t_game *game);
+// load_resources
+void			load_walls_and_sprites(char *string, t_game *game);
+void			load_music_and_sounds(char *string, t_game *game);
+void			load_weapons			(char *string, t_game *game);
+void			load_enemyset(char *str, t_game *g);
+void			load_enemyset_walk(char *str, uint32_t id, t_game *g);
+
+// load_files
+void			load_image_file	(t_game *g, char *path, t_img *dst_img, \
+									char *err);
+void			load_audio_file	(t_snd *dst, char *path);
+void			load_spriteset(t_img *dst, int count, char *path, t_game *game);
+void			load_audioset	(t_set *dst, char *path, t_game *game);
+void			load_audioset_multiple(t_set *dst, char *path, t_game *game);
+
 
 // parse_set_map
 void			set_map				(t_game *game, t_list *map);
@@ -582,10 +596,15 @@ void			sound_adjust_pan(struct s_player *pl, \
 									struct s_playing_sound sound);
 
 // doors
-void			doors		(t_game *game);
 t_door			*door_find	(t_game *game, t_point cell);
-void			door_open	(t_game *g, t_point cell, t_fpoint	*opener_pos, \
+void			doors		(t_game *game);
+void			door_autoclose(t_game *game, t_door *door);
+void			door_secret_open(t_game *game, t_door *door);
+
+// doors_extra
+void			door_open_try(t_game *g, t_point cell, t_fpoint *opener_pos, \
 								bool by_player);
+void			door_open(t_game *g, t_door *door, bool by_player);
 void			door_sound	(t_game *game, t_door *door);
 
 // weapons
@@ -615,23 +634,30 @@ void			enemy_set_state	(t_game *g, t_object *obj, \
 									enum e_objstate state);
 void			enemy_sound		(t_game *game, t_object *obj, \
 									enum e_sound sound_type);
+float			enemy_ray_intersect_distance(t_game *game, float angle);
 
-// pathfind
+
+// pathfind_bfs_grid
 void			bfs_grid_initialize	(t_game *g);
 void			bfs_grid_update		(t_game *g);
-void			*pathfind			(t_list **path, t_point from, t_point to, \
-									struct s_map *map);
+
+// pathfind
 bool			pathfind_init		(struct s_map *map, t_point target, \
 									t_list **queue, t_point **pt);
+void			*pathfind			(t_list **path, t_point from, t_point to, \
+											struct s_map *map);
+int				pathfind_nears_get	(struct s_map *map, t_point pt, \
+										t_point *nears);
+bool			pathfind_nears_check(t_list **queue, struct s_map *map, \
+										t_point pt_from, t_point pt_near);
 void			*pathfind_deinit	(t_list **queue, t_point *pt);
-int				pathfind_nears	(struct s_map *map, t_point pt, t_point *nears);
+
+// pathfind_construct
 void			*pathfind_construct	(t_list **path, t_point from, \
-									struct s_map *map);
+										struct s_map *map);
 
 // raycasting
-void			ray_cast			(t_game *game);
-struct s_column	ray_intersect		(t_game *g, float tan_angle, t_point step);
-float			ray_intersect_distance(t_game *game, float angle);
+void			ray_cast			(t_game *game, int ray);
 t_ray			ray_intersect_x		(t_game *g, int stx, float sty);
 t_ray			ray_intersect_y		(t_game *g, float stx, int sty);
 
@@ -648,18 +674,22 @@ void			draw_ceil_plain			(t_game *g);
 void			draw_floor_plain		(t_game *g);
 void			draw_ceilfloor_plain	(t_game *g);
 
-// draw_walls
+// draw_texture_set
+void			draw_texture_set		(t_game *g, struct s_column *col);
 void			draw_wall_texture_set	(t_game *g, struct s_column *col, \
 											t_point pt);
 void			draw_wall_texture_set_pos(struct s_column *col);
 void			draw_door_texture_set	(t_game *game, struct s_column *col, \
 											char chr);
+
+// draw_walls
 void			draw_walls				(t_game *g);
 void			draw_wall_scaled		(t_game *g, t_img src, t_point cur, \
 											int z_offset);
 void			draw_wall_scaled_f		(t_game *g, t_img src, t_point cur, \
 											int z_offset);
 void			draw_wall_solid			(t_game *game, uint32_t x, float fade);
+
 
 // draw_objects
 void			draw_object_properties(t_game *game, t_object *obj);
@@ -683,12 +713,9 @@ void			draw_map			(t_game *game);
 void			draw_map_player		(t_game *g);
 void			draw_map_objects	(t_game *game);
 
-// load_files
-void			load_image_file	(t_game *g, char *path, t_img *dst_img, \
-									char *err);
-void			load_audio_file	(t_snd *dst, char *path);
-void			load_audioset	(t_set *dst, char *path, t_game *game);
-void			load_spriteset(t_img *dst, int count, char *path, t_game *game);
+// draw_message
+void			message_add(t_game *g, char *string, int timer, uint32_t color);
+void			draw_message(t_game *g, struct s_string *s);
 
 // image_utils
 t_img			*img_create(void *mlx_ptr, t_img *dst, t_upoint size);
@@ -725,8 +752,6 @@ void			effect_fizzlefade(t_game *game, uint32_t color);
 char			*skip_spaces(char **str);
 char			*atoi_limited(uint32_t *dst_int, const char *src_string, \
 									uint32_t limit);
-void			string_add(t_game *g, char *string, int timer, uint32_t color);
-void			draw_string(t_game *g, struct s_string *s);
 
 // screenshot
 void			write_screenshot_and_exit	(t_game *game);
@@ -734,8 +759,8 @@ void			write_screenshot_data		(t_game *game, int file_id);
 
 // terminate
 int				terminate		(t_game *game, int return_value, char *message);
-void			terminate_free	(t_game *game);
-void			terminate_free_images(t_game *game, t_img *arr, uint32_t count);
+void			free_resources	(t_game *g);
+void			free_image_array(t_game *game, t_img *arr, uint32_t count);
 void			terminate_free_object(void *object);
 void			terminate_audio(t_game *game);
 
