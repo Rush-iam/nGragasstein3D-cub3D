@@ -6,7 +6,7 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/05/03 18:28:19 by ngragas          ###   ########.fr        #
+#    Updated: 2021/05/03 19:53:39 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,6 +39,7 @@ SRC_BONUS :=	control_borders	\
 				draw_map		\
 				draw_texture_set \
 				enemies			\
+				enemy_logic		\
 				hooks			\
 				initialize		\
 				initialize_images \

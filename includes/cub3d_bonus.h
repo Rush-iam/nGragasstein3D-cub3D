@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 18:32:46 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/03 21:08:19 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -353,7 +353,7 @@ typedef struct s_object
 		t_fpoint	target;
 		t_list		*path;
 		t_point		path_target;
-		float		path_angle;
+		float		walk_angle;
 		t_img		*imgset;
 		short		frame;
 		short		frames;
@@ -544,7 +544,6 @@ void			load_spriteset(t_img *dst, int count, char *path, t_game *game);
 void			load_audioset	(t_set *dst, char *path, t_game *game);
 void			load_audioset_multiple(t_set *dst, char *path, t_game *game);
 
-
 // parse_set_map
 void			set_map				(t_game *game, t_list *map);
 void			set_map_process		(t_game *game);
@@ -627,15 +626,19 @@ void			pickup_sound(t_game *g, enum e_objtype item);
 
 // enemies
 void			enemy			(t_game *game, t_object *obj);
-void			enemy_logic		(t_game *game, t_object *obj);
+void			enemy_move		(t_game *game, t_object *o, t_point move_int);
 void			enemy_sprite	(t_game *game, t_object *obj);
-void			enemy_shoot		(t_game *g, t_object *obj);
-void			enemy_set_state	(t_game *g, t_object *obj, \
-									enum e_objstate state);
 void			enemy_sound		(t_game *game, t_object *obj, \
 									enum e_sound sound_type);
-float			enemy_ray_intersect_distance(t_game *game, float angle);
+void			enemy_shoot		(t_game *g, t_object *obj);
 
+// enemy_logic
+void			enemy_logic		(t_game *game, t_object *obj);
+void			enemy_look		(t_game *game, t_object *obj);
+void			enemy_think		(t_game *game, t_object *obj);
+float			ray_intersect_distance(t_game *game, float angle);
+void			enemy_set_state	(t_game *g, t_object *obj, \
+									enum e_objstate state);
 
 // pathfind_bfs_grid
 void			bfs_grid_initialize	(t_game *g);
@@ -689,7 +692,6 @@ void			draw_wall_scaled		(t_game *g, t_img src, t_point cur, \
 void			draw_wall_scaled_f		(t_game *g, t_img src, t_point cur, \
 											int z_offset);
 void			draw_wall_solid			(t_game *game, uint32_t x, float fade);
-
 
 // draw_objects
 void			draw_object_properties(t_game *game, t_object *obj);

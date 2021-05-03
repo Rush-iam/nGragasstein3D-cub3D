@@ -29,9 +29,9 @@ void	objects(t_game *g)
 		obj->distance = g->p.vect.x * diff.x + g->p.vect.y * diff.y;
 		obj->distance_real = hypotf(diff.x, diff.y);
 		obj->atan_diff = atan2f(diff.y, diff.x);
-		draw_object_properties(g, obj);
 		if (obj->type == T_ENEMY)
 			enemy(g, obj);
+		draw_object_properties(g, obj);
 		if (obj->distance_real < 0.5f && pickup(g, obj->type))
 			ft_lstremove(&g->objects, cur_list);
 		cur_list = next_list;
