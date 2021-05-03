@@ -1,6 +1,7 @@
 R 2558 1296
-C 56,56,56
-F 60,56,66
+C 36,36,36
+#F 60,56,66
+FT ./resources/textures/ceilfloor/stone_rusty.png
 D 1
 I A horrible chill goes down your spine...
 
