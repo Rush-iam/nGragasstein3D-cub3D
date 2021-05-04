@@ -17,6 +17,8 @@ void	set_resolution(const char *res_string, t_game *game)
 	if (game->resolution.x)
 		terminate(game, ERR_PARSE, "Duplicated Resolution setting");
 	res_string++;
+	if (*res_string != ' ')
+		terminate(game, ERR_PARSE, "Add space after Resolution identifier");
 	res_string = atoi_limited(&game->resolution.x, res_string, UINT_MAX);
 	if (res_string == NULL)
 		terminate(game, ERR_PARSE, "Resolution X setting is wrong");
@@ -63,6 +65,8 @@ void	set_ceilfloor_color(char *string, uint32_t *target, t_game *game)
 
 	if (*target != -1U)
 		terminate(game, ERR_PARSE, "Duplicated F or C color setting");
+	if (*string != ' ')
+		terminate(game, ERR_PARSE, "Add space after F/C identifier");
 	string = atoi_limited(&r, string, UCHAR_MAX);
 	if (string == NULL)
 		terminate(game, ERR_PARSE, "F/C color Red is wrong (range: 0-255)");

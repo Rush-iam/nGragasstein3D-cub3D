@@ -34,8 +34,11 @@ char	*atoi_limited(uint32_t *dst_int, const char *src_string, uint32_t limit)
 		if (limit != UINT_MAX && num > limit)
 			return (NULL);
 		if (num > UINT_MAX)
+		{
 			while (ft_isdigit(*src_string))
 				src_string++;
+			num = UINT_MAX;
+		}
 	}
 	*dst_int = ft_umin(num, UINT_MAX);
 	while (*src_string == ' ')
