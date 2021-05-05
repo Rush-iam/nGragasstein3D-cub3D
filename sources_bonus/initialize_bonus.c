@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/05 22:37:16 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 15:32:53 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/05 14:49:02 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,16 +28,7 @@ void	initialize_game(t_game *g, bool screenshot_only)
 		terminate(g, ERR_MEM, "Memory allocation failed (ray columns)");
 	if (!ft_malloc_ptr((void **)&g->angles, g->img.size.x * sizeof(*g->angles)))
 		terminate(g, ERR_MEM, "Memory allocation failed (ray angles)");
-	__sincosf(g->p.angle, &g->p.vect.y, &g->p.vect.x);
-	g->fov_reset = ((g->img.aspect >= 1.77f) - (g->img.aspect < 1.77f)) * \
-			sqrtf(fabsf(M_PI_4_F * (g->img.aspect - 1.77f) / 2.0f)) + M_PI_2_F;
-	player_set_fov(g, 0, true);
-	g->key.mouse = true;
-	g->p.health = START_HEALTH;
-	g->p.ammo = START_AMMO;
-	g->p.weapons_mask = START_WEAPONS;
-	weapon_set(g, W_KNIFE);
-	weapon_set(g, W_PISTOL);
+	initialize_values(g);
 	music_play(g, &g->audio.music[MUSIC_BG_ID]);
 }
 
@@ -63,4 +54,20 @@ void	initialize_window(t_game *g, bool screenshot_only)
 			terminate(g, ERR_MEM, strerror(errno));
 		mlx_mouse_move(g->win, g->resolution.x / 2, g->resolution.y / 2);
 	}
+}
+
+void	initialize_values(t_game *g)
+{
+	__sincosf(g->p.angle, &g->p.vect.y, &g->p.vect.x);
+	g->horizon = g->center.y;
+	g->z_level = 0.5f;
+	g->fov_reset = ((g->img.aspect >= 1.77f) - (g->img.aspect < 1.77f)) * \
+			sqrtf(fabsf(M_PI_4_F * (g->img.aspect - 1.77f) / 2.0f)) + M_PI_2_F;
+	player_set_fov(g, 0, true);
+	g->key.mouse = true;
+	g->p.health = START_HEALTH;
+	g->p.ammo = START_AMMO;
+	g->p.weapons_mask = START_WEAPONS;
+	weapon_set(g, W_KNIFE);
+	weapon_set(g, W_PISTOL);
 }

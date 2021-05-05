@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/03 16:09:55 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 16:51:46 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/05 20:33:29 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,18 +107,21 @@ void	load_enemyset(char *str, t_game *g)
 		terminate(g, ERR_PARSE, "Enemy ID out of array range");
 	if (g->enemyset[id].wait[0].ptr != NULL)
 		terminate(g, ERR_PARSE, "Duplicated enemy spriteset setting");
-	if (ft_assign_ptr((void *)&path, ft_strjoin(str, "wait_")) == NULL)
-		terminate(g, ERR_PARSE, strerror(errno));
-	load_spriteset(g->enemyset[id].wait, 8, path, g);
+	if (id != ENEMY_DOG)
+	{
+		if (ft_assign_ptr((void *)&path, ft_strjoin(str, "wait_")) == NULL)
+			terminate(g, ERR_PARSE, strerror(errno));
+		load_spriteset(g->enemyset[id].wait, 8, path, g);
+		if (ft_assign_ptr((void *)&path, ft_strjoin(str, "pain_")) == NULL)
+			terminate(g, ERR_PARSE, strerror(errno));
+		load_spriteset(g->enemyset[id].pain, 2, path, g);
+	}
 	if (ft_assign_ptr((void *)&path, ft_strjoin(str, "attack_")) == NULL)
 		terminate(g, ERR_PARSE, strerror(errno));
-	load_spriteset(g->enemyset[id].attack, 3, path, g);
+	load_spriteset(g->enemyset[id].attack, 3 + 3 * (id == ENEMY_DOG), path, g);
 	if (ft_assign_ptr((void *)&path, ft_strjoin(str, "death_")) == NULL)
 		terminate(g, ERR_PARSE, strerror(errno));
-	load_spriteset(g->enemyset[id].death, 5, path, g);
-	if (ft_assign_ptr((void *)&path, ft_strjoin(str, "pain_")) == NULL)
-		terminate(g, ERR_PARSE, strerror(errno));
-	load_spriteset(g->enemyset[id].pain, 2, path, g);
+	load_spriteset(g->enemyset[id].death, 5 - (id == ENEMY_DOG), path, g);
 	load_enemyset_walk(str, id, g);
 	load_audioset(&g->enemyset[id], str, g);
 }

@@ -71,7 +71,6 @@ void	initialize_canvas_images(t_game *g)
 		terminate(g, ERR_MEM, strerror(errno));
 	g->center = (t_point){g->img.size.x / 2, g->img.size.y / 2};
 	g->img_pixelcount = g->img.size.x * g->img.size.y;
-	g->horizon = g->center.y;
 	if (img_create(g->mlx, &g->img_bg, g->img.size) == NULL)
 		terminate(g, ERR_MEM, strerror(errno));
 	if (g->color_ceil != -1U || g->color_floor != -1U)

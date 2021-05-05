@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:53:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 21:05:19 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/05 23:57:55 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,36 +35,76 @@ void	enemy(t_game *game, t_object *obj)
 					(t_point){obj->e->target.x, obj->e->target.y}, &game->map);
 			obj->e->path_target = (t_point){obj->e->target.x, obj->e->target.y};
 		}
-		if (obj->e->path)
+		if (obj->e->path && obj->e->type != ENEMY_DOG)
 			enemy_move(game, obj, *(t_point *)obj->e->path->content);
+		else if (obj->e->path)
+			enemy_chaotic_move(game, obj, *(t_point *)obj->e->path->content);
 	}
 	enemy_sprite(game, obj);
 }
 
-void	enemy_move(t_game *game, t_object *o, t_point move_int)
+void	enemy_move(t_game *game, t_object *ob, t_point move_int)
 {
-	if (o->e->path->next)
-		o->e->walk_angle = atan2f(move_int.y + 0.5f - o->pos.y, \
-									move_int.x + 0.5f - o->pos.x);
+	if (ob->e->path->next)
+		ob->e->walk_angle = atan2f(move_int.y + 0.5f - ob->pos.y, \
+									move_int.x + 0.5f - ob->pos.x);
 	else
-		o->e->walk_angle = atan2f(o->e->target.y - o->pos.y, \
-									o->e->target.x - o->pos.x);
-	if (o->e->target.x == o->e->location.x && \
-		o->e->target.y == o->e->location.y)
-		o->e->angle = o->e->walk_angle;
-	o->pos.x += cosf(o->e->walk_angle) * ENEMY_SPEED * (1 + o->e->alarmed);
-	o->pos.y += sinf(o->e->walk_angle) * ENEMY_SPEED * (1 + o->e->alarmed);
+		ob->e->walk_angle = atan2f(ob->e->target.y - ob->pos.y, \
+									ob->e->target.x - ob->pos.x);
+	if (ob->e->target.x == ob->e->location.x && \
+		ob->e->target.y == ob->e->location.y)
+		ob->e->angle = ob->e->walk_angle;
+	ob->pos.x += cosf(ob->e->walk_angle) * ob->e->speed * (1 + ob->e->alarmed);
+	ob->pos.y += sinf(ob->e->walk_angle) * ob->e->speed * (1 + ob->e->alarmed);
 	if (game->map.grid[move_int.y][move_int.x] != '.')
-		door_open_try(game, move_int, &o->pos, false);
-	if ((int)o->pos.x == move_int.x && (int)o->pos.y == move_int.y)
+		door_open_try(game, move_int, &ob->pos, false);
+	if ((int)ob->pos.x == move_int.x && (int)ob->pos.y == move_int.y)
 	{
-		if (o->e->path->next || o->e->see)
-			free(ft_lstpop(&o->e->path));
-		else if (fabsf(o->e->target.x - o->pos.x) < 0.1f && \
-				  fabsf(o->e->target.y - o->pos.y) < 0.1f)
+		if (ob->e->path->next || ob->e->see)
+			free(ft_lstpop(&ob->e->path));
+		else if (fabsf(ob->e->target.x - ob->pos.x) < 0.1f && \
+				  fabsf(ob->e->target.y - ob->pos.y) < 0.1f)
 		{
-			o->e->tick = o->e->ticks;
-			free(ft_lstpop(&o->e->path));
+			ob->e->tick = ob->e->ticks;
+			free(ft_lstpop(&ob->e->path));
+		}
+	}
+}
+
+void	enemy_chaotic_move(t_game *game, t_object *ob, t_point move_int)
+{
+	if (ob->distance_real < 1.0f)
+	{
+		ft_lstclear(&ob->e->path, free);
+		ob->e->tick = ob->e->ticks;
+		return ;
+	}
+	if (game->map.grid[move_int.y][move_int.x] != '.' && \
+		door_find(game, move_int)->part_opened < 0.8f)
+	{
+		ft_lstclear(&ob->e->path, free);
+		ob->e->angle += M_PI_F;
+		return ;
+	}
+	if (ob->e->path->next)
+		ob->e->walk_angle = atan2f(move_int.y + 0.5f - ob->pos.y, \
+									move_int.x + 0.5f - ob->pos.x);
+	else
+		ob->e->walk_angle = atan2f(ob->e->target.y - ob->pos.y, \
+									ob->e->target.x - ob->pos.x);
+	if (ob->e->see == false)
+		ob->e->angle = ob->e->walk_angle;
+	ob->pos.x += cosf(ob->e->walk_angle) * ob->e->speed * (1 + ob->e->alarmed);
+	ob->pos.y += sinf(ob->e->walk_angle) * ob->e->speed * (1 + ob->e->alarmed);
+	if ((int)ob->pos.x == move_int.x && (int)ob->pos.y == move_int.y)
+	{
+		if (ob->e->path->next || ob->e->see)
+			free(ft_lstpop(&ob->e->path));
+		else if (fabsf(ob->e->target.x - ob->pos.x) < 0.1f && \
+				  fabsf(ob->e->target.y - ob->pos.y) < 0.1f)
+		{
+			ob->e->tick = ob->e->ticks;
+			free(ft_lstpop(&ob->e->path));
 		}
 	}
 }
@@ -104,7 +144,7 @@ void	enemy_sound(t_game *game, t_object *obj, enum e_sound sound_type)
 			ft_umax(1, game->enemyset[obj->e->type].s_death_count)], obj->pos);
 }
 
-void	enemy_shoot(t_game *g, t_object *obj)
+void	enemy_range_attack(t_game *g, t_object *obj)
 {
 	uint32_t	damage;
 	float		power;
@@ -116,11 +156,29 @@ void	enemy_shoot(t_game *g, t_object *obj)
 	miss_chance = ft_umin(ENEMY_MISS_MAX, (int)sqrtf(obj->distance_real) * 10);
 	if (arc4random() % 100 < miss_chance)
 		return ;
-	damage = ENEMY_DMG_MIN + \
-			 arc4random() % (1 + ENEMY_DMG_MAX - ENEMY_DMG_MIN) * power;
+	damage = ENEMY_GUARD_DMG_MIN + arc4random() % \
+						(1 + ENEMY_GUARD_DMG_MAX - ENEMY_GUARD_DMG_MIN) * power;
 	g->p.health -= damage;
 	g->p.health = ft_max(0, g->p.health);
-	if (damage >= (ENEMY_DMG_MIN + ENEMY_DMG_MAX) / 2)
+	if (damage >= (ENEMY_GUARD_DMG_MIN + ENEMY_GUARD_DMG_MAX) / 2)
+		sound_play(g, &g->audio.sound[SND_PLAYER_PAIN], (t_fpoint){0, 0});
+	g->effect = (struct s_effect){15, 30, EF_FLASH, COLOR_RED, damage / 100.0f};
+	g->hud.needs_redraw = true;
+}
+
+void	enemy_melee_attack(t_game *g, t_object *obj)
+{
+	uint32_t	damage;
+
+	enemy_sound(g, obj, SND_ENEMY_ATTACK);
+	obj->e->shot = true;
+	if (obj->distance_real > 1.0f)
+		return ;
+	damage = ENEMY_DOG_DMG_MIN + \
+			 arc4random() % (1 + ENEMY_DOG_DMG_MAX - ENEMY_DOG_DMG_MIN);
+	g->p.health -= damage;
+	g->p.health = ft_max(0, g->p.health);
+	if (damage >= (ENEMY_DOG_DMG_MIN + ENEMY_DOG_DMG_MAX) / 2)
 		sound_play(g, &g->audio.sound[SND_PLAYER_PAIN], (t_fpoint){0, 0});
 	g->effect = (struct s_effect){15, 30, EF_FLASH, COLOR_RED, damage / 100.0f};
 	g->hud.needs_redraw = true;
