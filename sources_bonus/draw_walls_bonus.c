@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 23:32:38 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 15:24:45 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/05 23:16:08 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@ void	draw_walls(t_game *g)
 	uint32_t	ray;
 
 	ray = 0;
-	g->height_step_up = 1.0f / (0.5f - g->z_level);
-	g->height_step_down = 1.0f / (0.5f + g->z_level);
+	g->height_step_up = 1.0f / (1.0f - g->z_level);
+	g->height_step_down = 1.0f / g->z_level;
 	while (ray < g->img.size.x)
 	{
 		if ((uint32_t)g->column[ray].cell.x < g->map.size.x && \
@@ -32,7 +32,8 @@ void	draw_walls(t_game *g)
 			g->column[ray].height = \
 					(int)(g->col_scale / g->column[ray].distance) & ~1;
 			draw_wall_scaled(g, g->texture[g->column[ray].texture_id], \
-					(t_point){ray, 0}, g->z_level * g->column[ray].height);
+							(t_point){ray, 0}, \
+							g->horizon + g->z_level * g->column[ray].height);
 		}
 		ray++;
 	}
@@ -44,12 +45,10 @@ void	draw_wall_scaled(t_game *g, t_img src, t_point cur, int z_offset)
 	const float		step = (float)src.size.y / g->column[cur.x].height;
 	const int		src_x = g->column[cur.x].texture_pos * src.size.x;
 	float			src_y;
-	const t_point	minmax_y = {\
-	ft_max(0, g->horizon + z_offset - g->column[cur.x].height / 2), \
-	ft_min(g->img.size.y, g->horizon + z_offset + g->column[cur.x].height / 2)};
+	const t_point	minmax_y = {ft_max(0, z_offset - g->column[cur.x].height), \
+								ft_min(g->img.size.y, z_offset)};
 
-	src_y = fmaxf(0.0f, \
-				step * (g->column[cur.x].height / 2 - g->horizon - z_offset));
+	src_y = fmaxf(0.0f, step * (g->column[cur.x].height - z_offset));
 	cur.y = minmax_y.x;
 	if (g->texture_ceil.ptr && cur.y)
 		draw_ceil_textured(g, cur);

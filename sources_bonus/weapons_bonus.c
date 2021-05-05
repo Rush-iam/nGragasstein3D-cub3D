@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/12 16:12:36 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 18:33:58 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/05 21:40:57 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ void	weapon_sound(t_game *game, enum e_weapon weapon)
 void	weapon_shoot(t_game *g, t_object *target)
 {
 	uint32_t	damage;
+	const int	scores[] = {VAL_SCORE_KILL_GUARD, VAL_SCORE_KILL_DOG};
 
 	weapon_sound(g, g->p.weapon_cur);
 	if (g->p.weapon_cur != W_KNIFE)
@@ -108,13 +109,15 @@ void	weapon_shoot(t_game *g, t_object *target)
 		target->e->health -= damage;
 		if (target->e->health <= 0)
 		{
-			pickup_drop(g, target->pos, T_AMMO_ENEMY, \
-						&g->sprite[sizeof(CHAR_DECOR) - 1 + T_AMMO - 1]);
-			enemy_set_state(g, target, ST_DEATH);
-			g->p.score += VAL_SCORE_KILL;
+			g->p.score += scores[target->e->type];
+			if (target->e->type == ENEMY_GUARD)
+				enemy_range_set_state(g, target, ST_DEATH);
+			else if (target->e->type == ENEMY_DOG)
+				enemy_melee_set_state(g, target, ST_DEATH);
+			enemy_sound(g, target, SND_ENEMY_DEATH);
 		}
 		else
-			enemy_set_state(g, target, ST_PAIN);
+			enemy_range_set_state(g, target, ST_PAIN);
 	}
 	g->hud.needs_redraw = true;
 }

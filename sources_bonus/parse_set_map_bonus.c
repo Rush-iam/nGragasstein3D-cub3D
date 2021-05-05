@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:49 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 16:27:31 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/05 21:16:16 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,6 @@ void	set_map(t_game *game, t_list *map)
 void	set_map_process(t_game *game)
 {
 	t_upoint	pt;
-	const char	*obj_chars = CHAR_OBJECTS;
-	char		*chr_ptr;
 	char		chr;
 
 	pt.y = 0;
@@ -55,11 +53,10 @@ void	set_map_process(t_game *game)
 		{
 			set_map_check_cell(game, game->map.grid, pt);
 			chr = game->map.grid[pt.y][pt.x];
-			chr_ptr = ft_strchr(obj_chars, chr);
-			if (chr_ptr)
-				set_map_object_add(game, chr, chr_ptr - obj_chars, pt);
-			else if (chr == 'n' || chr == 's' || chr == 'w' || chr == 'e')
-				set_map_object_add(game, chr, sizeof(CHAR_OBJECTS) - 1, pt);
+			if (ft_strchr(CHAR_OBJECTS, chr))
+				set_map_object_add(game, chr, CHAR_OBJECTS, pt);
+			else if (ft_strchr(CHAR_ENEMY, chr))
+				set_map_enemy_add(game, chr, CHAR_ENEMY, pt);
 			else if (ft_strchr(CHAR_DOORS, chr) || chr == *CHAR_SECRET)
 				set_map_door_add(game, pt);
 			pt.x++;
@@ -68,32 +65,54 @@ void	set_map_process(t_game *game)
 	}
 }
 
-void	set_map_object_add(t_game *game, char chr, uint32_t type, t_upoint pt)
+void	set_map_object_add(t_game *game, char chr, char *set, t_upoint pt)
 {
 	t_object	*obj;
-	const char	*dirs = "eswn";
+	uint32_t	type = ft_strchr(set, chr) - set;
 
 	if (ft_assign_ptr((void **)&obj, ft_calloc(1, sizeof(*obj))) == NULL)
 		terminate(game, ERR_MEM, "Memory allocation failed (object)");
-	obj->pos = (t_fpoint){pt.x + 0.5, pt.y + 0.5};
-	if (type != sizeof(CHAR_OBJECTS) - 1)
-		obj->sprite = &game->sprite[type];
+	obj->pos = (t_fpoint){pt.x + 0.5f, pt.y + 0.5f};
+	obj->sprite = &game->sprite[type];
 	if (type > sizeof(CHAR_DECOR) - 2)
 		obj->type = type - (sizeof(CHAR_DECOR) - 2);
-	if (obj->type == T_ENEMY)
-	{
-		if (!ft_assign_ptr((void **)&obj->e, ft_calloc(1, sizeof(*obj->e))))
-			terminate(game, ERR_MEM, "Memory allocation failed (enemy)");
-		obj->e->angle = M_PI_2 * (ft_strchr(dirs, chr) - dirs);
-		obj->e->health = ENEMY_HEALTH;
-		obj->e->location = obj->pos;
-		obj->e->location_angle = obj->e->angle;
-		enemy_set_state(game, obj, ST_WAIT);
-	}
+	else
+		obj->type = T_DECOR;
 	if (ft_strchr(CHAR_SOLID, chr))
 		game->map.grid[pt.y][pt.x] = CHAR_SOLID_MAP;
 	else
 		game->map.grid[pt.y][pt.x] = '.';
+	object_add(game, &game->objects, obj);
+}
+
+void	set_map_enemy_add(t_game *game, char chr, char *set, t_upoint pt)
+{
+	t_object	*obj;
+
+	if (ft_assign_ptr((void **)&obj, ft_calloc(1, sizeof(*obj))) == NULL)
+		terminate(game, ERR_MEM, "Memory allocation failed (object)");
+	obj->pos = (t_fpoint){pt.x + 0.5f, pt.y + 0.5f};
+	obj->type = T_ENEMY;
+	if (!ft_assign_ptr((void **)&obj->e, ft_calloc(1, sizeof(*obj->e))))
+		terminate(game, ERR_MEM, "Memory allocation failed (enemy)");
+	if (chr == *CHAR_ENEMY_DOG)
+	{
+		obj->e->type = ENEMY_DOG;
+		obj->e->health = ENEMY_DOG_HEALTH;
+		obj->e->speed = ENEMY_DOG_SPEED;
+		enemy_melee_set_state(game, obj, ST_WALK);
+	}
+	else
+	{
+		obj->e->type = ENEMY_GUARD;
+		obj->e->health = ENEMY_GUARD_HEALTH;
+		obj->e->speed = ENEMY_GUARD_SPEED;
+		enemy_range_set_state(game, obj, ST_WAIT);
+		obj->e->location = obj->pos;
+		obj->e->location_angle = obj->e->angle;
+		obj->e->angle = M_PI_2_F * (ft_strchr(set, chr) - set);
+	}
+	game->map.grid[pt.y][pt.x] = '.';
 	object_add(game, &game->objects, obj);
 }
 

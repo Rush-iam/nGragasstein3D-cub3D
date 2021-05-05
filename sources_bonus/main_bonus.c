@@ -51,6 +51,7 @@ int	game_loop(t_game *game)
 		draw_ceil_plain(game);
 	if (game->color_floor != -1U)
 		draw_floor_plain(game);
+	ray_cast(game, -1);
 	draw_walls(game);
 	draw_objects(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
@@ -89,7 +90,6 @@ void	game_ticks(t_game *game)
 		player_control(game);
 		weapon(game, &game->p.weapon);
 		objects(game);
-		ray_cast(game, -1);
 		game->tick_diff--;
 	}
 }

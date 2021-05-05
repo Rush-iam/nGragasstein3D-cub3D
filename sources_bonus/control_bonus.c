@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:31:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 14:22:18 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/05 15:14:22 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,25 +80,25 @@ void	player_control_move(t_game *g)
 
 void	player_control_jump_n_crouch(t_game *g)
 {
-	g->z_level_target = PL_CROUCH_Z * g->key.k[K_CROUCH];
+	g->z_level_target = 0.5f + PL_CROUCH_Z * g->key.k[K_CROUCH];
 	if (g->z_level_vy > PL_GRAVITY)
 	{
-		g->z_level = fmaxf(0.0f, g->z_level + g->z_level_vy);
-		if (g->z_level > 0.0f)
+		g->z_level = fmaxf(0.5f, g->z_level + g->z_level_vy);
+		if (g->z_level > 0.5f)
 			g->z_level_vy += PL_GRAVITY / TICKS_PER_SEC;
 		else
 			g->z_level_vy = PL_GRAVITY;
 	}
-	else if (g->z_level < 0.0f || g->key.k[K_CROUCH] == true)
+	else if (g->z_level < 0.5f || g->key.k[K_CROUCH] == true)
 		g->z_level -= \
 				(g->z_level - g->z_level_target - FLOAT_FIX) / PL_CROUCH_SPEED;
 	else
-		g->z_level = 0.0f;
+		g->z_level = 0.5f;
 }
 
 void	player_control_toggler(t_game *g, int key_code)
 {
-	if (key_code == K_JUMP && fabsf(g->z_level) < 0.05f)
+	if (key_code == K_JUMP && fabsf(g->z_level) < 0.55f)
 		g->z_level_vy = PL_JUMP;
 	if (key_code == K_MOUSE_TOGGLE)
 	{

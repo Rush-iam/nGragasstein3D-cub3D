@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 21:32:53 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/05 22:13:19 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,7 +185,10 @@ typedef struct s_snd
 //# define CHAR_WALLS		"0123456789:" CHAR_ELEVATOR CHAR_ELEVATOR_ON
 # define CHAR_DECOR		"^*$(),!@%#&?[]{}_~`"
 # define CHAR_PICKUP	"+HhAaZzXx"
-# define CHAR_ENEMY		"nswe"
+# define CHAR_ENEMY_GUARD	"eswn"
+# define CHAR_ENEMY_DOG	"d"
+# define CHAR_ENEMY		"eswnd"
+//# define CHAR_ENEMY	CHAR_ENEMY_GUARD CHAR_ENEMY_DOG
 # define CHAR_SOLID		"$(),!@%#&?[]"
 # define CHAR_SOLID_MAP	'"'
 # define CHAR_OBJECTS	"^*$(),!@%#&?[]{}_~`+HhAaZzXx"
@@ -205,7 +208,7 @@ typedef struct s_snd
 # define CHAR_SECRET	"="
 # define CHAR_DOORS		"-|>v;"
 //# define CHAR_DOORS		CHAR_DOOR_1 CHAR_DOOR_2 CHAR_ELEVATOR
-# define CHARS " .NSWE0123456789:;<-|>v;^*$(),!@%#&?[]{}_~`+HhAaZzXxnswe="
+# define CHARS " .NSWE0123456789:;<-|>v;^*$(),!@%#&?[]{}_~`+HhAaZzXxnswed="
 //# define CHARS	" .NSWE" CHAR_WALLS CHAR_DOORS CHAR_OBJECTS CHAR_ENEMY
 //	CHAR_SECRET
 # define TEXTURE_DOOR_1		13
@@ -248,7 +251,8 @@ enum	e_sound
 # define VAL_SCORE_L	1000
 # define VAL_SCORE_M	500
 # define VAL_SCORE_S	100
-# define VAL_SCORE_KILL	100
+# define VAL_SCORE_KILL_GUARD 100
+# define VAL_SCORE_KILL_DOG	200
 # define W_KNIFE_MASK	0b001
 # define W_PISTOL_MASK	0b010
 # define W_RIFLE_MASK	0b100
@@ -263,14 +267,16 @@ enum	e_sound
 # define START_WEAPONS	0b011
 //# define START_WEAPONS	W_KNIFE_MASK | W_PISTOL_MASK
 
-# define ENEMY_HEALTH		25
+# define ENEMY_GUARD_HEALTH	25
+# define ENEMY_DOG_HEALTH	1
 # define ENEMY_FOV_HALF		M_PI_2_F
 # define ENEMY_MISS_MAX		60
-# define ENEMY_DMG_MIN		3
-# define ENEMY_DMG_MAX		30
-//# define ENEMY_DMG_MIN		1
-//# define ENEMY_DMG_MAX		1
-# define ENEMY_SPEED		0.012f
+# define ENEMY_GUARD_DMG_MIN 3
+# define ENEMY_GUARD_DMG_MAX 30
+# define ENEMY_DOG_DMG_MIN 1
+# define ENEMY_DOG_DMG_MAX 16
+# define ENEMY_GUARD_SPEED	0.012f
+# define ENEMY_DOG_SPEED	0.018f
 # define ANIM_ENEMY_TICKS	10
 # define ANIM_ENEMY_WALK_FRAMES	4
 # define ANIM_ENEMY_SLOWMO	2
@@ -282,7 +288,7 @@ typedef struct s_set
 {
 	t_img		wait[8];
 	t_img		walk[8][4];
-	t_img		attack[3];
+	t_img		attack[6];
 	t_img		pain[2];
 	t_img		death[5];
 	t_snd		s_alarm;
@@ -330,7 +336,7 @@ typedef struct s_object
 		T_RIFLE,
 		T_AMMO,
 		T_BONUS_XL,
-		T_BONUS_L __attribute__((unused)),
+		T_BONUS_L,
 		T_BONUS_M,
 		T_BONUS_S,
 		T_ENEMY,
@@ -340,7 +346,8 @@ typedef struct s_object
 	{
 		enum		e_enemytype
 		{
-			ENEMY_GUARD = 0
+			ENEMY_GUARD = 0,
+			ENEMY_DOG
 		}			type;
 		bool		see;
 		bool		alarmed;
@@ -348,6 +355,7 @@ typedef struct s_object
 		float		angle;
 		float		p_to_angle;
 		short		health;
+		float		speed;
 		t_fpoint	location;
 		float		location_angle;
 		t_fpoint	target;
@@ -359,7 +367,7 @@ typedef struct s_object
 		short		frames;
 		time_t		tick;
 		time_t		ticks;
-		enum		e_objstate
+		enum		e_state
 		{
 			ST_WAIT = 0,
 			ST_WALK,
@@ -387,7 +395,7 @@ typedef struct s_game
 	uint32_t	tick_diff;
 	t_img		texture[2 *MAX_TEXTURES];
 	t_img		sprite[sizeof(CHAR_OBJECTS) - 1];
-	t_set		enemyset[1];
+	t_set		enemyset[2];
 	t_list		*doors;
 	t_list		*objects;
 	struct		s_map
@@ -548,16 +556,19 @@ void			load_audioset_multiple(t_set *dst, char *path, t_game *game);
 void			set_map				(t_game *game, t_list *map);
 void			set_map_process		(t_game *game);
 void			set_map_door_add	(t_game *game, t_upoint pt);
-void			set_map_object_add	(t_game *game, char chr, unsigned type, \
-										t_upoint pt);
+void			set_map_object_add	(t_game *game, char chr, char *set, t_upoint pt);
+void			set_map_enemy_add(t_game *game, char chr, char *set, t_upoint pt);
 void			set_map_check_cell	(t_game *game, char **map, t_upoint pt);
 
 // initialize
 void			initialize_game			(t_game *g, bool screenshot_only);
 void			initialize_window		(t_game *g, bool screenshot_only);
-void			initialize_canvas_images(t_game *g);
+void			initialize_values		(t_game *g);
+
+// initialize_images
 void			initialize_hud_images	(t_game *g);
 void			initialize_face_images	(t_game *g);
+void			initialize_canvas_images(t_game *g);
 void			initialize_weapons_and_faded_walls(t_game *g);
 
 // hooks
@@ -626,19 +637,23 @@ void			pickup_sound(t_game *g, enum e_objtype item);
 
 // enemies
 void			enemy			(t_game *game, t_object *obj);
-void			enemy_move		(t_game *game, t_object *o, t_point move_int);
+void			enemy_move		(t_game *game, t_object *ob, t_point move_int);
+void			enemy_chaotic_move(t_game *game, t_object *ob, t_point move_int);
 void			enemy_sprite	(t_game *game, t_object *obj);
 void			enemy_sound		(t_game *game, t_object *obj, \
 									enum e_sound sound_type);
-void			enemy_shoot		(t_game *g, t_object *obj);
+void			enemy_range_attack(t_game *g, t_object *obj);
+void			enemy_melee_attack(t_game *g, t_object *obj);
 
 // enemy_logic
 void			enemy_logic		(t_game *game, t_object *obj);
 void			enemy_look		(t_game *game, t_object *obj);
-void			enemy_think		(t_game *game, t_object *obj);
+void			enemy_range_think(t_game *game, t_object *obj);
+void			enemy_melee_think(t_game *game, t_object *obj);
 float			ray_intersect_distance(t_game *game, float angle);
-void			enemy_set_state	(t_game *g, t_object *obj, \
-									enum e_objstate state);
+void			enemy_range_set_state	(t_game *g, t_object *obj, \
+									enum e_state state);
+void			enemy_melee_set_state(t_game *g, t_object *obj, enum e_state state);
 
 // pathfind_bfs_grid
 void			bfs_grid_initialize	(t_game *g);

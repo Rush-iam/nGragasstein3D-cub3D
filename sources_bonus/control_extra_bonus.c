@@ -63,7 +63,7 @@ void	player_set_fov(t_game *game, float fov, bool reset)
 	if (reset)
 		fov = game->fov_reset;
 	game->col_step = tanf(fov / (game->img.size.x - 1));
-	game->col_scale = 1 / game->col_step;
+	game->col_scale = 1.0f / game->col_step;
 	n = 0;
 	while (n < (int)game->img.size.x)
 	{
