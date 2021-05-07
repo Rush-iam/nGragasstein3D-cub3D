@@ -12,6 +12,11 @@
 
 #include "cub3d_bonus.h"
 
+inline bool	chr_is_wall(char c)
+{
+	return ((unsigned char)(c - '0') < sizeof(CHAR_WALLS) - 1);
+}
+
 char	*skip_spaces(char **str)
 {
 	while (**str == ' ')

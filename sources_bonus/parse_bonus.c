@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:32:59 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 16:18:55 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/07 11:54:37 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,8 @@ bool	parse(int args, char **av, t_game *game)
 	int		file_id;
 	char	*line;
 
-	if (args == 1)
-		terminate(game, ERR_ARGS, "Please specify scene filename");
-	else if (args >= 4)
-		terminate(game, ERR_ARGS, "Too many arguments");
-	av++;
+	if (ft_strncmp("--help", *av, 7) == 0)
+		terminate_help(game);
 	if (ft_strlen(*av) < 5 || ft_memcmp(".cub", *av + ft_strlen(*av) - 4, 5))
 		terminate(game, ERR_ARGS, "Wrong scene filename");
 	file_id = open(*av, O_RDONLY);

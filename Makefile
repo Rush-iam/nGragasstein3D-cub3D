@@ -6,12 +6,12 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/05/05 23:19:54 by ngragas          ###   ########.fr        #
+#    Updated: 2021/05/07 11:26:14 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME 	= 	cub3D
-CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g -Ofast -march=native #-fsanitize=address
+CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g3 -Ofast -march=native #-fsanitize=address
 SRC    :=		main			\
 				control			\
 				draw_walls		\
