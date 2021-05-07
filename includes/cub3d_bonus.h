@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/05 22:13:19 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/07 12:56:53 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -523,7 +523,6 @@ typedef struct s_game
 int				game_loop	(t_game *game);
 void			game_ticks	(t_game *game);
 int				dead_exit	(t_game *game);
-bool			chr_is_wall	(char c);
 
 // parse
 bool			parse(int args, char **av, t_game *game);
@@ -561,9 +560,10 @@ void			set_map_enemy_add(t_game *game, char chr, char *set, t_upoint pt);
 void			set_map_check_cell	(t_game *game, char **map, t_upoint pt);
 
 // initialize
-void			initialize_game			(t_game *g, bool screenshot_only);
-void			initialize_window		(t_game *g, bool screenshot_only);
-void			initialize_values		(t_game *g);
+void			initialize_game		(t_game *game, bool screenshot_only);
+void			initialize_window	(t_game *game, bool screenshot_only);
+void			initialize_values	(t_game *game);
+void			initialize_hooks		(t_game *game);
 
 // initialize_images
 void			initialize_hud_images	(t_game *g);
@@ -766,6 +766,7 @@ void			effect_flash	(t_game *game, uint32_t color, float power);
 void			effect_fizzlefade(t_game *game, uint32_t color);
 
 // utils
+bool			chr_is_wall	(char c);
 char			*skip_spaces(char **str);
 char			*atoi_limited(uint32_t *dst_int, const char *src_string, \
 									uint32_t limit);
@@ -776,10 +777,13 @@ void			write_screenshot_data		(t_game *game, int file_id);
 
 // terminate
 int				terminate		(t_game *game, int return_value, char *message);
+void			terminate_help	(t_game *game);
 void			free_resources	(t_game *g);
+void			free_resources_enemysets(t_game *g);
 void			free_image_array(t_game *game, t_img *arr, uint32_t count);
-void			terminate_free_object(void *object);
-void			terminate_audio(t_game *game);
+void			free_object(void *object);
+void			terminate_engine(t_game *game);
+void			terminate_engine_hud(t_game *game);
 
 // demo_tools
 void			demo_fillrate	(t_game *mlx, int step);

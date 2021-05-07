@@ -118,7 +118,7 @@ typedef struct s_game
 	t_list			*objects;
 }	t_game;
 
-void		initialize_game		(t_game *g, bool screenshot_only);
+void		initialize_game		(t_game *game, bool screenshot_only);
 void		initialize_game_2	(t_game *game);
 void		player_set_fov		(t_game *game, float fov, bool reset);
 int			game_loop			(t_game *game);
