@@ -15,7 +15,7 @@ To run: `./cub3D game_level.cub`
 - **horror.cub** (by @mharriso)
 - **neon.cub** (by @ckendall)
 
-## Let's Play demo video:
+## "Let's Play" demo video:
 https://youtu.be/ujFoM7Q15zM
 
 [![Watch the video](https://img.youtube.com/vi/ujFoM7Q15zM/hqdefault.jpg)](https://youtu.be/ujFoM7Q15zM)
