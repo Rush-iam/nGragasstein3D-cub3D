@@ -18,4 +18,4 @@ To run: `./cub3D game_level.cub`
 ## "Let's Play" demo video:
 https://youtu.be/ujFoM7Q15zM
 
-[![Watch the video](https://img.youtube.com/vi/ujFoM7Q15zM/hqdefault.jpg)](https://youtu.be/ujFoM7Q15zM)
+[![Watch the video](https://img.youtube.com/vi/ujFoM7Q15zM/maxresdefault.jpg)](https://youtu.be/ujFoM7Q15zM)
