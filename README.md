@@ -1,7 +1,7 @@
 # nGragasstein 3D (cub3D)
 Ray-casting project inspired by the world-famous 90’s game - Wolfenstein 3D.
 
-Made with **MiniLibX** graphics library and **cute_headers cute_sound** sound library.
+Written in **C** with **MiniLibX** graphics library and **cute_headers cute_sound** sound library.
 
 ## How to play:
 Compatibility: **Mac OS only**
