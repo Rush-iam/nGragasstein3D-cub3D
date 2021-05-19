@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:30:14 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/19 22:09:46 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/19 22:14:43 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,9 @@ void	initialize_sounds(t_game *g)
 	cs_spawn_mix_thread(g->audio.ctx);
 	cs_spawn_mix_thread(g->audio.ctx7);
 	cs_spawn_mix_thread(g->audio.ctx22);
-	cs_thread_sleep_delay(g->audio.ctx, 25);
-	cs_thread_sleep_delay(g->audio.ctx7, 25);
-	cs_thread_sleep_delay(g->audio.ctx22, 25);
+	cs_thread_sleep_delay(g->audio.ctx, 20);
+	cs_thread_sleep_delay(g->audio.ctx7, 20);
+	cs_thread_sleep_delay(g->audio.ctx22, 20);
 }
 
 void	sounds(t_game *game)
