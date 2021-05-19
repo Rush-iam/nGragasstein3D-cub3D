@@ -6,7 +6,7 @@
 #    By: ngragas <ngragas@student.21-school.ru>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/30 19:52:31 by ngragas           #+#    #+#              #
-#    Updated: 2021/05/07 11:26:14 by ngragas          ###   ########.fr        #
+#    Updated: 2021/05/19 21:54:14 by ngragas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,6 +40,7 @@ SRC_BONUS :=	control_borders	\
 				draw_texture_set \
 				enemies			\
 				enemy_logic		\
+				free_resources	\
 				hooks			\
 				initialize		\
 				initialize_images \
@@ -86,9 +87,8 @@ LIB = $(LIB_DIR)libft.a
 MLX_DIR = minilibx_opengl/
 MLX = $(MLX_DIR)libmlx.a
 
-CUTE_SOUND = cute_sound/
-CUTE_SOUND_C = $(CUTE_SOUND)cute_sound.c
-CUTE_SOUND_O = $(CUTE_SOUND_C:.c=.o)
+CUTE_SOUND_DIR = cute_sound/
+CUTE_SOUND = $(CUTE_SOUND_DIR)cute_sound.o
 
 all: switch_clean
 	$(MAKE) $(NAME) -j8
@@ -97,17 +97,18 @@ $(LIB): FORCE
 	$(MAKE) -C $(LIB_DIR)
 $(MLX): FORCE
 	$(MAKE) -C $(MLX_DIR) CFLAGS=-DSTRINGPUTX11\ -Ofast\ -g\ -Wno-deprecated
-$(NAME): $(LIB) $(MLX) $(OBJ) $(CUTE_SOUND_O)
+$(CUTE_SOUND): FORCE
+	$(MAKE) -C $(CUTE_SOUND_DIR)
+$(NAME): $(LIB) $(MLX) $(CUTE_SOUND) $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $@ -lft -L$(LIB_DIR) \
-	-lmlx -L$(MLX_DIR) -I$(MLX_DIR) -framework OpenGL -framework AppKit -lz \
-	$(CUTE_SOUND_O) -I$(CUTE_SOUND) -framework AudioUnit
-$(CUTE_SOUND_O): $(CUTE_SOUND_C)
-	$(CC) $(CFLAGS)-c $< -o $@ -I$(CUTE_SOUND)
+		-lmlx -L$(MLX_DIR) -I$(MLX_DIR) -framework OpenGL -framework AppKit -lz \
+		$(CUTE_SOUND) -I$(CUTE_SOUND_DIR) -framework AudioUnit
 $(OBJ): | $(OBJ_DIR)
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c Makefile
-	$(CC) $(CFLAGS) -c $< -o $@ -I$(INC_DIR) -I$(LIB_DIR) -I$(MLX_DIR) -I$(CUTE_SOUND)
+	$(CC) $(CFLAGS) -c $< -o $@ \
+		-I$(INC_DIR) -I$(LIB_DIR) -I$(MLX_DIR) -I$(CUTE_SOUND_DIR)
 -include $(DEP)
 
 switch_clean:
@@ -118,10 +119,12 @@ clean:
 	$(RM)r $(OBJ_DIR)
 	$(MAKE) -C $(LIB_DIR) $@
 	$(MAKE) -C $(MLX_DIR) $@
+	$(MAKE) -C $(CUTE_SOUND_DIR) $@
 fclean: clean
 	$(RM) $(NAME)
 	$(RM) $(LIB)
 	$(RM) $(MLX)
+	$(RM) $(CUTE_SOUND)
 re: fclean all
 
 norm:

@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:53:39 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/05 23:57:55 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/19 17:54:23 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,15 @@ void	enemy(t_game *game, t_object *obj)
 		else if (obj->e->path)
 			enemy_chaotic_move(game, obj, *(t_point *)obj->e->path->content);
 	}
+//	if (game->map.grid[(int)obj->pos.y][(int)obj->pos.x] != CHAR_EMPTY)
+//		door_open_try(game, (t_point){(int)obj->pos.x, (int)obj->pos.y}, false);
 	enemy_sprite(game, obj);
 }
 
 void	enemy_move(t_game *game, t_object *ob, t_point move_int)
 {
+	t_fpoint	pos_new;
+
 	if (ob->e->path->next)
 		ob->e->walk_angle = atan2f(move_int.y + 0.5f - ob->pos.y, \
 									move_int.x + 0.5f - ob->pos.x);
@@ -54,12 +58,14 @@ void	enemy_move(t_game *game, t_object *ob, t_point move_int)
 	if (ob->e->target.x == ob->e->location.x && \
 		ob->e->target.y == ob->e->location.y)
 		ob->e->angle = ob->e->walk_angle;
-	ob->pos.x += cosf(ob->e->walk_angle) * ob->e->speed * (1 + ob->e->alarmed);
-	ob->pos.y += sinf(ob->e->walk_angle) * ob->e->speed * (1 + ob->e->alarmed);
-	if (game->map.grid[move_int.y][move_int.x] != '.')
-		door_open_try(game, move_int, &ob->pos, false);
-	if ((int)ob->pos.x == move_int.x && (int)ob->pos.y == move_int.y)
+	pos_new.x = ob->pos.x + cosf(ob->e->walk_angle) * ob->e->speed * (1 + ob->e->alarmed);
+	pos_new.y = ob->pos.y + sinf(ob->e->walk_angle) * ob->e->speed * (1 + ob->e->alarmed);
+	if ((int)pos_new.x == move_int.x && (int)pos_new.y == move_int.y)
 	{
+		if (game->map.grid[move_int.y][move_int.x] != CHAR_EMPTY)
+			door_open_try(game, move_int, false);
+		else if (game->map.grid[(int)ob->pos.y][(int)ob->pos.x] != CHAR_EMPTY)
+			door_locker(game, (t_point){(int)ob->pos.x, (int)ob->pos.y}, false);
 		if (ob->e->path->next || ob->e->see)
 			free(ft_lstpop(&ob->e->path));
 		else if (fabsf(ob->e->target.x - ob->pos.x) < 0.1f && \
@@ -69,17 +75,20 @@ void	enemy_move(t_game *game, t_object *ob, t_point move_int)
 			free(ft_lstpop(&ob->e->path));
 		}
 	}
+	ob->pos = pos_new;
 }
 
 void	enemy_chaotic_move(t_game *game, t_object *ob, t_point move_int)
 {
+	t_fpoint	pos_new;
+
 	if (ob->distance_real < 1.0f)
 	{
 		ft_lstclear(&ob->e->path, free);
 		ob->e->tick = ob->e->ticks;
 		return ;
 	}
-	if (game->map.grid[move_int.y][move_int.x] != '.' && \
+	if (game->map.grid[move_int.y][move_int.x] != CHAR_EMPTY && \
 		door_find(game, move_int)->part_opened < 0.8f)
 	{
 		ft_lstclear(&ob->e->path, free);
@@ -94,10 +103,14 @@ void	enemy_chaotic_move(t_game *game, t_object *ob, t_point move_int)
 									ob->e->target.x - ob->pos.x);
 	if (ob->e->see == false)
 		ob->e->angle = ob->e->walk_angle;
-	ob->pos.x += cosf(ob->e->walk_angle) * ob->e->speed * (1 + ob->e->alarmed);
-	ob->pos.y += sinf(ob->e->walk_angle) * ob->e->speed * (1 + ob->e->alarmed);
-	if ((int)ob->pos.x == move_int.x && (int)ob->pos.y == move_int.y)
+	pos_new.x = ob->pos.x + cosf(ob->e->walk_angle) * ob->e->speed * (1 + ob->e->alarmed);
+	pos_new.y = ob->pos.y + sinf(ob->e->walk_angle) * ob->e->speed * (1 + ob->e->alarmed);
+	if ((int)pos_new.x == move_int.x && (int)pos_new.y == move_int.y)
 	{
+		if (game->map.grid[move_int.y][move_int.x] != CHAR_EMPTY)
+			door_locker(game, move_int, true);
+		else if (game->map.grid[(int)ob->pos.y][(int)ob->pos.x] != CHAR_EMPTY)
+			door_locker(game, (t_point){(int)ob->pos.x, (int)ob->pos.y}, false);
 		if (ob->e->path->next || ob->e->see)
 			free(ft_lstpop(&ob->e->path));
 		else if (fabsf(ob->e->target.x - ob->pos.x) < 0.1f && \
@@ -107,6 +120,7 @@ void	enemy_chaotic_move(t_game *game, t_object *ob, t_point move_int)
 			free(ft_lstpop(&ob->e->path));
 		}
 	}
+	ob->pos = pos_new;
 }
 
 void	enemy_sprite(t_game *game, t_object *obj)

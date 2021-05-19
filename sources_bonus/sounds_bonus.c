@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/25 17:30:14 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 18:07:53 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/19 22:09:46 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,12 @@ void	initialize_sounds(t_game *g)
 	g->audio.ctx = cs_make_context(0, 44100, 8192, 2, NULL);
 	g->audio.ctx7 = cs_make_context(0, 7042, 1024, MAX_PLAYING_SOUNDS, NULL);
 	g->audio.ctx22 = cs_make_context(0, 22050, 2048, MAX_PLAYING_SOUNDS, NULL);
+	cs_spawn_mix_thread(g->audio.ctx);
+	cs_spawn_mix_thread(g->audio.ctx7);
+	cs_spawn_mix_thread(g->audio.ctx22);
+	cs_thread_sleep_delay(g->audio.ctx, 25);
+	cs_thread_sleep_delay(g->audio.ctx7, 25);
+	cs_thread_sleep_delay(g->audio.ctx22, 25);
 }
 
 void	sounds(t_game *game)
@@ -35,12 +41,9 @@ void	sounds(t_game *game)
 		}
 		i++;
 	}
-	cs_mix(game->audio.ctx);
-	cs_mix(game->audio.ctx7);
-	cs_mix(game->audio.ctx22);
 }
 
-cs_playing_sound_t	*sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos)
+struct s_playback	*sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos)
 {
 	uint32_t		i;
 	cs_context_t	*target_ctx;
@@ -63,7 +66,7 @@ cs_playing_sound_t	*sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos)
 	game->audio.playing[i].sourcepos = sourcepos;
 	if (sourcepos.x != 0.0f)
 		sound_adjust_pan(&game->p, game->audio.playing[i]);
-	return (game->audio.playing[i].snd);
+	return (&game->audio.playing[i]);
 }
 
 void	music_play(t_game *game, t_snd *music)
@@ -80,10 +83,10 @@ void	music_play(t_game *game, t_snd *music)
 			cs_stop_sound(game->audio.playing[i].snd);
 		i++;
 	}
-	sound_play(game, music, (t_fpoint){0, 0})->looped = true;
+	sound_play(game, music, (t_fpoint){0, 0})->snd->looped = true;
 }
 
-void	sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound)
+void	sound_adjust_pan(struct s_player *pl, struct s_playback sound)
 {
 	float	distance;
 	float	angle;
@@ -95,6 +98,6 @@ void	sound_adjust_pan(struct s_player *pl, struct s_playing_sound sound)
 	if (angle < -M_PI_F)
 		angle += PI2_F;
 	cs_set_pan(sound.snd, 0.5f + sinf(angle) / 2.0f);
-	sound.snd->volume0 = fmaxf(1.0f - 0.05f * distance, 0.5f);
+	sound.snd->volume0 = fmaxf(1.0f - 0.1f * distance, 0.3f);
 	sound.snd->volume1 = sound.snd->volume0;
 }
