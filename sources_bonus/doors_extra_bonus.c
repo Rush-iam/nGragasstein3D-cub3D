@@ -6,14 +6,13 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/03 14:37:44 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/03 14:54:48 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/19 20:52:41 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d_bonus.h"
 
-void	door_open_try(t_game *g, t_point cell, t_fpoint *opener_pos,
-																bool by_player)
+void	door_open_try(t_game *g, t_point cell, bool by_player)
 {
 	t_door	*door;
 
@@ -26,14 +25,12 @@ void	door_open_try(t_game *g, t_point cell, t_fpoint *opener_pos,
 		return ;
 	}
 	door = door_find(g, cell);
-	if ((door->opener_pos && (int)door->opener_pos->x == cell.x && \
-							(int)door->opener_pos->y == cell.y) || \
-		(door->secret && door->opening) || \
-		(by_player == false && door->opening == true))
+	if (by_player == false)
+		door->locked_count++;
+	if (door->locked_count > 1 - (by_player == true) || \
+		(door->secret && door->opening))
 		return ;
-	door->opener_pos = opener_pos;
 	door_open(g, door, by_player);
-	door_sound(g, door);
 }
 
 void	door_open(t_game *g, t_door *door, bool by_player)
@@ -58,30 +55,46 @@ void	door_open(t_game *g, t_door *door, bool by_player)
 		door->ticks_to_close = -1;
 	else
 		door->ticks_to_close = DOOR_TIMER_TICKS * (door->opening == true);
+	door_sound(g, door);
 }
 
-void	door_sound(t_game *game, t_door *door)
+void	door_locker(t_game *g, t_point cell, bool lock)
+{
+	t_door	*door;
+
+	door = door_find(g, cell);
+	if (!door)
+		return ;
+	if (lock)
+		door->locked_count++;
+	else
+		door->locked_count--;
+}
+
+void	door_sound(t_game *game, t_door *d)
 {
 	t_snd	*sound;
 
-	if (door->secret)
+	if (d->secret)
 		sound = &game->audio.sound[SND_DOOR_SECRET];
-	else if (door->end_level)
+	else if (d->end_level)
 		sound = &game->audio.sound[SND_ELEVATOR];
-	else if (door->opening)
+	else if (d->opening)
 		sound = &game->audio.sound[SND_DOOR_OPEN];
 	else
 		sound = &game->audio.sound[SND_DOOR_CLOSE];
-	if (door->sound)
-		cs_stop_sound(door->sound);
-	door->sound = sound_play(game, sound, \
-						(t_fpoint){door->cell.x + 0.5f, door->cell.y + 0.5f});
-	if (door->sound == NULL)
+	if (d->sound && d->sound->snd \
+				 && d->sound->sourcepos.x == d->cell.x + 0.5f \
+				 && d->sound->sourcepos.y == d->cell.y + 0.5f)
+		cs_stop_sound(d->sound->snd);
+	d->sound = sound_play(game, sound, \
+						(t_fpoint){d->cell.x + 0.5f, d->cell.y + 0.5f});
+	if (d->sound == NULL)
 		return ;
-	if (door->opening)
-		door->sound->sample_index = (float)DOOR_ANIM_TICKS / TICKS_PER_SEC * \
-					door->part_opened * door->sound->loaded_sound->sample_rate;
+	if (d->opening)
+		d->sound->snd->sample_index = (float)DOOR_ANIM_TICKS / TICKS_PER_SEC * \
+				d->part_opened * d->sound->snd->loaded_sound->sample_rate;
 	else
-		door->sound->sample_index = (float)DOOR_ANIM_TICKS / TICKS_PER_SEC * \
-			(1.0f - door->part_opened) * door->sound->loaded_sound->sample_rate;
+		d->sound->snd->sample_index = (float)DOOR_ANIM_TICKS / TICKS_PER_SEC * \
+		(1.0f - d->part_opened) * d->sound->snd->loaded_sound->sample_rate;
 }

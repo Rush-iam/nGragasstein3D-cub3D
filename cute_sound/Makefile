@@ -1,0 +1,24 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2021/05/19 21:33:05 by ngragas           #+#    #+#              #
+#    Updated: 2021/05/19 21:39:09 by ngragas          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+NAME = cute_sound.o
+SRC = cute_sound.c
+CFLAGS = -Wall -Wextra -Werror -g -Ofast
+HEADER = cute_sound.h
+
+all: $(NAME)
+$(NAME): $(HEADER)
+clean:
+fclean: clean
+	@$(RM) $(NAME)
+re: fclean all
+.PHONY: all clean fclean re

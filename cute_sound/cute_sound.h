@@ -1476,7 +1476,7 @@ static void* cs_ctx_thread(void* udata)
 
 	while (ctx->running)
 	{
-        printf("Entering mix...\n");
+//        printf("Entering mix...\n");
 		cs_mix(ctx);
 		if (ctx->sleep_milliseconds) cs_sleep(ctx->sleep_milliseconds);
 		else pthread_yield_np();

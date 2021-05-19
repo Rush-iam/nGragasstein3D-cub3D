@@ -18,7 +18,7 @@ bool	parse(int args, char **av, t_game *game)
 	char	*line;
 
 	if (ft_strncmp("--help", *av, 7) == 0)
-		terminate_help(game);
+		print_help(game);
 	if (ft_strlen(*av) < 5 || ft_memcmp(".cub", *av + ft_strlen(*av) - 4, 5))
 		terminate(game, ERR_ARGS, "Wrong scene filename");
 	file_id = open(*av, O_RDONLY);

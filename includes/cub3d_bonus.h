@@ -6,7 +6,7 @@
 /*   By: ngragas <ngragas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/06 17:29:00 by ngragas           #+#    #+#             */
-/*   Updated: 2021/05/07 12:56:53 by ngragas          ###   ########.fr       */
+/*   Updated: 2021/05/19 20:48:36 by ngragas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,6 @@ typedef struct s_img
 	bool		*alpha_y;
 }				t_img;
 
-typedef cs_playing_sound_t	t_playing_snd;
 typedef struct s_snd
 {
 	cs_loaded_sound_t	file;
@@ -191,6 +190,7 @@ typedef struct s_snd
 //# define CHAR_ENEMY	CHAR_ENEMY_GUARD CHAR_ENEMY_DOG
 # define CHAR_SOLID		"$(),!@%#&?[]"
 # define CHAR_SOLID_MAP	'"'
+# define CHAR_EMPTY		'.'
 # define CHAR_OBJECTS	"^*$(),!@%#&?[]{}_~`+HhAaZzXx"
 //# define CHAR_OBJECTS	CHAR_DECOR CHAR_PICKUP
 # define CHAR_DOOR_1_H	"-"
@@ -299,16 +299,16 @@ typedef struct s_set
 
 typedef struct s_door
 {
-	t_point			cell;
-	bool			opening;
-	float			part_opened;
-	t_fpoint		*opener_pos;
-	time_t			ticks_to_close;
-	t_playing_snd	*sound;
-	bool			secret;
-	char			secret_texture_id;
-	t_point			secret_target;
-	bool			end_level;
+	t_point				cell;
+	bool				opening;
+	float				part_opened;
+	int					locked_count;
+	time_t				ticks_to_close;
+	struct s_playback	*sound;
+	bool				secret;
+	char				secret_texture_id;
+	t_point				secret_target;
+	bool				end_level;
 }				t_door;
 
 typedef struct s_object
@@ -480,10 +480,10 @@ typedef struct s_game
 		cs_context_t	*ctx22;
 		t_snd			music[2];
 		t_snd			sound[21];
-		struct			s_playing_sound
+		struct			s_playback
 		{
-			t_playing_snd	*snd;
-			t_fpoint		sourcepos;
+			cs_playing_sound_t	*snd;
+			t_fpoint			sourcepos;
 		}				playing[MAX_PLAYING_SOUNDS];
 	}			audio;
 	struct		s_player
@@ -600,22 +600,22 @@ void			player_control_borders_enemies(t_game *game);
 // sounds
 void			initialize_sounds(t_game *g);
 void			sounds			(t_game *game);
-t_playing_snd	*sound_play	(t_game *game, t_snd *sound, t_fpoint sourcepos);
+struct s_playback	*sound_play	(t_game *game, t_snd *sound, t_fpoint sourcepos);
 void			music_play		(t_game *game, t_snd *music);
 void			sound_adjust_pan(struct s_player *pl, \
-									struct s_playing_sound sound);
+									struct s_playback sound);
 
 // doors
 t_door			*door_find	(t_game *game, t_point cell);
-void			doors		(t_game *game);
+void			doors		(t_game *g);
 void			door_autoclose(t_game *game, t_door *door);
 void			door_secret_open(t_game *game, t_door *door);
 
 // doors_extra
-void			door_open_try(t_game *g, t_point cell, t_fpoint *opener_pos, \
-								bool by_player);
+void			door_open_try(t_game *g, t_point cell, bool by_player);
 void			door_open(t_game *g, t_door *door, bool by_player);
-void			door_sound	(t_game *game, t_door *door);
+void			door_locker(t_game *g, t_point cell, bool lock);
+void			door_sound	(t_game *game, t_door *d);
 
 // weapons
 void			weapon		(t_game *game, struct s_weapon *weapon);
@@ -777,13 +777,16 @@ void			write_screenshot_data		(t_game *game, int file_id);
 
 // terminate
 int				terminate		(t_game *game, int return_value, char *message);
-void			terminate_help	(t_game *game);
+void			terminate_sound(t_game *game);
+void			terminate_engine(t_game *game);
+void			terminate_engine_hud(t_game *game);
+void			print_help	(t_game *game);
+
+// free_resources
 void			free_resources	(t_game *g);
 void			free_resources_enemysets(t_game *g);
 void			free_image_array(t_game *game, t_img *arr, uint32_t count);
-void			free_object(void *object);
-void			terminate_engine(t_game *game);
-void			terminate_engine_hud(t_game *game);
+void			free_object		(void *object);
 
 // demo_tools
 void			demo_fillrate	(t_game *mlx, int step);
