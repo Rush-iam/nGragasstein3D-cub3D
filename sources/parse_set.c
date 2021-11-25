@@ -97,9 +97,6 @@ void	set_textures_import(char *string, t_img *texture, t_game *game)
 	if (ft_memcmp(".xpm", string + str_len - 4, 5) == 0)
 		texture->ptr = mlx_xpm_file_to_image(game->mlx, string, \
 							(int *)&texture->size.x, (int *)&texture->size.y);
-	else if (ft_memcmp(".png", string + str_len - 4, 5) == 0)
-		texture->ptr = mlx_png_file_to_image(game->mlx, string, \
-							(int *)&texture->size.x, (int *)&texture->size.y);
 	else
 		terminate(game, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
 	if (texture->ptr == NULL)

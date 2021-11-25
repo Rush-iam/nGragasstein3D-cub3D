@@ -20,6 +20,7 @@
 # include <errno.h>
 # include <string.h>
 # include <limits.h>
+# include <time.h>
 # include "mlx.h"
 # include "libft.h"
 # include "get_next_line.h"
@@ -95,7 +96,7 @@ typedef struct s_game
 		double		angle;
 		t_fpoint	vect;
 	}				p;
-	bool			key[280];
+	bool			key[512];
 	struct			s_map
 	{
 		t_upoint	size;

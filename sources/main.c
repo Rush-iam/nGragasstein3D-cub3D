@@ -31,9 +31,9 @@ int	main(int args, char *av[])
 	if (screenshot_only == true)
 		write_screenshot_and_exit(&game);
 	mlx_do_key_autorepeatoff(game.mlx);
-	mlx_hook(game.win, EVENT_KEYPRESS, 0, hook_key_press, &game);
-	mlx_hook(game.win, EVENT_KEYRELEASE, 0, hook_key_release, &game);
-	mlx_hook(game.win, EVENT_DESTROYNOTIFY, 0, hook_exit, &game);
+	mlx_hook(game.win, KeyPress, KeyPressMask, hook_key_press, &game);
+	mlx_hook(game.win, KeyRelease, KeyReleaseMask, hook_key_release, &game);
+	mlx_hook(game.win, DestroyNotify, StructureNotifyMask, hook_exit, &game);
 	mlx_loop_hook(game.mlx, game_loop, &game);
 	mlx_loop(game.mlx);
 }
@@ -46,7 +46,7 @@ void	initialize_game(t_game *g, bool screenshot)
 	if (screenshot)
 		max_res = (t_upoint){MAX_SCREENSHOT_X, MAX_SCREENSHOT_Y};
 	else
-		mlx_get_screen_size((int *)&max_res.x, (int *)&max_res.y);
+		mlx_get_screen_size(g->mlx, (int *)&max_res.x, (int *)&max_res.y);
 	g->img.size.x = ft_umax(MIN_RES, g->img.size.x);
 	g->img.size.x = ft_umin(max_res.x, g->img.size.x);
 	g->img.size.y = ft_umin(max_res.y, g->img.size.y);
@@ -70,7 +70,8 @@ void	initialize_game_2(t_game *game)
 	t_list		*cur_list;
 	t_object	*obj;
 
-	__sincos(game->p.angle, &game->p.vect.y, &game->p.vect.x);
+	game->p.vect.y = sin(game->p.angle);
+	game->p.vect.x = cos(game->p.angle);
 	player_set_fov(game, 0, true);
 	cur_list = game->objects;
 	while (cur_list)
@@ -97,11 +98,18 @@ void	player_set_fov(t_game *game, float fov, bool reset)
 
 int	game_loop(t_game *game)
 {
+	static clock_t	clock_cur;
+	int				fps;
+
 	player_control(game);
 	ray_cast(game);
 	img_ceilfloor_fill_rgb(&game->img, game->color_ceil, game->color_floor);
 	draw_walls(game);
 	draw_objects(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
+	fps = CLOCKS_PER_SEC / (clock() - clock_cur);
+	clock_cur = clock();
+	mlx_string_put(game->mlx, game->win, 0, 20, 0x00FFFFFF, \
+		(char []){'0' + fps / 100, '0' + fps / 10 % 10, '0' + fps % 10, '\0'});
 	return (0);
 }

@@ -85,13 +85,14 @@ LIB_DIR = libft/
 LIB = $(LIB_DIR)libft.a
 
 MLX_DIR = minilibx_opengl/
+MLX_DIR := minilibx_linux/
 MLX = $(MLX_DIR)libmlx.a
 
 CUTE_SOUND_DIR = cute_sound/
 CUTE_SOUND = $(CUTE_SOUND_DIR)cute_sound.o
 
 all: switch_clean
-	$(MAKE) $(NAME) -j8
+	$(MAKE) $(NAME)
 bonus: $(NAME) switch_clean
 $(LIB): FORCE
 	$(MAKE) -C $(LIB_DIR)
@@ -101,8 +102,8 @@ $(CUTE_SOUND): FORCE
 	$(MAKE) -C $(CUTE_SOUND_DIR)
 $(NAME): $(LIB) $(MLX) $(CUTE_SOUND) $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $@ -lft -L$(LIB_DIR) \
-		-lmlx -L$(MLX_DIR) -I$(MLX_DIR) -framework OpenGL -framework AppKit -lz \
-		$(CUTE_SOUND) -I$(CUTE_SOUND_DIR) -framework AudioUnit
+		-lmlx -L$(MLX_DIR) -I$(MLX_DIR)  -lX11 -lXext -lm #\
+		#$(CUTE_SOUND) -I$(CUTE_SOUND_DIR) #-framework AudioUnit -framework OpenGL -framework AppKit -lz
 $(OBJ): | $(OBJ_DIR)
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
