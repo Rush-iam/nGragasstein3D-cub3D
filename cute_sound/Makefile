@@ -10,10 +10,14 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = cute_sound.o
-SRC = cute_sound.c
-CFLAGS = -Wall -Wextra -Werror -g -Ofast
-HEADER = cute_sound.h
+NAME	= cute_sound.o
+SRC		= cute_sound.c
+CFLAGS	= -Wall -Wextra -Ofast -march=native
+HEADER	= cute_sound.h
+
+ifeq ($(OS),Windows_NT)
+	CFLAGS += -D _WIN32
+endif
 
 all: $(NAME)
 $(NAME): $(HEADER)

@@ -60,7 +60,7 @@ void	*ft_memchr(const void *s, int c, size_t n)
 	while (n >= 8)
 	{
 		check = *(size_t *)s ^ mask_c;
-		if (~((check & mask_0) + mask_0 | check | mask_0) != 0)
+		if (~(((check & mask_0) + mask_0) | check | mask_0) != 0)
 			return (ft_memchr_check_8((char *)s, (char)ch));
 		s += 8;
 		n -= 8;

@@ -12,9 +12,9 @@
 
 #include "cub3d.h"
 
-bool	key_pressed(t_game *game, int key)
+static inline bool	key_pressed(t_game *game, int key)
 {
-	return (game->key[key + 256]);
+	return (game->key[(short)key + KEYCODE_OFFSET]);
 }
 
 void	player_control(t_game *game)
@@ -46,31 +46,15 @@ void	player_control(t_game *game)
 	game->p.vect.y = sin(game->p.angle);
 }
 
-void	player_control_borders(t_game *game)
-{
-	if (game->p.angle > PI2)
-		game->p.angle -= PI2;
-	if (game->p.angle < 0)
-		game->p.angle += PI2;
-	if (game->p.pos.x < 0)
-		game->p.pos.x = 0.0001;
-	if (game->p.pos.y < 0)
-		game->p.pos.y = 0.0001;
-	if (game->p.pos.x >= game->map.size.x)
-		game->p.pos.x = game->map.size.x - 0.0001;
-	if (game->p.pos.y >= game->map.size.y)
-		game->p.pos.y = game->map.size.y - 0.0001;
-}
-
 int	hook_key_press(int key_code, t_game *game)
 {
 	key_code = (short)key_code;
 	printf("keycode: %hd\n", (short)key_code);
 	if (key_code >= (int) sizeof(game->key) || key_code < -256)
 		return (1);
-	if (key_code == KEY_ESCAPE)
+	if (key_code == (short)K_EXIT)
 		terminate(game, EXIT_SUCCESS, NULL);
-	game->key[key_code + 256] = true;
+	game->key[key_code + KEYCODE_OFFSET] = true;
 	return (0);
 }
 
@@ -79,7 +63,7 @@ int	hook_key_release(int key_code, t_game *game)
 	key_code = (short)key_code;
 	if (key_code >= (int) sizeof(game->key) || key_code < -256)
 		return (1);
-	game->key[key_code + 256] = false;
+	game->key[key_code + KEYCODE_OFFSET] = false;
 	return (0);
 }
 

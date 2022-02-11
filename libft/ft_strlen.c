@@ -20,7 +20,7 @@ size_t	ft_strlen(const char *s)
 	while ((size_t)check & 0b111)
 		if (!*check++)
 			return (check - s - 1);
-	while (~((*(size_t *)check & mask) + mask | *(size_t *)check | mask) == 0)
+	while (~(((*(size_t *)check & mask) + mask) | *(size_t *)check | mask) == 0)
 		check += 8;
 	if (!check[0])
 		return (check - s);

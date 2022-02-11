@@ -85,9 +85,6 @@ void		ft_lstclear(t_list **lst, void (*del)(void*));
 void		ft_lstiter(t_list *lst, void (*f)(void *));
 t_list		*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 
-int			ft_wchrto8(char *dst_utf8, wchar_t src_utf32);
-size_t		ft_wstrto8(char *dst_utf8, const wchar_t *src_utf32, size_t n);
-
 int			ft_min(int a, int b);
 int			ft_max(int a, int b);
 uint32_t	ft_umin(uint32_t a, uint32_t b);

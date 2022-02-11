@@ -87,6 +87,20 @@ void	set_textures(char *string, t_game *game)
 	set_textures_import(string, &game->texture[id], game);
 }
 
+#ifndef __APPLE__
+
+void	*mlx_png_file_to_image(void *_1, char *_2, int *_3, int *_4)
+{
+	(void)_1;
+	(void)_2;
+	(void)_3;
+	(void)_4;
+	write(STDERR_FILENO, "FAIL: PNG images are supported only on Mac OS\n", 46);
+	exit(EXIT_FAILURE);
+}
+
+#endif
+
 void	set_textures_import(char *string, t_img *texture, t_game *game)
 {
 	int				n;
@@ -96,6 +110,9 @@ void	set_textures_import(char *string, t_img *texture, t_game *game)
 		terminate(game, ERR_ARGS, "Can't identify texture format (.xpm/.png)");
 	if (ft_memcmp(".xpm", string + str_len - 4, 5) == 0)
 		texture->ptr = mlx_xpm_file_to_image(game->mlx, string, \
+							(int *)&texture->size.x, (int *)&texture->size.y);
+	else if (ft_memcmp(".png", string + str_len - 4, 5) == 0)
+		texture->ptr = mlx_png_file_to_image(game->mlx, string, \
 							(int *)&texture->size.x, (int *)&texture->size.y);
 	else
 		terminate(game, ERR_ARGS, "Can't identify texture format (.xpm/.png)");

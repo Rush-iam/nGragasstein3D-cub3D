@@ -37,7 +37,7 @@ void	ray_intersect(t_game *g, double angle, unsigned int ray)
 	const t_fpoint	x1 = ray_intersect_x(g, (t_fpoint){stx, stx * tan(angle)});
 	const t_fpoint	y1 = ray_intersect_y(g, (t_fpoint){sty / tan(angle), sty});
 	const t_fpoint	distance = {g->p.vect.x * (x1.x - g->p.pos.x) + \
-								g->p.vect.y * (x1.y - g->p.pos.y),
+								g->p.vect.y * (x1.y - g->p.pos.y), \
 								g->p.vect.x * (y1.x - g->p.pos.x) + \
 								g->p.vect.y * (y1.y - g->p.pos.y)};
 

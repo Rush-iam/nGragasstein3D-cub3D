@@ -10,9 +10,10 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = libft.a
-CFLAGS = -Wall -Wextra -Werror -g -Ofast
-HEADER = libft.h
+NAME	= libft.a
+CC		= gcc
+CFLAGS	= -Wall -Wextra -Werror -Ofast
+HEADER	= libft.h
 SRCS =	ft_isalpha.c	ft_isdigit.c	ft_isalnum.c	ft_isprint.c	\
 		ft_isascii.c	ft_toupper.c	ft_tolower.c	ft_strmapi.c	\
 		ft_strlen.c		ft_strncmp.c	ft_memcmp.c						\
@@ -30,7 +31,6 @@ SRCS =	ft_isalpha.c	ft_isdigit.c	ft_isalnum.c	ft_isprint.c	\
 		ft_lstsort.c	ft_lstreverse.c	ft_lstsize.c				\
 		ft_lstlast.c	\
 		ft_lstiter.c	ft_lstmap.c										\
-		ft_wchrto8.c	ft_wstrto8.c									\
 		get_next_line.c	ft_minmax.c		ft_file_exists.c
 OBJS = $(SRCS:.c=.o)
 

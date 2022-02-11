@@ -28,11 +28,8 @@ char	*atoi_limited(unsigned int *dst_int, const char *src_string, \
 		if (limit != UINT_MAX && num > limit)
 			return (NULL);
 		if (num > UINT_MAX)
-		{
 			while (ft_isdigit(*src_string))
 				src_string++;
-			num = UINT_MAX;
-		}
 	}
 	*dst_int = ft_umin(UINT_MAX, num);
 	while (*src_string == ' ')

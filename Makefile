@@ -14,7 +14,9 @@ NAME 	= 	cub3D
 CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g3 -Ofast -march=native #-fsanitize=address
 SRC    :=		main			\
 				control			\
+				control_borders	\
 				draw_walls		\
+				initialize		\
 				objects			\
 				parse			\
 				parse_set		\
@@ -22,8 +24,7 @@ SRC    :=		main			\
 				raycasting		\
 				utils
 
-SRC_BONUS :=	control_borders	\
-				control_extra	\
+SRC_BONUS :=	control_extra	\
 				demo_tools		\
 				doors			\
 				doors_extra		\
@@ -42,7 +43,6 @@ SRC_BONUS :=	control_borders	\
 				enemy_logic		\
 				free_resources	\
 				hooks			\
-				initialize		\
 				initialize_images \
 				image_utils		\
 				load_files		\
@@ -81,35 +81,55 @@ SRC := $(addsuffix .c, $(SRC))
 OBJ = $(addprefix $(OBJ_DIR), $(SRC:.c=.o))
 DEP = $(OBJ:.o=.d)
 
-LIB_DIR = libft/
-LIB = $(LIB_DIR)libft.a
+LIB_DIR	= libft/
+LIB		= $(LIB_DIR)libft.a
 
-MLX_DIR = minilibx_opengl/
-MLX_DIR := minilibx_linux/
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S), Darwin)
+	MLX_DIR = minilibx_opengl/
+else
+	MLX_DIR = minilibx_linux/
+endif
+
 MLX = $(MLX_DIR)libmlx.a
-
 CUTE_SOUND_DIR = cute_sound/
 CUTE_SOUND = $(CUTE_SOUND_DIR)cute_sound.o
+
+CPPFLAGS	= -I$(LIB_DIR)	-I$(MLX_DIR)	-I$(INC_DIR)
+LDFLAGS		= -L$(LIB_DIR)	-L$(MLX_DIR)
+LDLIBS		= -lft			-lmlx
+
+ifeq ($(UNAME_S), Darwin)
+	LDLIBS	+= -framework OpenGL -framework AppKit -lz
+else
+	LDLIBS	+= -lX11 -lXext -lm
+endif
+
+ifeq ($(filter bonus, $(MAKECMDGOALS)), bonus)
+	CPPFLAGS	+= -I$(CUTE_SOUND_DIR)
+	OBJ			+= $(CUTE_SOUND)
+	ifeq ($(UNAME_S), Darwin)
+		LDLIBS	+= -framework AudioUnit
+	endif
+endif
 
 all: switch_clean
 	$(MAKE) $(NAME)
 bonus: $(NAME) switch_clean
+$(NAME): $(LIB) $(MLX) $(CUTE_SOUND) $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) -o $@ $(LDFLAGS) $(LDLIBS)
 $(LIB): FORCE
 	$(MAKE) -C $(LIB_DIR)
 $(MLX): FORCE
-	$(MAKE) -C $(MLX_DIR) CFLAGS=-DSTRINGPUTX11\ -Ofast\ -g\ -Wno-deprecated
+	$(MAKE) -C $(MLX_DIR) CFLAGS=-DSTRINGPUTX11\ -Ofast\ -Wno-deprecated
 $(CUTE_SOUND): FORCE
 	$(MAKE) -C $(CUTE_SOUND_DIR)
-$(NAME): $(LIB) $(MLX) $(CUTE_SOUND) $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $@ -lft -L$(LIB_DIR) \
-		-lmlx -L$(MLX_DIR) -I$(MLX_DIR)  -lX11 -lXext -lm #\
-		#$(CUTE_SOUND) -I$(CUTE_SOUND_DIR) #-framework AudioUnit -framework OpenGL -framework AppKit -lz
 $(OBJ): | $(OBJ_DIR)
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
-$(OBJ_DIR)%.o: $(SRC_DIR)%.c Makefile
-	$(CC) $(CFLAGS) -c $< -o $@ \
-		-I$(INC_DIR) -I$(LIB_DIR) -I$(MLX_DIR) -I$(CUTE_SOUND_DIR)
+$(OBJ_DIR)%.o: $(SRC_DIR)%.c
+	$(CC) $(CFLAGS) -c $< -o $@ $(CPPFLAGS)
+
 -include $(DEP)
 
 switch_clean:

@@ -43,10 +43,10 @@ char	*ft_strchr(const char *s, int c)
 			return ((char *)(s - 1));
 	if (*s == '\0')
 		return ((char *)((uintptr_t)s * (ch == '\0')));
-	while (~((*(size_t *)s & mask_0) + mask_0 | *(size_t *)s | mask_0) == 0)
+	while (~(((*(size_t *)s & mask_0) + mask_0) | *(size_t *)s | mask_0) == 0)
 	{
 		check = *(size_t *)s ^ mask_c;
-		if (~((check & mask_0) + mask_0 | check | mask_0) != 0)
+		if (~(((check & mask_0) + mask_0) | check | mask_0) != 0)
 			return (ft_strchr_check_8(s, ch));
 		s += 8;
 	}
