@@ -67,16 +67,36 @@ void	set_textures(char *string, t_game *game)
 	set_textures_import(string, &game->texture[id], game);
 }
 
-#ifndef __APPLE__
+#ifdef __APPLE__
 
-void	*mlx_png_file_to_image(void *_1, char *_2, int *_3, int *_4)
+static void	*png_file_to_image(void *mlx, char *file, int *width, int *height)
 {
-	(void)_1;
-	(void)_2;
-	(void)_3;
-	(void)_4;
-	write(STDERR_FILENO, "FAIL: PNG images are supported only on Mac OS\n", 46);
-	exit(EXIT_FAILURE);
+	return (mlx_png_file_to_image(mlx, file, width, height));
+}
+
+#else
+
+static void	*png_file_to_image(void *mlx, char *file, int *width, int *height)
+{
+	const cp_image_t	png_img = cp_load_png(file);
+	void				*mlx_img;
+	char				*mlx_img_data;
+	int					null;
+
+	if (png_img.pix == NULL)
+		return (NULL);
+	mlx_img = mlx_new_image(mlx, png_img.w, png_img.h);
+	if (mlx_img == NULL)
+	{
+		free(png_img.pix);
+		return (NULL);
+	}
+	mlx_img_data = mlx_get_data_addr(mlx_img, &null, &null, &null);
+	ft_memcpy(mlx_img_data, png_img.pix, png_img.w * png_img.h * 4);
+	*width = png_img.w;
+	*height = png_img.h;
+	free(png_img.pix);
+	return (mlx_img);
 }
 
 #endif
@@ -92,7 +112,7 @@ void	set_textures_import(char *string, t_img *texture, t_game *game)
 		texture->ptr = mlx_xpm_file_to_image(game->mlx, string, \
 							(int *)&texture->size.x, (int *)&texture->size.y);
 	else if (ft_memcmp(".png", string + str_len - 4, 5) == 0)
-		texture->ptr = mlx_png_file_to_image(game->mlx, string, \
+		texture->ptr = png_file_to_image(game->mlx, string, \
 							(int *)&texture->size.x, (int *)&texture->size.y);
 	else
 		terminate(game, ERR_ARGS, "Can't identify texture format (.xpm/.png)");

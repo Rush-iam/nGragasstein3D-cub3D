@@ -18,6 +18,10 @@
 # include "mlx.h"
 # include "x_events.h"
 
+# ifndef __APPLE__
+#  include "cute_png.h"
+# endif
+
 # include <errno.h>
 # include <fcntl.h>
 # include <limits.h>

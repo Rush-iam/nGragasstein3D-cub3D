@@ -1,5 +1,5 @@
 NO ./resources/wall_0.xpm
-SO ./resources/wall_3.xpm
+SO ./resources/textures/wall_42.png
 WE ./resources/wall_6.xpm
 EA ./resources/wall_10.xpm
 

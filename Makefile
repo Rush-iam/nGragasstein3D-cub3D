@@ -92,23 +92,30 @@ else
 	MLX_DIR = minilibx_linux/
 endif
 MLX = $(MLX_DIR)libmlx.a
-CUTE_SOUND_DIR = cute_sound/
-CUTE_SOUND = $(CUTE_SOUND_DIR)cute_sound.o
+
+CUTE_PNG_DIR	= cute_png/
+CUTE_PNG		= $(CUTE_PNG_DIR)cute_png.o
+CUTE_SOUND_DIR	= cute_sound/
+CUTE_SOUND		= $(CUTE_SOUND_DIR)cute_sound.o
 
 LIBS		= $(LIBFT) $(MLX)
 CPPFLAGS	= -I$(LIBFT_DIR)	-I$(MLX_DIR)	-I$(INC_DIR)
 LDFLAGS		= -L$(LIBFT_DIR)	-L$(MLX_DIR)
-LDLIBS		= -lft			-lmlx
+LDLIBS		= -lft				-lmlx
 
 ifeq ($(PLATFORM), Darwin)
 	LDLIBS	+= -framework OpenGL -framework AppKit -lz
 else
 	LDLIBS	+= -lX11 -lXext -lm
+	LIBS	+= $(CUTE_PNG)
+	LDLIBS	+= $(CUTE_PNG)
+	CPPFLAGS+= -I$(CUTE_PNG_DIR)
 endif
 
 ifeq ($(filter bonus, $(MAKECMDGOALS)), bonus)
-	CPPFLAGS	+= -I$(CUTE_SOUND_DIR)
 	LIBS		+= $(CUTE_SOUND)
+	LDLIBS		+= $(CUTE_SOUND)
+	CPPFLAGS	+= -I$(CUTE_SOUND_DIR)
 	ifeq ($(PLATFORM), Darwin)
 		LDLIBS	+= -framework AudioUnit
 	endif
@@ -122,6 +129,8 @@ $(LIBFT): FORCE
 $(MLX): FORCE
 	$(MAKE) -C $(MLX_DIR) "CFLAGS=-DSTRINGPUTX11 -Ofast \
 		-Wno-deprecated -Wno-return-type -Wno-parentheses -Wno-pointer-sign"
+$(CUTE_PNG): FORCE
+	$(MAKE) -C $(CUTE_PNG_DIR)
 $(CUTE_SOUND): FORCE
 	$(MAKE) -C $(CUTE_SOUND_DIR)
 
