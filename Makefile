@@ -17,7 +17,6 @@ SRC    :=		main			\
 				control_borders	\
 				draw_walls		\
 				initialize		\
-				objects			\
 				parse			\
 				parse_set		\
 				parse_set_map	\
@@ -47,6 +46,7 @@ SRC_BONUS :=	control_extra	\
 				image_utils		\
 				load_files		\
 				load_resources	\
+				objects			\
 				pathfind		\
 				pathfind_bfs_grid \
 				pathfind_construct \

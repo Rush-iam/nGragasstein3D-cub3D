@@ -28,9 +28,6 @@
 # include <time.h>
 
 # define TITLE	"cub3D by nGragas"
-# define MAX_SCREENSHOT_X 20000
-# define MAX_SCREENSHOT_Y 20000
-# define MIN_RES	2
 
 # define ERR_MLX	1
 # define ERR_ARGS	2
@@ -42,7 +39,6 @@
 # define WALL_S	1
 # define WALL_W	2
 # define WALL_E	3
-# define SPRITE 4
 
 # define K_EXIT			KEY_ESCAPE
 
@@ -80,14 +76,6 @@ typedef struct s_img
 	double		aspect;
 }	t_img;
 
-typedef struct s_object
-{
-	t_img		*sprite;
-	t_fpoint	pos;
-	t_upoint	size;
-	double		distance;
-}	t_object;
-
 typedef struct s_game
 {
 	bool			test;
@@ -112,29 +100,25 @@ typedef struct s_game
 	double			col_scale;
 	struct			s_column
 	{
-		double			distance;
 		unsigned int	height;
 		double			texture_pos;
 		char			dir;
 	}				*column;
 	unsigned int	color_ceil;
 	unsigned int	color_floor;
-	t_img			texture[5];
-	t_list			*objects;
+	t_img			texture[4];
 }	t_game;
 
 void		player_set_fov(t_game *game, float fov, bool reset);
 int			game_loop(t_game *game);
 
 void		initialize_game(t_game *game, bool screenshot_only);
-void		initialize_game_2(t_game *game);
 
 void		parse(int args, char **av, t_game *game, bool *screenshot_only);
 void		parse_scene(int file_id, char **line, t_game *game);
-void		parse_map(int file_id, char *line, t_list *map, t_game *game);
+void		parse_map(int file_id, char *line, t_game *game);
 void		validate_settings(t_game *game);
 
-void		set_resolution(const char *res_string, t_upoint *res, t_game *game);
 void		set_ceilfloor(const char *color_string, unsigned int *target, \
 							t_game *game);
 void		set_textures(char *string, t_game *game);
@@ -158,13 +142,8 @@ t_fpoint	ray_intersect_y(t_game *game, t_fpoint step);
 
 void		img_ceilfloor_fill_rgb(t_img *img, int ceil, int floor);
 void		draw_walls(t_game *g);
-void		draw_wall_scaled(t_game *game, t_img *src, unsigned int x);
-
-void		draw_objects(t_game *g);
-int			objects_sort(t_object *obj1, t_object *obj2);
-void		draw_sprite(t_game *game, t_object *obj, double angle);
-void		draw_sprite_scaled(t_img *img, t_object *obj, unsigned x, \
-															unsigned src_x);
+void		draw_wall_scaled(t_img *game_img, const t_img *src_img, \
+							const struct s_column *column, unsigned int x);
 
 char		*atoi_limited(unsigned int *dst_int, const char *src_string, \
 														unsigned int limit);

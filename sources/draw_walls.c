@@ -25,7 +25,23 @@ void	img_ceilfloor_fill_rgb(t_img *img, int ceil, int floor)
 		img->data[i++] = floor;
 }
 
-void	draw_wall_scaled_new(t_img *game_img, const t_img *src_img, \
+void	draw_walls(t_game *game)
+{
+	unsigned int	ray;
+	unsigned int	texture_id;
+	const char		*textures = "NSWE";
+
+	ray = 0;
+	while (ray < game->img.size.x)
+	{
+		texture_id = ft_strchr(textures, game->column[ray].dir) - textures;
+		draw_wall_scaled(&game->img, &game->texture[texture_id], \
+						&game->column[ray], ray);
+		ray++;
+	}
+}
+
+void	draw_wall_scaled(t_img *game_img, const t_img *src_img, \
 							const struct s_column *column, unsigned int x)
 {
 	const unsigned int	src_x = column->texture_pos * src_img->size.x;
@@ -52,52 +68,5 @@ void	draw_wall_scaled_new(t_img *game_img, const t_img *src_img, \
 		game_img->data[game_img->size.x * dst_y++ + x] = \
 			src_img->data[src_y * src_img->size.x + src_x];
 		error += src_img->size.y;
-	}
-}
-
-void	draw_walls(t_game *game)
-{
-	unsigned int	ray;
-	unsigned int	texture_id;
-	const char		*textures = "NSWE";
-
-	ray = 0;
-	while (ray < game->img.size.x)
-	{
-		texture_id = ft_strchr(textures, game->column[ray].dir) - textures;
-		if (game->test)
-			draw_wall_scaled_new(\
-			&game->img, &game->texture[texture_id], &game->column[ray], ray);
-		else
-			draw_wall_scaled(game, &game->texture[texture_id], ray);
-		ray++;
-	}
-}
-
-void	draw_wall_scaled(t_game *game, t_img *src, unsigned int x)
-{
-	const double		step = (double)src->size.y / game->column[x].height;
-	const unsigned int	src_x = game->column[x].texture_pos * src->size.x;
-	double				src_y;
-	int					y;
-	int					max_height;
-
-	if (game->column[x].height > game->img.size.y)
-	{
-		src_y = step * (game->column[x].height - game->img.size.y) / 2;
-		y = -1;
-		max_height = game->img.size.y;
-	}
-	else
-	{
-		src_y = 0;
-		y = -1 + (game->img.size.y - game->column[x].height) / 2;
-		max_height = y + game->column[x].height;
-	}
-	while (++y < max_height)
-	{
-		game->img.data[y * game->img.size.x + x] = \
-				src->data[(unsigned)src_y * src->size.x + src_x];
-		src_y += step;
 	}
 }

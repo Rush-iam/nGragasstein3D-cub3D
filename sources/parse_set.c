@@ -12,23 +12,6 @@
 
 #include "cub3d.h"
 
-void	set_resolution(const char *res_string, t_upoint *res, t_game *game)
-{
-	if (res->x)
-		terminate(game, ERR_PARSE, "Duplicated Resolution setting");
-	res_string++;
-	if (*res_string != ' ')
-		terminate(game, ERR_PARSE, "Add space after Resolution identifier");
-	res_string = atoi_limited(&res->x, res_string, UINT_MAX);
-	if (res_string == NULL)
-		terminate(game, ERR_PARSE, "Resolution X setting is wrong");
-	res_string = atoi_limited(&res->y, res_string, UINT_MAX);
-	if (res_string == NULL)
-		terminate(game, ERR_PARSE, "Resolution Y setting is wrong");
-	else if (*res_string != '\0' || res->x == 0 || res->y == 0)
-		terminate(game, ERR_PARSE, "Wrong Resolution setting");
-}
-
 void	set_ceilfloor(const char *color_string, unsigned int *target,
 																t_game *game)
 {
@@ -64,9 +47,7 @@ void	set_textures(char *string, t_game *game)
 	int	id;
 
 	id = -1;
-	if (string[0] == 'S' && string[1] == ' ')
-		id = SPRITE;
-	else if (string[0] == 'N' && string[1] == 'O')
+	if (string[0] == 'N' && string[1] == 'O')
 		id = WALL_N;
 	else if (string[0] == 'S' && string[1] == 'O')
 		id = WALL_S;
@@ -77,9 +58,8 @@ void	set_textures(char *string, t_game *game)
 	else
 		terminate(game, ERR_PARSE, "Wrong texture setting. Valid: NO/SO/WE/EA");
 	if (game->texture[id].ptr != NULL)
-		terminate(game, ERR_PARSE, "Duplicated sprite/texture identifier");
-	if ((id == SPRITE && string[1] != ' ') || \
-		(id != SPRITE && string[2] != ' '))
+		terminate(game, ERR_PARSE, "Duplicated texture identifier");
+	if (string[2] != ' ')
 		terminate(game, ERR_PARSE, "Add space after texture identifier");
 	string += 2;
 	while (*string == ' ')

@@ -49,11 +49,6 @@ void	player_control(t_game *game)
 int	hook_key_press(int key_code, t_game *game)
 {
 	key_code = (short)key_code;
-	if (key_code == (short)XK_1)
-	{
-		game->test = !game->test;
-		printf("TEST = %d\n", game->test);
-	}
 	if (key_code >= (int) sizeof(game->key) || key_code < -256)
 		return (1);
 	if (key_code == (short)K_EXIT)

@@ -65,7 +65,6 @@ void	free_resources(t_game *g)
 {
 	unsigned int	i;
 
-	ft_lstclear(&g->objects, free);
 	free(g->column);
 	if (g->map.grid)
 	{
@@ -92,7 +91,6 @@ void	write_screenshot_and_exit(t_game *game)
 	img_ceilfloor_fill_rgb(&game->img, game->color_ceil, game->color_floor);
 	ray_cast(game);
 	draw_walls(game);
-	draw_objects(game);
 	file_id = open("shot.bmp", O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
 	if (file_id == -1)
 		terminate(game, ERR_BMP, strerror(errno));
