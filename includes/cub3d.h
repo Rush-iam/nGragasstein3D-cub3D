@@ -90,6 +90,7 @@ typedef struct s_object
 
 typedef struct s_game
 {
+	bool			test;
 	void			*mlx;
 	void			*win;
 	t_img			img;
@@ -122,10 +123,11 @@ typedef struct s_game
 	t_list			*objects;
 }	t_game;
 
-void		initialize_game(t_game *game, bool screenshot_only);
-void		initialize_game_2(t_game *game);
 void		player_set_fov(t_game *game, float fov, bool reset);
 int			game_loop(t_game *game);
+
+void		initialize_game(t_game *game, bool screenshot_only);
+void		initialize_game_2(t_game *game);
 
 void		parse(int args, char **av, t_game *game, bool *screenshot_only);
 void		parse_scene(int file_id, char **line, t_game *game);

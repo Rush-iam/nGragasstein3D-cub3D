@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 NAME 	= 	cub3D
-CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g3 -Ofast -march=native #-fsanitize=address
+CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g -Ofast -march=native #-fsanitize=address
 SRC    :=		main			\
 				control			\
 				control_borders	\
@@ -56,6 +56,9 @@ SRC_BONUS :=	control_extra	\
 				terminate		\
 				weapons
 
+ifeq ($(OS),Windows_NT)
+	NAME := $(addsuffix .exe, $(NAME))
+endif
 SRC_DIR := sources/
 INC_DIR := includes/
 OBJ_DIR = objects/
@@ -67,39 +70,37 @@ SRC_BONUS_DIR = sources_bonus/
 
 ifeq ($(filter bonus, $(MAKECMDGOALS)), bonus)
 	SWITCH_CLEAN := $(addsuffix .o, $(SRC))
-	SWITCH_CLEAN += $(addsuffix .d, $(SRC))
 	SRC_DIR = $(SRC_BONUS_DIR)
-	SRC += $(SRC_BONUS)
-	SRC := $(addsuffix _bonus, $(SRC))
+	SRC := $(addsuffix _bonus, $(SRC) $(SRC_BONUS))
 else
 	SWITCH_CLEAN := $(addsuffix _bonus.o, $(SRC) $(SRC_BONUS))
-	SWITCH_CLEAN += $(addsuffix _bonus.d, $(SRC) $(SRC_BONUS))
 endif
-SWITCH_CLEAN := $(addprefix $(OBJ_DIR), $(SWITCH_CLEAN))
+SWITCH_CLEAN := $(addprefix $(OBJ_DIR), $(SWITCH_CLEAN) $(SWITCH_CLEAN:.o=.d))
+RM_SWITCH_CLEAN	:= $(shell $(RM) $(SWITCH_CLEAN))
 
 SRC := $(addsuffix .c, $(SRC))
 OBJ = $(addprefix $(OBJ_DIR), $(SRC:.c=.o))
 DEP = $(OBJ:.o=.d)
 
-LIB_DIR	= libft/
-LIB		= $(LIB_DIR)libft.a
+LIBFT_DIR	= libft/
+LIBFT		= $(LIBFT_DIR)libft.a
 
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S), Darwin)
+PLATFORM := $(shell uname -s)
+ifeq ($(PLATFORM), Darwin)
 	MLX_DIR = minilibx_opengl/
 else
 	MLX_DIR = minilibx_linux/
 endif
-
 MLX = $(MLX_DIR)libmlx.a
 CUTE_SOUND_DIR = cute_sound/
 CUTE_SOUND = $(CUTE_SOUND_DIR)cute_sound.o
 
-CPPFLAGS	= -I$(LIB_DIR)	-I$(MLX_DIR)	-I$(INC_DIR)
-LDFLAGS		= -L$(LIB_DIR)	-L$(MLX_DIR)
+LIBS		= $(LIBFT) $(MLX)
+CPPFLAGS	= -I$(LIBFT_DIR)	-I$(MLX_DIR)	-I$(INC_DIR)
+LDFLAGS		= -L$(LIBFT_DIR)	-L$(MLX_DIR)
 LDLIBS		= -lft			-lmlx
 
-ifeq ($(UNAME_S), Darwin)
+ifeq ($(PLATFORM), Darwin)
 	LDLIBS	+= -framework OpenGL -framework AppKit -lz
 else
 	LDLIBS	+= -lX11 -lXext -lm
@@ -107,43 +108,40 @@ endif
 
 ifeq ($(filter bonus, $(MAKECMDGOALS)), bonus)
 	CPPFLAGS	+= -I$(CUTE_SOUND_DIR)
-	OBJ			+= $(CUTE_SOUND)
-	ifeq ($(UNAME_S), Darwin)
+	LIBS		+= $(CUTE_SOUND)
+	ifeq ($(PLATFORM), Darwin)
 		LDLIBS	+= -framework AudioUnit
 	endif
 endif
 
-all: switch_clean
-	$(MAKE) $(NAME)
-bonus: $(NAME) switch_clean
-$(NAME): $(LIB) $(MLX) $(CUTE_SOUND) $(OBJ)
+all bonus: $(NAME)
+$(NAME): $(LIBS) $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $@ $(LDFLAGS) $(LDLIBS)
-$(LIB): FORCE
-	$(MAKE) -C $(LIB_DIR)
+$(LIBFT): FORCE
+	$(MAKE) -C $(LIBFT_DIR)
 $(MLX): FORCE
-	$(MAKE) -C $(MLX_DIR) CFLAGS=-DSTRINGPUTX11\ -Ofast\ -Wno-deprecated
+	$(MAKE) -C $(MLX_DIR) "CFLAGS=-DSTRINGPUTX11 -Ofast \
+		-Wno-deprecated -Wno-return-type -Wno-parentheses -Wno-pointer-sign"
 $(CUTE_SOUND): FORCE
 	$(MAKE) -C $(CUTE_SOUND_DIR)
+
 $(OBJ): | $(OBJ_DIR)
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
-$(OBJ_DIR)%.o: $(SRC_DIR)%.c
+$(OBJ_DIR)%.o: $(SRC_DIR)%.c Makefile
 	$(CC) $(CFLAGS) -c $< -o $@ $(CPPFLAGS)
-
 -include $(DEP)
 
-switch_clean:
-	@$(RM) $(SWITCH_CLEAN)
 clean:
 	$(RM) $(OBJ)
 	$(RM) $(DEP)
 	$(RM)r $(OBJ_DIR)
-	$(MAKE) -C $(LIB_DIR) $@
+	$(MAKE) -C $(LIBFT_DIR) $@
 	$(MAKE) -C $(MLX_DIR) $@
 	$(MAKE) -C $(CUTE_SOUND_DIR) $@
 fclean: clean
 	$(RM) $(NAME)
-	$(RM) $(LIB)
+	$(RM) $(LIBFT)
 	$(RM) $(MLX)
 	$(RM) $(CUTE_SOUND)
 re: fclean all

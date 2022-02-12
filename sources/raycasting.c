@@ -43,11 +43,11 @@ void	ray_intersect(t_game *g, double angle, unsigned int ray)
 
 	if (distance.x < distance.y)
 		g->column[ray] = (struct s_column) \
-			{distance.x, g->col_scale / distance.x, \
+			{distance.x, (unsigned int)(g->col_scale / distance.x) & ~1, \
 				x1.y - (int)x1.y, "EW"[x1.x < g->p.pos.x]};
 	else
 		g->column[ray] = (struct s_column) \
-			{distance.y, g->col_scale / distance.y, \
+			{distance.y, (unsigned int)(g->col_scale / distance.y) & ~1, \
 				y1.x - (int)y1.x, "SN"[y1.y < g->p.pos.y]};
 	if (g->column[ray].dir == 'W' || g->column[ray].dir == 'S')
 		g->column[ray].texture_pos = 1. - g->column[ray].texture_pos;
