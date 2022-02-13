@@ -73,11 +73,11 @@ void	draw_weapon(t_game *g, struct s_weapon *weapon)
 						sinf((float)((int)g->tick % (TICKS_PER_SEC * 2 / 3) - \
 						TICKS_PER_SEC / 3) / (TICKS_PER_SEC / 3) * M_PI_F));
 
-	mlx_put_image_to_window(g->mlx, g->win, \
+	put_image_to_window(g->mlx, g->win, \
 		g->p.weapon_img[g->p.weapon_cur] \
 						[weapon->animation[weapon->frame]].ptr, \
-		g->p.weapon_pos.x - g->key.mdir.x / 4 + offset, \
-		g->p.weapon_pos.y + ft_max(0, -g->key.mdir.y / 3) + abs(offset));
+		(t_point){g->p.weapon_pos.x - g->key.mdir.x / 4 + offset, \
+		g->p.weapon_pos.y + ft_max(0, -g->key.mdir.y / 3) + abs(offset)});
 }
 
 void	weapon_sound(t_game *game, enum e_weapon weapon)
@@ -101,10 +101,10 @@ void	weapon_shoot(t_game *g, t_object *target)
 	if (target && (g->p.weapon_cur != W_KNIFE || target->distance_real < 1.0f))
 	{
 		if (g->p.weapon_cur == W_KNIFE)
-			damage = DMG_KNIFE_MIN + arc4random() % \
+			damage = DMG_KNIFE_MIN + random() % \
 						(1 + DMG_KNIFE_MAX - DMG_KNIFE_MIN);
 		else
-			damage = DMG_SHOT_MIN + arc4random() % \
+			damage = DMG_SHOT_MIN + random() % \
 						(1 + DMG_SHOT_MAX - DMG_SHOT_MIN);
 		target->e->health -= damage;
 		if (target->e->health <= 0)

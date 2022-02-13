@@ -154,7 +154,7 @@ void	enemy_sound(t_game *game, t_object *obj, enum e_sound sound_type)
 	else if (sound_type == SND_ENEMY_ATTACK)
 		sound_play(game, &game->enemyset[obj->e->type].s_attack, obj->pos);
 	else if (sound_type == SND_ENEMY_DEATH)
-		sound_play(game, &game->enemyset[obj->e->type].s_death[arc4random() % \
+		sound_play(game, &game->enemyset[obj->e->type].s_death[random() % \
 			ft_umax(1, game->enemyset[obj->e->type].s_death_count)], obj->pos);
 }
 
@@ -168,9 +168,9 @@ void	enemy_range_attack(t_game *g, t_object *obj)
 	obj->e->shot = true;
 	power = fminf(1.0f, 1.0f / sqrtf(obj->distance_real));
 	miss_chance = ft_umin(ENEMY_MISS_MAX, (int)sqrtf(obj->distance_real) * 10);
-	if (arc4random() % 100 < miss_chance)
+	if (random() % 100 < miss_chance)
 		return ;
-	damage = ENEMY_GUARD_DMG_MIN + arc4random() % \
+	damage = ENEMY_GUARD_DMG_MIN + random() % \
 						(1 + ENEMY_GUARD_DMG_MAX - ENEMY_GUARD_DMG_MIN) * power;
 	g->p.health -= damage;
 	g->p.health = ft_max(0, g->p.health);
@@ -189,7 +189,7 @@ void	enemy_melee_attack(t_game *g, t_object *obj)
 	if (obj->distance_real > 1.0f)
 		return ;
 	damage = ENEMY_DOG_DMG_MIN + \
-			 arc4random() % (1 + ENEMY_DOG_DMG_MAX - ENEMY_DOG_DMG_MIN);
+			 random() % (1 + ENEMY_DOG_DMG_MAX - ENEMY_DOG_DMG_MIN);
 	g->p.health -= damage;
 	g->p.health = ft_max(0, g->p.health);
 	if (damage >= (ENEMY_DOG_DMG_MIN + ENEMY_DOG_DMG_MAX) / 2)

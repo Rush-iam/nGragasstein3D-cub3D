@@ -12,36 +12,41 @@
 
 #include "cub3d_bonus.h"
 
+static inline bool	key_pressed(t_game *game, int key)
+{
+	return (game->key.k[(short)key + KEYCODE_OFFSET]);
+}
+
 void	player_control_weapon(t_game *game)
 {
 	if (game->p.weapon.frame == 0)
 	{
-		if (game->key.k[K_KNIFE] && game->p.weapon_cur != W_KNIFE)
+		if (key_pressed(game, K_KNIFE) && game->p.weapon_cur != W_KNIFE)
 			weapon_set(game, W_KNIFE);
-		else if (game->key.k[K_PISTOL])
+		else if (key_pressed(game, K_PISTOL))
 			weapon_set(game, W_PISTOL);
-		else if (game->key.k[K_RIFLE])
+		else if (key_pressed(game, K_RIFLE))
 			weapon_set(game, W_RIFLE);
 	}
-	if ((game->key.m[M_SHOOT] || game->key.k[K_SHOOT]) && \
+	if ((game->key.m[M_SHOOT] || key_pressed(game, K_SHOOT)) && \
 		game->p.weapon.lock == false && \
 		(game->p.ammo || game->p.weapon_cur == W_KNIFE))
 	{
 		game->p.weapon.lock = true;
 		game->p.weapon.tick = ANIM_TICKS - 1;
 	}
-	if ((game->key.m[M_SHOOT] == false && game->key.k[K_SHOOT] == false) && \
+	if ((game->key.m[M_SHOOT] == false && key_pressed(game, K_SHOOT) == false) && \
 		game->p.weapon.lock == true && game->p.weapon.frame == 0)
 		game->p.weapon.lock = false;
 }
 
 void	player_control_fov(t_game *g)
 {
-	if (g->key.k[K_FOV_TELE])
+	if (key_pressed(g, K_FOV_TELE))
 		g->fov_reset = g->fov / 1.1f;
-	else if (g->key.k[K_FOV_WIDE])
+	else if (key_pressed(g, K_FOV_WIDE))
 		g->fov_reset = g->fov * 1.1f;
-	else if (g->key.k[K_FOV_RESET])
+	else if (key_pressed(g, K_FOV_RESET))
 		g->fov_reset = ((g->img.aspect >= 1.77f) - (g->img.aspect < 1.77f)) * \
 			sqrtf(fabsf(M_PI_4_F * (g->img.aspect - 1.77f) / 2.0f)) + M_PI_2_F;
 	if (g->key.m[M_ZOOM_IN] && g->p.weapon_cur != W_KNIFE)

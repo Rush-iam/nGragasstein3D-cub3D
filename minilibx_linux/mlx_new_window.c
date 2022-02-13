@@ -40,6 +40,14 @@ void	*mlx_new_window(t_xvar *xvar,int size_x,int size_y,char *title)
 					0,CopyFromParent,InputOutput,xvar->visual,
 					CWEventMask|CWBackPixel|CWBorderPixel|
 					CWColormap,&xswa);
+
+	// Double buffer for Windows/WSL2 and faster draw.
+	printf("%d bits\n", xvar->depth); // remove me!
+	new_win->window_back = \
+		XCreatePixmap(xvar->display, xvar->root, size_x, size_y, xvar->depth);
+	new_win->width = size_x;
+	new_win->height = size_y;
+
 	mlx_int_anti_resize_win(xvar,new_win->window,size_x,size_y);
 	XStoreName(xvar->display,new_win->window,title);
 	XSetWMProtocols(xvar->display, new_win->window, &(xvar->wm_delete_window), 1);

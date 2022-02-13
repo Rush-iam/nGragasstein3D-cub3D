@@ -44,9 +44,9 @@ void	draw_map(t_game *game)
 	}
 	draw_map_player(game);
 	draw_map_objects(game);
-	mlx_put_image_to_window(game->mlx, game->win, game->map.img.ptr, \
-		game->center.x - game->map.img.size.x / 2, \
-		game->center.y - game->map.img.size.y / 2);
+	put_image_to_window(game->mlx, game->win, game->map.img.ptr, \
+		(t_point){game->center.x - game->map.img.size.x / 2, \
+				game->center.y - game->map.img.size.y / 2});
 }
 
 void	draw_map_player(t_game *g)

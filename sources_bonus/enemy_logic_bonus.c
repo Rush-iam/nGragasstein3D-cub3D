@@ -67,7 +67,7 @@ void	enemy_range_think(t_game *game, t_object *obj)
 			enemy_range_set_state(game, obj, ST_ATTACK);
 		else
 			enemy_range_set_state(game, obj, \
-            (enum e_state[]){ST_ATTACK, ST_WALK, ST_WALK}[arc4random() % 3]);
+            (enum e_state[]){ST_ATTACK, ST_WALK, ST_WALK}[random() % 3]);
 	}
 	else if (obj->e->see == false)
 	{
@@ -92,7 +92,7 @@ void	enemy_melee_think(t_game *game, t_object *obj)
 							{-1, -1}, {1, 1}, {-1, 1}, {1, -1}};
 	t_point			check;
 	int				i;
-	int				rnd = arc4random() % 8;
+	int				rnd = random() % 8;
 
 	if (obj->e->alarmed == false || obj->e->path == NULL)
 	{
@@ -151,7 +151,7 @@ void	enemy_range_set_state(t_game *g, t_object *obj, enum e_state state)
 	if (state == ST_WAIT)
 		obj->e->angle = obj->e->location_angle;
 	else if (state == ST_WALK)
-		obj->e->frames += arc4random() % ((int)obj->distance_real + 1) & ~1;
+		obj->e->frames += random() % ((int)obj->distance_real + 1) & ~1;
 	else if (state == ST_ATTACK)
 		obj->e->shot = false;
 	else if (state == ST_PAIN)

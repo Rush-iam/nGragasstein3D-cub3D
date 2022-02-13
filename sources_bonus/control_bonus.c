@@ -26,61 +26,119 @@ void	player_control(t_game *game)
 	player_control_borders_enemies(game);
 }
 
+#ifdef __APPLE__
+
+static inline void	mouse_get_pos(void *mlx_ptr, void *win_ptr, int *x, int *y)
+{
+	(void)mlx_ptr;
+	mlx_mouse_get_pos(win_ptr, x, y);
+}
+
+static inline void	mouse_move(void *mlx_ptr, void *win_ptr, int x, int y)
+{
+	(void)mlx_ptr;
+	mlx_mouse_move(win_ptr, x, y);
+}
+
+static inline void	mouse_show(void *mlx_ptr, void *win_ptr)
+{
+	(void)mlx_ptr;
+	(void)win_ptr;
+	mlx_mouse_show();
+}
+
+static inline void	mouse_hide(void *mlx_ptr, void *win_ptr)
+{
+	(void)mlx_ptr;
+	(void)win_ptr;
+	mlx_mouse_hide();
+}
+
+#else
+
+static inline void	mouse_get_pos(void *mlx_ptr, void *win_ptr, int *x, int *y)
+{
+	mlx_mouse_get_pos(mlx_ptr, win_ptr, x, y);
+}
+
+static inline void	mouse_move(void *mlx_ptr, void *win_ptr, int x, int y)
+{
+	mlx_mouse_move(mlx_ptr, win_ptr, x, y);
+}
+
+static inline void	mouse_show(void *mlx_ptr, void *win_ptr)
+{
+	mlx_mouse_show(mlx_ptr, win_ptr);
+}
+
+static inline void	mouse_hide(void *mlx_ptr, void *win_ptr)
+{
+	mlx_mouse_hide(mlx_ptr, win_ptr);
+}
+
+#endif
+
+static inline bool	key_pressed(t_game *game, int key)
+{
+	return (game->key.k[(short)key + KEYCODE_OFFSET]);
+}
+
 void	player_control_rotate(t_game *game)
 {
 	if (game->key.mouse == true)
 	{
-		mlx_mouse_get_pos(game->win, &game->key.mpos.x, &game->key.mpos.y);
+		mouse_get_pos(game->mlx, game->win, &game->key.mpos.x, &game->key.mpos.y);
 		game->key.mdir.x = game->key.mdir.x / 2 + game->key.mpos.x - \
 						   (int)game->resolution.x / 2;
 		game->key.mdir.y = game->key.mdir.y / 2 + game->key.mpos.y - \
 						   (int)game->resolution.y / 2;
-		mlx_mouse_move(game->win, game->center.x, (int)game->resolution.y / 2);
+		mouse_move(game->mlx, game->win, game->center.x, (int)game->resolution.y / 2);
 		game->p.angle += game->key.mdir.x * game->col_step * MOUSE_SPEED;
 		game->horizon -= game->key.mdir.y * MOUSE_SPEED;
 		game->horizon = ft_min(3 * (int)game->img.size.y, \
 						ft_max(-3 * (int)game->img.size.y, game->horizon));
 	}
-	if (game->key.k[K_TURN_LEFT])
+	if (key_pressed(game, K_TURN_LEFT))
 		game->p.angle -= PL_SPEED / 2.0f;
-	if (game->key.k[K_TURN_RIGHT])
+	if (key_pressed(game, K_TURN_RIGHT))
 		game->p.angle += PL_SPEED / 2.0f;
 	if (game->p.angle >= M_PI_F)
 		game->p.angle -= PI2_F;
 	else if (game->p.angle < -M_PI_F)
 		game->p.angle += PI2_F;
-	__sincosf(game->p.angle, &game->p.vect.y, &game->p.vect.x);
+	game->p.vect.x = cosf(game->p.angle);
+	game->p.vect.y = sinf(game->p.angle);
 }
 
 void	player_control_move(t_game *g)
 {
-	const int	active = (g->key.k[K_MOVE_FORWARD] || g->key.k[K2_MOVE_FORWARD]
-		|| g->key.k[K_MOVE_BACK] || g->key.k[K2_MOVE_BACK] ||
-	g->key.k[K_MOVE_LEFT] || g->key.k[K_MOVE_RIGHT]) * (1 + g->key.k[K_RUN]);
-	const float	target = fmaxf(0.0f, active - g->key.k[K_CROUCH] / 2.0f);
+	const int	active = (key_pressed(g, K_MOVE_FORWARD) || key_pressed(g, K2_MOVE_FORWARD)
+		|| key_pressed(g, K_MOVE_BACK) || key_pressed(g, K2_MOVE_BACK) ||
+	key_pressed(g, K_MOVE_LEFT) || key_pressed(g, K_MOVE_RIGHT)) * (1 + key_pressed(g, K_RUN));
+	const float	target = fmaxf(0.0f, active - key_pressed(g, K_CROUCH) / 2.0f);
 	const float	pl_speed = g->p.velocity * PL_SPEED;
 
 	if (fabsf(target - g->p.velocity) > 0.01f)
 		g->p.velocity += (target - g->p.velocity) / 5.0f;
 	else
 		g->p.velocity = target;
-	if (g->key.k[K_MOVE_FORWARD] || g->key.k[K2_MOVE_FORWARD])
+	if (key_pressed(g, K_MOVE_FORWARD) || key_pressed(g, K2_MOVE_FORWARD))
 		g->p.pos = (t_fpoint){g->p.pos.x + pl_speed * g->p.vect.x,
 			g->p.pos.y + pl_speed * g->p.vect.y};
-	else if (g->key.k[K_MOVE_BACK] || g->key.k[K2_MOVE_BACK])
+	else if (key_pressed(g, K_MOVE_BACK) || key_pressed(g, K2_MOVE_BACK))
 		g->p.pos = (t_fpoint){g->p.pos.x - pl_speed / 1.5f * g->p.vect.x,
 			g->p.pos.y - pl_speed / 1.5f * g->p.vect.y};
-	if (g->key.k[K_MOVE_LEFT])
+	if (key_pressed(g, K_MOVE_LEFT))
 		g->p.pos = (t_fpoint){g->p.pos.x + pl_speed * g->p.vect.y,
 			g->p.pos.y - pl_speed * g->p.vect.x};
-	if (g->key.k[K_MOVE_RIGHT])
+	if (key_pressed(g, K_MOVE_RIGHT))
 		g->p.pos = (t_fpoint){g->p.pos.x - pl_speed * g->p.vect.y,
 			g->p.pos.y + pl_speed * g->p.vect.x};
 }
 
 void	player_control_jump_n_crouch(t_game *g)
 {
-	g->z_level_target = 0.5f + PL_CROUCH_Z * g->key.k[K_CROUCH];
+	g->z_level_target = 0.5f + PL_CROUCH_Z * key_pressed(g, K_CROUCH);
 	if (g->z_level_vy > PL_GRAVITY)
 	{
 		g->z_level = fmaxf(0.5f, g->z_level + g->z_level_vy);
@@ -89,7 +147,7 @@ void	player_control_jump_n_crouch(t_game *g)
 		else
 			g->z_level_vy = PL_GRAVITY;
 	}
-	else if (g->z_level < 0.5f || g->key.k[K_CROUCH] == true)
+	else if (g->z_level < 0.5f || key_pressed(g, K_CROUCH) == true)
 		g->z_level -= \
 				(g->z_level - g->z_level_target - FLOAT_FIX) / PL_CROUCH_SPEED;
 	else
@@ -103,11 +161,11 @@ void	player_control_toggler(t_game *g, int key_code)
 	if (key_code == K_MOUSE_TOGGLE)
 	{
 		if (g->key.mouse == true)
-			mlx_mouse_show();
+			mouse_show(g->mlx, g->win);
 		if (g->key.mouse == false)
 		{
-			mlx_mouse_move(g->win, g->resolution.x / 2, g->resolution.y / 2);
-			mlx_mouse_hide();
+			mouse_move(g->mlx, g->win, g->resolution.x / 2, g->resolution.y / 2);
+			mouse_hide(g->mlx, g->win);
 		}
 		g->key.mouse = !g->key.mouse;
 	}

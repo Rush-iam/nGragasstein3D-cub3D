@@ -79,6 +79,9 @@ typedef struct	s_win_list
 	void				*key_param;
 	void				*expose_param;
 	t_event_list		hooks[MLX_MAX_EVENT];
+	Pixmap				window_back;
+	int					width;
+	int					height;
 }				t_win_list;
 
 

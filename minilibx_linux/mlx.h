@@ -76,6 +76,15 @@ int	mlx_put_image_to_window(void *mlx_ptr, void *win_ptr, void *img_ptr,
 				int x, int y);
 int	mlx_get_color_value(void *mlx_ptr, int color);
 
+/*
+** Back buffered version of mlx_put_image_to_window(),
+** which is faster/more reliable for multiple calls per frame.
+** Need to call mlx_window_image_flip() at the end of your loop.
+*/
+int	mlx_put_image_to_window_back(void *mlx_ptr, void *win_ptr, void *img_ptr,
+							   int x, int y);
+void	mlx_window_image_flip(void *mlx_ptr, void *win_ptr);
+
 
 /*
 ** dealing with Events

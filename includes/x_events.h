@@ -16,6 +16,10 @@
 # include <X11/X.h>
 # include <X11/keysym.h>
 
+# ifdef __APPLE__
+
+#  define KEYCODE_OFFSET 0
+
 enum	e_mouse
 {
 	MOUSE_LEFT = 1,
@@ -24,10 +28,6 @@ enum	e_mouse
 	MOUSE_SCROLLUP,
 	MOUSE_SCROLLDOWN
 };
-
-# ifdef __APPLE__
-
-#  define KEYCODE_OFFSET 0
 
 enum	e_keyboard
 {
@@ -105,18 +105,39 @@ enum	e_keyboard
 
 #  define KEYCODE_OFFSET 256
 
+enum	e_mouse
+{
+	MOUSE_LEFT = 1,
+	MOUSE_MIDDLE,
+	MOUSE_RIGHT,
+	MOUSE_SCROLLUP,
+	MOUSE_SCROLLDOWN
+};
+
 enum e_keyboard
 {
+	KEY_SHIFT_LEFT = XK_Shift_L,
+	KEY_CONTROL_LEFT = XK_Control_L,
+	KEY_CONTROL_RIGHT = XK_Control_R,
+	KEY_1 = XK_1,
+	KEY_2 = XK_2,
+	KEY_3 = XK_3,
 	KEY_A = XK_a,
 	KEY_S = XK_s,
 	KEY_D = XK_d,
 	KEY_W = XK_w,
+	KEY_E = XK_e,
+	KEY_M = XK_m,
+	KEY_SPACE = XK_space,
+	KEY_BACKSPACE = XK_BackSpace,
 	KEY_ESCAPE = XK_Escape,
 	KEY_NUMASTERISK = XK_KP_Multiply,
 	KEY_NUMPLUS = XK_KP_Add,
 	KEY_NUMMINUS = XK_KP_Subtract,
+	KEY_UP = XK_Up,
 	KEY_LEFT = XK_Left,
-	KEY_RIGHT = XK_Right
+	KEY_RIGHT = XK_Right,
+	KEY_DOWN = XK_Down
 };
 
 # endif

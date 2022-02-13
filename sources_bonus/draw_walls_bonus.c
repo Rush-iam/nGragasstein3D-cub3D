@@ -25,8 +25,8 @@ void	draw_walls(t_game *g)
 			(uint32_t)g->column[ray].cell.y < g->map.size.y)
 		{
 			draw_texture_set(g, &g->column[ray]);
-			__sincosf(g->p.angle + g->angles[ray], \
-						&g->ray_vector.y, &g->ray_vector.x);
+			g->ray_vector.x = cosf(g->p.angle + g->angles[ray]);
+			g->ray_vector.y = sinf(g->p.angle + g->angles[ray]);
 			g->ray_vector.x /= cosf(g->angles[ray]);
 			g->ray_vector.y /= cosf(g->angles[ray]);
 			g->column[ray].height = \

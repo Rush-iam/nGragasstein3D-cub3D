@@ -13,21 +13,34 @@
 #ifndef CUB3D_BONUS_H
 # define CUB3D_BONUS_H
 
-# include <time.h>
-# include <stdio.h>
-# include <fcntl.h>
-# include <math.h>
-# include <stdbool.h>
-# include <errno.h>
-# include <string.h>
-# include <limits.h>
 # include "cute_sound.h"
-# include "mlx.h"
-# include "libft.h"
 # include "get_next_line.h"
+# include "libft.h"
+# include "mlx.h"
 # include "x_events.h"
 
-# define TITLE	"nGragasstein 3D"
+# ifndef __APPLE__
+#  include "cute_png.h"
+# endif
+
+# include <errno.h>
+# include <fcntl.h>
+# include <limits.h>
+# include <math.h>
+# include <stdbool.h>
+# include <stdio.h>
+# include <string.h>
+# include <time.h>
+
+# ifdef __APPLE__
+#  define SOUND_DISABLED 0
+#  define FLASHES_DISABLED 0
+# else
+#  define SOUND_DISABLED 1
+#  define FLASHES_DISABLED 1
+# endif
+
+# define TITLE "nGragasstein 3D"
 # define MAX_SCREENSHOT_X 20000
 # define MAX_SCREENSHOT_Y 20000
 # define MIN_RES	2
@@ -73,6 +86,8 @@
 # define ERR_PARSE	3
 # define ERR_MEM	4
 # define ERR_BMP	5
+
+# define K_EXIT			KEY_ESCAPE
 
 # define K_MOVE_FORWARD	KEY_W
 # define K2_MOVE_FORWARD KEY_UP
@@ -432,7 +447,7 @@ typedef struct s_game
 	}			*column;
 	struct		s_key
 	{
-		bool		k[280];
+		bool		k[512];
 		bool		m[8];
 		t_point		mpos;
 		t_point		mdir;
@@ -792,5 +807,9 @@ void			free_object		(void *object);
 void			demo_fillrate	(t_game *mlx, int step);
 void			demo_radar		(t_game *mlx, int rays);
 void			demo_cursor		(t_game *game, int color);
+
+// mlx_os_adapters
+void put_image_to_window(void *mlx_ptr, void *win_ptr, void *img_ptr, \
+						 t_point offset);
 
 #endif

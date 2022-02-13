@@ -12,6 +12,48 @@
 
 #include "cub3d_bonus.h"
 
+#ifdef __APPLE__
+
+static void	*png_file_to_image(void *mlx, char *file, int *width, int *height)
+{
+	return (mlx_png_file_to_image(mlx, file, width, height));
+}
+
+#else
+
+static void	*png_file_to_image(void *mlx, char *file, int *width, int *height)
+{
+	const cp_image_t	png_img = cp_load_png(file);
+	void				*mlx_img;
+	char				*mlx_img_data;
+	int					i;
+
+	if (png_img.pix == NULL)
+		return (NULL);
+	mlx_img = mlx_new_image(mlx, png_img.w, png_img.h);
+	if (mlx_img == NULL)
+	{
+		free(png_img.pix);
+		return (NULL);
+	}
+	mlx_img_data = mlx_get_data_addr(mlx_img, &i, &i, &i);
+	i = 0;
+	while (i < png_img.w * png_img.h)
+	{
+		mlx_img_data[i * 4 + 0] = (char)png_img.pix[i].b;
+		mlx_img_data[i * 4 + 1] = (char)png_img.pix[i].g;
+		mlx_img_data[i * 4 + 2] = (char)png_img.pix[i].r;
+		mlx_img_data[i * 4 + 3] = (char)(255 - png_img.pix[i].a);
+		++i;
+	}
+	*width = png_img.w;
+	*height = png_img.h;
+	free(png_img.pix);
+	return (mlx_img);
+}
+
+#endif
+
 void	load_image_file(t_game *g, char *path, t_img *dst_img, char *err)
 {
 	int				n;
@@ -23,7 +65,7 @@ void	load_image_file(t_game *g, char *path, t_img *dst_img, char *err)
 		dst_img->ptr = mlx_xpm_file_to_image(g->mlx, path, \
 						(int *)&dst_img->size.x, (int *)&dst_img->size.y);
 	else if (ft_memcmp(".png", path + str_len - 4, 5) == 0)
-		dst_img->ptr = mlx_png_file_to_image(g->mlx, path, \
+		dst_img->ptr = png_file_to_image(g->mlx, path, \
 						(int *)&dst_img->size.x, (int *)&dst_img->size.y);
 	else
 		terminate(g, ERR_ARGS, "Can't identify texture format (.xpm/.png)");

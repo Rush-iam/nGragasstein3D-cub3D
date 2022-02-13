@@ -14,20 +14,22 @@
 
 int	hook_key_press(int key_code, t_game *game)
 {
-	if ((unsigned)key_code >= sizeof(game->key.k))
-		return (1);
-	if (key_code == KEY_ESCAPE)
-		terminate(game, EXIT_SUCCESS, NULL);
 	player_control_toggler(game, key_code);
-	game->key.k[key_code] = true;
+	if (key_code == K_EXIT)
+		terminate(game, EXIT_SUCCESS, NULL);
+	key_code = (short)key_code;
+	if (key_code >= (int) sizeof(game->key) || key_code < -256)
+		return (1);
+	game->key.k[key_code + KEYCODE_OFFSET] = true;
 	return (0);
 }
 
 int	hook_key_release(int key_code, struct s_key *key)
 {
-	if ((unsigned)key_code >= sizeof(key->k))
+	key_code = (short)key_code;
+	if (key_code >= (int) sizeof(key->k) || key_code < -256)
 		return (1);
-	key->k[key_code] = false;
+	key->k[key_code + KEYCODE_OFFSET] = false;
 	return (0);
 }
 

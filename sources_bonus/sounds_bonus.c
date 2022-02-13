@@ -14,6 +14,8 @@
 
 void	initialize_sounds(t_game *g)
 {
+	if (SOUND_DISABLED)
+		return ;
 	g->audio.ctx = cs_make_context(0, 44100, 8192, 2, NULL);
 	g->audio.ctx7 = cs_make_context(0, 7042, 1024, MAX_PLAYING_SOUNDS, NULL);
 	g->audio.ctx22 = cs_make_context(0, 22050, 2048, MAX_PLAYING_SOUNDS, NULL);
@@ -29,6 +31,8 @@ void	sounds(t_game *game)
 {
 	uint32_t	i;
 
+	if (SOUND_DISABLED)
+		return ;
 	i = 0;
 	while (i < sizeof(game->audio.playing) / sizeof(*game->audio.playing))
 	{
@@ -48,7 +52,7 @@ struct s_playback	*sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos)
 	uint32_t		i;
 	cs_context_t	*target_ctx;
 
-	if (sound == NULL || sound->file.channels[0] == NULL)
+	if (SOUND_DISABLED || sound == NULL || sound->file.channels[0] == NULL)
 		return (NULL);
 	i = 0;
 	while (game->audio.playing[i].snd != NULL && \
@@ -73,7 +77,7 @@ void	music_play(t_game *game, t_snd *music)
 {
 	uint32_t	i;
 
-	if (music->file.channels[0] == NULL)
+	if (SOUND_DISABLED || music->file.channels[0] == NULL)
 		return ;
 	i = 0;
 	while (i < sizeof(game->audio.playing) / sizeof(*game->audio.playing))

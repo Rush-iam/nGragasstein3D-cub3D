@@ -12,6 +12,46 @@
 
 #include "cub3d_bonus.h"
 
+#ifdef __APPLE__
+
+static inline void	get_screen_size(void *mlx_ptr, int *size_x, int *size_y)
+{
+	(void)mlx_ptr;
+	mlx_get_screen_size(size_x, size_y);
+}
+
+static inline void	mouse_move(void *mlx_ptr, void *win_ptr, int x, int y)
+{
+	(void)mlx_ptr;
+	mlx_mouse_move(win_ptr, x, y);
+}
+
+static inline void	mouse_hide(void *mlx_ptr, void *win_ptr)
+{
+	(void)mlx_ptr;
+	(void)win_ptr;
+	mlx_mouse_hide();
+}
+
+#else
+
+static inline void	get_screen_size(void *mlx_ptr, int *size_x, int *size_y)
+{
+	mlx_get_screen_size(mlx_ptr, size_x, size_y);
+}
+
+static inline void	mouse_move(void *mlx_ptr, void *win_ptr, int x, int y)
+{
+	mlx_mouse_move(mlx_ptr, win_ptr, x, y);
+}
+
+static inline void	mouse_hide(void *mlx_ptr, void *win_ptr)
+{
+	mlx_mouse_hide(mlx_ptr, win_ptr);
+}
+
+#endif
+
 void	initialize_game(t_game *game, bool screenshot_only)
 {
 	initialize_sounds(game);
@@ -42,7 +82,7 @@ void	initialize_window(t_game *game, bool screenshot_only)
 		max_res = (t_point){MAX_SCREENSHOT_X, MAX_SCREENSHOT_Y};
 	else
 	{
-		mlx_get_screen_size(&max_res.x, &max_res.y);
+		get_screen_size(game->mlx, &max_res.x, &max_res.y);
 		max_res.y -= 44;
 	}
 	game->resolution.x = ft_umax(game->resolution.x & ~1U, MIN_RES);
@@ -54,8 +94,8 @@ void	initialize_window(t_game *game, bool screenshot_only)
 				game->mlx, game->resolution.x, game->resolution.y, TITLE);
 		if (game->win == NULL)
 			terminate(game, ERR_MEM, strerror(errno));
-		mlx_mouse_move(game->win, game->resolution.x / 2, \
-									game->resolution.y / 2);
+		mouse_move(game->mlx, game->win, game->resolution.x / 2, \
+										game->resolution.y / 2);
 	}
 }
 
@@ -63,7 +103,8 @@ void	initialize_values(t_game *game)
 {
 	if (!game->fade_distance)
 		game->fade_distance = 8;
-	__sincosf(game->p.angle, &game->p.vect.y, &game->p.vect.x);
+	game->p.vect.x = cosf(game->p.angle);
+	game->p.vect.y = sinf(game->p.angle);
 	game->horizon = game->center.y;
 	game->z_level = 0.5f;
 	game->fov_reset = \
@@ -81,11 +122,11 @@ void	initialize_values(t_game *game)
 void	initialize_hooks(t_game *game)
 {
 	mlx_do_key_autorepeatoff(game->mlx);
-	mlx_mouse_hide();
-	mlx_hook(game->win, EVENT_KEYPRESS, 0, hook_key_press, game);
-	mlx_hook(game->win, EVENT_KEYRELEASE, 0, hook_key_release, &game->key);
-	mlx_hook(game->win, EVENT_BUTTONPRESS, 0, hook_mouse_press, &game->key);
-	mlx_hook(game->win, EVENT_BUTTONRELEASE, 0, hook_mouse_release, &game->key);
-	mlx_hook(game->win, EVENT_DESTROYNOTIFY, 0, hook_exit, game);
+	mouse_hide(game->mlx, game->win);
+	mlx_hook(game->win, KeyPress, KeyPressMask, hook_key_press, game);
+	mlx_hook(game->win, KeyRelease, KeyReleaseMask, hook_key_release, &game->key);
+	mlx_hook(game->win, ButtonPress, ButtonPressMask, hook_mouse_press, &game->key);
+	mlx_hook(game->win, ButtonRelease, ButtonReleaseMask, hook_mouse_release, &game->key);
+	mlx_hook(game->win, DestroyNotify, StructureNotifyMask, hook_exit, game);
 	mlx_loop_hook(game->mlx, game_loop, game);
 }

@@ -35,3 +35,23 @@ int	mlx_put_image_to_window(t_xvar *xvar,t_win_list *win,t_img *img,
   if (xvar->do_flush)
     XFlush(xvar->display);
 }
+
+
+int	mlx_put_image_to_window_back(t_xvar *xvar,t_win_list *win,t_img *img,
+									int x,int y)
+{
+	GC	gc = (img->gc) ? img->gc : win->gc;
+
+	if (img->type==MLX_TYPE_XIMAGE)
+		XPutImage(xvar->display,win->window_back,gc,img->image,0,0,x,y,
+				  img->width,img->height);
+	else if (img->type==MLX_TYPE_SHM)
+		XShmPutImage(xvar->display,win->window_back,gc,img->image,0,0,x,y,
+					 img->width, img->height, False);
+}
+
+void	mlx_window_image_flip(t_xvar *xvar, t_win_list *win)
+{
+	XCopyArea(xvar->display,win->window_back,win->window,win->gc,0,0,
+			  win->width,win->height,0,0);
+}

@@ -30,12 +30,12 @@ void	draw_hud(t_game *g)
 		hud_digits_bake(&g->hud, hud_num_to_str(num_str, g->p.ammo, 2), \
 						(t_upoint){g->hud.bar.size.x * HUD_AMMO_X, y_offset});
 	}
-	mlx_put_image_to_window(g->mlx, g->win, \
-		g->hud.bar.ptr, 0, g->img.size.y);
-	mlx_put_image_to_window(g->mlx, g->win, \
+	put_image_to_window(g->mlx, g->win, \
+		g->hud.bar.ptr, (t_point){0, g->img.size.y});
+	put_image_to_window(g->mlx, g->win, \
 		g->hud.weapon[g->p.weapon_cur].ptr, \
-		g->hud.bar.size.x * HUD_WEAPON_X, \
-		g->img.size.y + g->hud.bar.size.y * HUD_WEAPON_Y);
+		(t_point){g->hud.bar.size.x * HUD_WEAPON_X, \
+		g->img.size.y + g->hud.bar.size.y * HUD_WEAPON_Y});
 	draw_hud_face(g, true);
 	g->hud.needs_redraw = false;
 }
@@ -47,13 +47,13 @@ void	draw_hud_face(t_game *g, bool force_redraw)
 
 	if (g->p.health == 0)
 	{
-		mlx_put_image_to_window(g->mlx, g->win, g->hud.face_dead.ptr, \
-								g->hud.face_pos.x, g->hud.face_pos.y);
+		put_image_to_window(g->mlx, g->win, g->hud.face_dead.ptr, \
+							g->hud.face_pos);
 		return ;
 	}
 	if (g->hud.face_nexttick < g->tick)
 	{
-		face_dir = arc4random() % HUD_FACE_DIRS;
+		face_dir = random() % HUD_FACE_DIRS;
 		g->hud.face_nexttick = g->tick + HUD_FACE_TICK_TIMER;
 		force_redraw = true;
 	}
@@ -64,9 +64,9 @@ void	draw_hud_face(t_game *g, bool force_redraw)
 		health_level = 0;
 	else if (health_level >= HUD_FACE_LEVELS)
 		health_level = HUD_FACE_LEVELS - 1;
-	mlx_put_image_to_window(g->mlx, g->win, \
-							g->hud.face[health_level][face_dir].ptr, \
-							g->hud.face_pos.x, g->hud.face_pos.y);
+	put_image_to_window(g->mlx, g->win, \
+						g->hud.face[health_level][face_dir].ptr, \
+						g->hud.face_pos);
 }
 
 char	*hud_num_to_str(char num_str[11], uint32_t num, int length)

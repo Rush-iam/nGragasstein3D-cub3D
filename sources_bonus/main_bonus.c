@@ -35,6 +35,7 @@ int	main(int args, char *av[])
 	initialize_hooks(&game);
 	clock_gettime(CLOCK_MONOTONIC, &time);
 	game.tick = 60 * time.tv_sec + 60 * time.tv_nsec / NANSECS_PER_SEC;
+	srandom(time.tv_nsec);
 	mlx_loop(game.mlx);
 }
 
@@ -51,15 +52,16 @@ int	game_loop(t_game *game)
 	ray_cast(game, -1);
 	draw_walls(game);
 	draw_objects(game);
-	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
+	put_image_to_window(game->mlx, game->win, game->img.ptr, (t_point){0, 0});
 	draw_effect(game, &game->effect);
 	draw_weapon(game, &game->p.weapon);
-	if (*game->string.text)
-		draw_message(game, &game->string);
 	if (game->map.enabled)
 		draw_map(game);
 	draw_hud(game);
 	draw_hud_face(game, false);
+	mlx_window_image_flip(game->mlx, game->win);
+	if (*game->string.text)
+		draw_message(game, &game->string);
 	draw_fps(game);
 	return (0);
 }

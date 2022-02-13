@@ -30,8 +30,10 @@ void	draw_effect(t_game *game, struct s_effect *ef)
 
 void	effect_flash(t_game *game, uint32_t color, float power)
 {
+	if (FLASHES_DISABLED)
+		return ;
 	img_clear_rgb(&game->img_effect, color | ((int)(255 - 255 * power) << 24));
-	mlx_put_image_to_window(game->mlx, game->win, game->img_effect.ptr, 0, 0);
+	put_image_to_window(game->mlx, game->win, game->img_effect.ptr, (t_point){0, 0});
 }
 
 void	effect_fizzlefade(t_game *game, uint32_t color)
@@ -56,5 +58,5 @@ void	effect_fizzlefade(t_game *game, uint32_t color)
 		draw_square_fill(&game->img_effect, pos, scale, color);
 		i++;
 	}
-	mlx_put_image_to_window(game->mlx, game->win, game->img_effect.ptr, 0, 0);
+	put_image_to_window(game->mlx, game->win, game->img_effect.ptr, (t_point){0, 0});
 }

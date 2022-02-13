@@ -55,7 +55,8 @@ SRC_BONUS :=	control_extra	\
 				sounds			\
 				screenshot		\
 				terminate		\
-				weapons
+				weapons			\
+				os_adapters/put_image_to_window
 
 ifeq ($(OS),Windows_NT)
 	NAME := $(addsuffix .exe, $(NAME))
@@ -119,6 +120,10 @@ ifeq ($(filter bonus, $(MAKECMDGOALS)), bonus)
 	CPPFLAGS	+= -I$(CUTE_SOUND_DIR)
 	ifeq ($(PLATFORM), Darwin)
 		LDLIBS	+= -framework AudioUnit
+	else ifeq ($(PLATFORM), Linux)
+		LDLIBS	+= -pthread -ldl
+	else ifeq ($(OS),Windows_NT)
+		LDLIBS	+= -lpthread -ldsound
 	endif
 endif
 
@@ -135,9 +140,9 @@ $(CUTE_PNG): FORCE
 $(CUTE_SOUND): FORCE
 	$(MAKE) -C $(CUTE_SOUND_DIR)
 
-$(OBJ): | $(OBJ_DIR)
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
+$(OBJ): | $(OBJ_DIR)os_adapters
+$(OBJ_DIR)os_adapters:
+	mkdir -p $@
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c Makefile
 	$(CC) $(CFLAGS) -c $< -o $@ $(CPPFLAGS)
 -include $(DEP)

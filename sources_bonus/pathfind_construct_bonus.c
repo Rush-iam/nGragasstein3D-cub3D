@@ -15,7 +15,7 @@
 void	*pathfind_construct(t_list **path, t_point from, struct s_map *map)
 {
 	const t_point	dirs[] = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
-	const int		rnd = arc4random() % 4;
+	const int		rnd = random() % 4;
 	t_point			check;
 	t_list			*lst;
 	int				i;
