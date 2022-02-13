@@ -12,24 +12,21 @@
 
 #include "cub3d.h"
 
-int	main(int args, char *av[])
+int	main(int argc, char *argv[])
 {
 	t_game	game;
-	bool	screenshot_only;
 
 	errno = 0;
 	game = (t_game){0};
-	if (args == 1)
+	if (argc < 2)
 		terminate(&game, ERR_ARGS, "Please specify scene filename");
-	else if (args >= 4)
+	else if (argc > 2)
 		terminate(&game, ERR_ARGS, "Too many arguments");
 	game.mlx = mlx_init();
 	if (game.mlx == NULL)
 		terminate(&game, ERR_MLX, strerror(errno));
-	parse(args, av, &game, &screenshot_only);
-	initialize_game(&game, screenshot_only);
-	if (screenshot_only == true)
-		write_screenshot_and_exit(&game);
+	parse(argv[1], &game);
+	initialize_game(&game);
 	mlx_do_key_autorepeatoff(game.mlx);
 	mlx_hook(game.win, KeyPress, KeyPressMask, hook_key_press, &game);
 	mlx_hook(game.win, KeyRelease, KeyReleaseMask, hook_key_release, &game);
@@ -61,9 +58,9 @@ int	game_loop(t_game *game)
 	img_ceilfloor_fill_rgb(&game->img, game->color_ceil, game->color_floor);
 	draw_walls(game);
 	mlx_put_image_to_window(game->mlx, game->win, game->img.ptr, 0, 0);
-	if (clock() != clock_cur)
-		fps = CLOCKS_PER_SEC / (clock() - clock_cur);
-	clock_cur = clock();
+	if (clock() != clock_cur)//
+		fps = CLOCKS_PER_SEC / (clock() - clock_cur);//
+	clock_cur = clock(); //
 	mlx_string_put(game->mlx, game->win, 0, 20, 0x00FFFFFF, \
 		(char []){'0' + fps / 100, '0' + fps / 10 % 10, '0' + fps % 10, '\0'});
 	return (0);

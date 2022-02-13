@@ -29,18 +29,15 @@ static inline void	get_screen_size(void *mlx_ptr, int *size_x, int *size_y)
 
 #endif
 
-void	initialize_game(t_game *g, bool screenshot)
+void	initialize_game(t_game *g)
 {
 	int	n;
 
 	get_screen_size(g->mlx, (int *)&g->img.size.x, (int *)&g->img.size.y);
 	g->img.aspect = (double)g->img.size.x / g->img.size.y;
-	if (screenshot == false)
-	{
-		g->win = mlx_new_window(g->mlx, g->img.size.x, g->img.size.y, TITLE);
-		if (g->win == NULL)
-			terminate(g, ERR_MLX, strerror(errno));
-	}
+	g->win = mlx_new_window(g->mlx, g->img.size.x, g->img.size.y, TITLE);
+	if (g->win == NULL)
+		terminate(g, ERR_MLX, strerror(errno));
 	g->img.ptr = mlx_new_image(g->mlx, g->img.size.x, g->img.size.y);
 	if (g->img.ptr == NULL)
 		terminate(g, ERR_MLX, strerror(errno));

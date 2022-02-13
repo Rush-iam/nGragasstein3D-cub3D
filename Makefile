@@ -11,6 +11,7 @@
 # **************************************************************************** #
 
 NAME 	= 	cub3D
+CC		=	clang
 CFLAGS 	= 	-Wall -Wextra -Werror -MMD -g -Ofast -march=native #-fsanitize=address
 SRC    :=		main			\
 				control			\
@@ -147,11 +148,13 @@ clean:
 	$(RM)r $(OBJ_DIR)
 	$(MAKE) -C $(LIBFT_DIR) $@
 	$(MAKE) -C $(MLX_DIR) $@
+	$(MAKE) -C $(CUTE_PNG_DIR) $@
 	$(MAKE) -C $(CUTE_SOUND_DIR) $@
 fclean: clean
 	$(RM) $(NAME)
 	$(RM) $(LIBFT)
 	$(RM) $(MLX)
+	$(RM) $(CUTE_PNG)
 	$(RM) $(CUTE_SOUND)
 re: fclean all
 

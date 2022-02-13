@@ -51,6 +51,8 @@ int	hook_key_press(int key_code, t_game *game)
 	key_code = (short)key_code;
 	if (key_code >= (int) sizeof(game->key) || key_code < -256)
 		return (1);
+	if (key_code == XK_1)
+		game->test = !game->test;
 	if (key_code == (short)K_EXIT)
 		terminate(game, EXIT_SUCCESS, NULL);
 	game->key[key_code + KEYCODE_OFFSET] = true;

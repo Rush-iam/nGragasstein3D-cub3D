@@ -25,6 +25,37 @@ void	img_ceilfloor_fill_rgb(t_img *img, int ceil, int floor)
 		img->data[i++] = floor;
 }
 
+void	draw_wall_scaled2(t_img *game_img, const t_img *src_img, \
+							const struct s_column *column, unsigned int x)
+{
+	const unsigned int	src_x = column->texture_pos * src_img->size.x;
+	unsigned int		src_y;
+	unsigned int		dst_y;
+	unsigned int		max_y;
+	unsigned int		error;
+
+	src_y = 0;
+	dst_y = ft_max(0, ((int)game_img->size.y - (int)column->height) / 2);
+	max_y = dst_y + column->height;
+	error = src_img->size.y / 2;
+	if (column->height > game_img->size.y)
+	{
+		error = (column->height - game_img->size.y) * src_img->size.y / 2;
+		src_y = error / column->height;
+		error = error % column->height;
+		max_y = game_img->size.y;
+	}
+	const unsigned int offset = src_x * src_img->size.y;
+	while (dst_y < max_y)
+	{
+		while (error >= column->height && ++src_y)
+			error -= column->height;
+		game_img->data[game_img->size.x * dst_y++ + x] = \
+			src_img->data[offset + src_y];
+		error += src_img->size.y;
+	}
+}
+
 void	draw_walls(t_game *game)
 {
 	unsigned int	ray;
@@ -35,7 +66,11 @@ void	draw_walls(t_game *game)
 	while (ray < game->img.size.x)
 	{
 		texture_id = ft_strchr(textures, game->column[ray].dir) - textures;
-		draw_wall_scaled(&game->img, &game->texture[texture_id], \
+		if (game->test)
+			draw_wall_scaled2(&game->img, &game->texture[texture_id], \
+						&game->column[ray], ray);
+		else
+			draw_wall_scaled(&game->img, &game->texture[texture_id], \
 						&game->column[ray], ray);
 		ray++;
 	}

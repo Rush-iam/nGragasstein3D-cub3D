@@ -12,39 +12,31 @@
 
 #include "cub3d.h"
 
-void	parse(int args, char **av, t_game *game, bool *screenshot_only)
+void	parse(char *filename, t_game *game)
 {
-	int		file_id;
+	int		file_fd;
 	char	*line;
 
-	av++;
-	if (ft_strlen(*av) < 5 || ft_memcmp(".cub", *av + ft_strlen(*av) - 4, 5))
+	if (ft_strlen(filename) < 5 \
+	|| ft_memcmp(".cub", filename + ft_strlen(filename) - 4, 5) != 0)
 		terminate(game, ERR_ARGS, "Wrong scene filename");
-	file_id = open(*av, O_RDONLY);
-	if (file_id == -1)
+	file_fd = open(filename, O_RDONLY);
+	if (file_fd == -1)
 		terminate(game, ERR_ARGS, strerror(errno));
-	parse_scene(file_id, &line, game);
+	parse_scene(file_fd, &line, game);
 	validate_settings(game);
-	parse_map(file_id, line, game);
-	if (close(file_id) == -1)
+	parse_map(file_fd, line, game);
+	if (close(file_fd) == -1)
 		terminate(game, ERR_PARSE, strerror(errno));
-	*screenshot_only = false;
-	if (args == 3)
-	{
-		if (ft_strncmp("--save", *(av + 1), 7) == 0)
-			*screenshot_only = true;
-		else
-			terminate(game, ERR_ARGS, "Invalid option");
-	}
 }
 
-void	parse_scene(int file_id, char **line, t_game *game)
+void	parse_scene(int file_fd, char **line, t_game *game)
 {
 	int	status;
 
 	game->color_floor = -1U;
 	game->color_ceil = -1U;
-	status = get_next_line(file_id, line);
+	status = get_next_line(file_fd, line);
 	while (status >= 0)
 	{
 		if (**line == 'C')
@@ -59,13 +51,13 @@ void	parse_scene(int file_id, char **line, t_game *game)
 		free(*line);
 		if (status == 0)
 			terminate(game, ERR_PARSE, "There is no map in scene file");
-		status = get_next_line(file_id, line);
+		status = get_next_line(file_fd, line);
 	}
 	if (status == -1)
 		terminate(game, ERR_PARSE, "Can't load scene file");
 }
 
-void	parse_map(int file_id, char *line, t_game *game)
+void	parse_map(int file_fd, char *line, t_game *game)
 {
 	t_list	*map;
 	t_list	*line_lst;
@@ -74,7 +66,7 @@ void	parse_map(int file_id, char *line, t_game *game)
 	if (ft_assign_ptr((void *)&map, ft_lstnew(line)) == NULL)
 		terminate(game, ERR_MEM, "Memory allocation failed (map first row)");
 	game->map.size = (t_upoint){ft_strlen(line), 1};
-	status = get_next_line(file_id, &line);
+	status = get_next_line(file_fd, &line);
 	while (status >= 0 && *line != '\0')
 	{
 		if (ft_assign_ptr((void *)&line_lst, ft_lstnew(line)) == NULL)
@@ -82,7 +74,7 @@ void	parse_map(int file_id, char *line, t_game *game)
 		ft_lstadd_front(&map, line_lst);
 		game->map.size.x = ft_umax(ft_strlen(line), game->map.size.x);
 		game->map.size.y++;
-		status = get_next_line(file_id, &line);
+		status = get_next_line(file_fd, &line);
 	}
 	if (status == -1)
 		terminate(game, ERR_PARSE, "Can't load scene file");

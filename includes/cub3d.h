@@ -82,7 +82,7 @@ typedef struct s_img
 
 typedef struct s_game
 {
-	bool			test;
+	bool			test; //
 	void			*mlx;
 	void			*win;
 	t_img			img;
@@ -116,11 +116,11 @@ typedef struct s_game
 void		player_set_fov(t_game *game, float fov, bool reset);
 int			game_loop(t_game *game);
 
-void		initialize_game(t_game *game, bool screenshot_only);
+void		initialize_game(t_game *game);
 
-void		parse(int args, char **av, t_game *game, bool *screenshot_only);
-void		parse_scene(int file_id, char **line, t_game *game);
-void		parse_map(int file_id, char *line, t_game *game);
+void		parse(char *filename, t_game *game);
+void		parse_scene(int file_fd, char **line, t_game *game);
+void		parse_map(int file_fd, char *line, t_game *game);
 void		validate_settings(t_game *game);
 
 void		set_ceilfloor(const char *color_string, unsigned int *target, \
@@ -153,7 +153,5 @@ char		*atoi_limited(unsigned int *dst_int, const char *src_string, \
 														unsigned int limit);
 int			terminate(t_game *game, int return_value, char *message);
 void		free_resources(t_game *g);
-void		write_screenshot_and_exit(t_game *game);
-void		write_screenshot_data(t_game *game, int file_id);
 
 #endif
