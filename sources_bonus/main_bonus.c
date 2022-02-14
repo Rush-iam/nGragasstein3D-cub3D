@@ -59,7 +59,6 @@ int	game_loop(t_game *game)
 		draw_map(game);
 	draw_hud(game);
 	draw_hud_face(game, false);
-	mlx_window_image_flip(game->mlx, game->win);
 	if (*game->string.text)
 		draw_message(game, &game->string);
 	draw_fps(game);
@@ -100,9 +99,12 @@ int	dead_exit(t_game *game)
 	if (game->effect.type != EF_FIZZLEFADE)
 	{
 		game->effect = (struct s_effect){0, 192, EF_FIZZLEFADE, COLOR_RED, 0};
-		cs_stop_all_sounds(game->audio.ctx);
-		cs_stop_all_sounds(game->audio.ctx7);
-		cs_stop_all_sounds(game->audio.ctx22);
+		if (SOUND_DISABLED == 0)
+		{
+			cs_stop_all_sounds(game->audio.ctx);
+			cs_stop_all_sounds(game->audio.ctx7);
+			cs_stop_all_sounds(game->audio.ctx22);
+		}
 		sound_play(game, &game->audio.sound[SND_PLAYER_DEATH], \
 					(t_fpoint){0, 0});
 	}

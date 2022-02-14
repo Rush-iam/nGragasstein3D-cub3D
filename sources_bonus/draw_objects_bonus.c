@@ -78,10 +78,10 @@ void	draw_sprite(t_game *game, t_object *obj)
 
 void	draw_sprite_scaled(t_game *g, t_object *obj, t_point min, t_point max)
 {
-	const float	x_src = obj->render.step.x * (min.x - obj->render.start_0);
-	int			x;
-	t_fpoint	cur_src;
-	int			src_pixel;
+	const float		x_src = obj->render.step.x * (min.x - obj->render.start_0);
+	int				x;
+	t_fpoint		cur_src;
+	unsigned int	src_pixel;
 
 	cur_src.y = fmaxf(0.0f, -obj->render.start.y * obj->render.step.y);
 	while (min.y < max.y)
@@ -94,7 +94,7 @@ void	draw_sprite_scaled(t_game *g, t_object *obj, t_point min, t_point max)
 			{
 				src_pixel = obj->sprite->data[(uint32_t)cur_src.y * \
 									obj->sprite->size.x + (uint32_t)cur_src.x];
-				if ((src_pixel >> 24) == 0)
+				if ((src_pixel >> 24) == ALPHA_OPAQUE)
 					g->img.data[min.y * g->img.size.x + x] = src_pixel;
 				cur_src.x += obj->render.step.x;
 				x++;
@@ -107,11 +107,11 @@ void	draw_sprite_scaled(t_game *g, t_object *obj, t_point min, t_point max)
 
 void	draw_sprite_scaled_f(t_game *g, t_object *obj, t_point min, t_point max)
 {
-	const float	x_src = obj->render.step.x * (min.x - obj->render.start_0);
-	int			x;
-	t_fpoint	cur_src;
-	int			pix;
-	const float	f = 1.5f * g->fade_distance / obj->distance;
+	const float		x_src = obj->render.step.x * (min.x - obj->render.start_0);
+	int				x;
+	t_fpoint		cur_src;
+	unsigned int	pix;
+	const float		f = 1.5f * g->fade_distance / obj->distance;
 
 	cur_src.y = fmaxf(0.0f, -obj->render.start.y * obj->render.step.y);
 	while (min.y < max.y)
@@ -124,7 +124,7 @@ void	draw_sprite_scaled_f(t_game *g, t_object *obj, t_point min, t_point max)
 			{
 				pix = obj->sprite->data[(uint32_t)cur_src.y * \
 						obj->sprite->size.x + (uint32_t)cur_src.x];
-				if ((pix >> 24) == 0)
+				if ((pix >> 24) == ALPHA_OPAQUE)
 					g->img.data[min.y * g->img.size.x + x] = pixel_fade(pix, f);
 				cur_src.x += obj->render.step.x;
 			}

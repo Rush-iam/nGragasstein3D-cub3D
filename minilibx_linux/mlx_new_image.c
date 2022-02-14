@@ -110,6 +110,7 @@ void	*mlx_int_new_image(t_xvar *xvar,int width, int height,int format)
 
   if (!(img = malloc(sizeof(*img))))
     return ((void *)0);
+  bzero(img,sizeof(*img));
   if (!(img->data = malloc((width+32)*height*4)))
   {
     free(img);
@@ -146,6 +147,17 @@ void	*mlx_new_image(t_xvar *xvar,int width, int height)
     if (img = mlx_int_new_xshm_image(xvar,width,height,ZPixmap))
       return (img);
   return (mlx_int_new_image(xvar,width,height,ZPixmap));
+}
+
+void	*mlx_new_image_alpha(t_xvar *xvar,int width, int height)
+{
+	t_img	*img;
+
+	img = mlx_new_image(xvar, width, height);
+	if (img)
+		img->pict = XRenderCreatePicture(xvar->display, img->pix,
+										 xvar->pict_format, 0, NULL);
+	return (img);
 }
 
 void	*mlx_new_image2(t_xvar *xvar,int width, int height)

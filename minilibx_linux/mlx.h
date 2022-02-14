@@ -66,6 +66,12 @@ void	*mlx_new_image(void *mlx_ptr,int width,int height);
 **  obsolete : image2 data is stored using bit planes
 **  void	*mlx_new_image2(void *mlx_ptr,int width,int height);
 */
+
+/*
+** mlx_new_image_alpha - creates image with alpha channel
+*/
+void	*mlx_new_image_alpha(void *mlx_ptr,int width,int height);
+
 char	*mlx_get_data_addr(void *img_ptr, int *bits_per_pixel,
 			   int *size_line, int *endian);
 /*
@@ -75,16 +81,6 @@ char	*mlx_get_data_addr(void *img_ptr, int *bits_per_pixel,
 int	mlx_put_image_to_window(void *mlx_ptr, void *win_ptr, void *img_ptr,
 				int x, int y);
 int	mlx_get_color_value(void *mlx_ptr, int color);
-
-/*
-** Back buffered version of mlx_put_image_to_window(),
-** which is faster/more reliable for multiple calls per frame.
-** Need to call mlx_window_image_flip() at the end of your loop.
-*/
-int	mlx_put_image_to_window_back(void *mlx_ptr, void *win_ptr, void *img_ptr,
-							   int x, int y);
-void	mlx_window_image_flip(void *mlx_ptr, void *win_ptr);
-
 
 /*
 ** dealing with Events

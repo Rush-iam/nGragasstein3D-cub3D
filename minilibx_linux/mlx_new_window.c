@@ -37,14 +37,18 @@ void	*mlx_new_window(t_xvar *xvar,int size_x,int size_y,char *title)
 	if (!(new_win = malloc(sizeof(*new_win))))
 		return ((void *)0);
 	new_win->window = XCreateWindow(xvar->display,xvar->root,0,0,size_x,size_y,
-					0,CopyFromParent,InputOutput,xvar->visual,
+					0,xvar->depth,InputOutput,xvar->visual,
 					CWEventMask|CWBackPixel|CWBorderPixel|
 					CWColormap,&xswa);
 
+	// XRenderPicture allows alpha blending
+	new_win->pict = XRenderCreatePicture(xvar->display, new_win->window,
+										 xvar->pict_format, 0, NULL);
 	// Double buffer for Windows/WSL2 and faster draw.
-	printf("%d bits\n", xvar->depth); // remove me!
-	new_win->window_back = \
-		XCreatePixmap(xvar->display, xvar->root, size_x, size_y, xvar->depth);
+	new_win->window_back = XCreatePixmap(xvar->display, xvar->root,
+										 size_x, size_y, xvar->depth);
+	new_win->pict_back = XRenderCreatePicture(xvar->display, new_win->window_back,
+										 xvar->pict_format, 0, NULL);
 	new_win->width = size_x;
 	new_win->height = size_y;
 

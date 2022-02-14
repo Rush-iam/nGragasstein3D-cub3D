@@ -16,7 +16,7 @@ t_img	*img_create(void *mlx_ptr, t_img *dst, t_upoint size)
 {
 	int	null;
 
-	dst->ptr = mlx_new_image(mlx_ptr, size.x, size.y);
+	dst->ptr = new_image(mlx_ptr, size.x, size.y);
 	if (dst->ptr == NULL)
 		return (NULL);
 	dst->data = (void *)mlx_get_data_addr(dst->ptr, &null, &null, &null);
@@ -76,7 +76,7 @@ void	img_alpha_columns_get(t_img *img)
 		alpha_y = true;
 		while (px.x < img->size.x)
 		{
-			if ((img->data[px.y * img->size.x + px.x] >> 24) != 0xFF)
+			if ((img->data[px.y * img->size.x + px.x] >> 24) == ALPHA_OPAQUE)
 			{
 				img->min_x = ft_umin(img->min_x, px.x);
 				img->max_x = ft_umax(img->max_x, px.x + 1);

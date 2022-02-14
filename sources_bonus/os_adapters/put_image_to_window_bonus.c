@@ -15,7 +15,7 @@ void put_image_to_window(void *mlx_ptr, void *win_ptr, void *img_ptr, \
 void put_image_to_window(void *mlx_ptr, void *win_ptr, void *img_ptr, \
 						 t_point offset)
 {
-	mlx_put_image_to_window_back(mlx_ptr, win_ptr, img_ptr, offset.x, offset.y);
+	mlx_put_image_to_window(mlx_ptr, win_ptr, img_ptr, offset.x, offset.y);
 }
 
 #endif

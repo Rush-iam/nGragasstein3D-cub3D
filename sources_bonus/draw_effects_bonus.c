@@ -25,16 +25,28 @@ void	draw_effect(t_game *game, struct s_effect *ef)
 			effect_flash(game, game->effect.color, power * ef->max_power);
 		else if (ef->type == EF_FIZZLEFADE)
 			effect_fizzlefade(game, game->effect.color);
+		put_image_to_window(game->mlx, game->win, game->img_effect.ptr, (t_point){0, 0});
 	}
 }
 
+#ifdef __APPLE__
+
 void	effect_flash(t_game *game, uint32_t color, float power)
 {
-	if (FLASHES_DISABLED)
-		return ;
-	img_clear_rgb(&game->img_effect, color | ((int)(255 - 255 * power) << 24));
-	put_image_to_window(game->mlx, game->win, game->img_effect.ptr, (t_point){0, 0});
+	img_clear_rgb(&game->img_effect, \
+				  color | ((int)(255 - 255 * power) << 24));
+
 }
+
+#else
+
+void	effect_flash(t_game *game, uint32_t color, float power)
+{
+	img_clear_rgb(&game->img_effect, \
+				  pixel_fade(color, power) | ((int)(255 * power) << 24));
+}
+
+#endif
 
 void	effect_fizzlefade(t_game *game, uint32_t color)
 {
@@ -45,7 +57,8 @@ void	effect_fizzlefade(t_game *game, uint32_t color)
 	uint32_t		scale;
 
 	scale = ft_max(game->center.x, game->img.size.y) / 256 + 1;
-	img_clear_rgb(&game->img_effect, 0xFF000000);
+	img_clear_rgb(&game->img_effect, \
+					(unsigned int)(~(unsigned char)ALPHA_OPAQUE) << 24);
 	i = 0;
 	while (i < 1024)
 	{
@@ -55,8 +68,8 @@ void	effect_fizzlefade(t_game *game, uint32_t color)
 		rndval >>= 1;
 		if (lsb)
 			rndval ^= 0x12000;
-		draw_square_fill(&game->img_effect, pos, scale, color);
+		draw_square_fill(&game->img_effect, pos, scale, \
+						color | (ALPHA_OPAQUE << 24));
 		i++;
 	}
-	put_image_to_window(game->mlx, game->win, game->img_effect.ptr, (t_point){0, 0});
 }

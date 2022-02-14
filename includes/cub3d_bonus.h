@@ -33,11 +33,11 @@
 # include <time.h>
 
 # ifdef __APPLE__
+#  define ALPHA_OPAQUE 0x00
 #  define SOUND_DISABLED 0
-#  define FLASHES_DISABLED 0
 # else
+#  define ALPHA_OPAQUE 0xFF
 #  define SOUND_DISABLED 1
-#  define FLASHES_DISABLED 1
 # endif
 
 # define TITLE "nGragasstein 3D"
@@ -809,7 +809,8 @@ void			demo_radar		(t_game *mlx, int rays);
 void			demo_cursor		(t_game *game, int color);
 
 // mlx_os_adapters
-void put_image_to_window(void *mlx_ptr, void *win_ptr, void *img_ptr, \
+void			*new_image(void *mlx_ptr,int width, int height);
+void			put_image_to_window(void *mlx_ptr, void *win_ptr, void *img_ptr, \
 						 t_point offset);
 
 #endif

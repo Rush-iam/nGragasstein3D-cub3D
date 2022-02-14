@@ -17,10 +17,15 @@ int		mlx_string_put(t_xvar *xvar,t_win_list *win,
 			       int x,int y,int color,char *string)
 {
    XGCValues	xgcv;
+   Pixmap 		target_pixmap;
    
    xgcv.foreground = mlx_int_get_good_color(xvar,color);
    XChangeGC(xvar->display,win->gc,GCForeground,&xgcv);
-   XDrawString(xvar->display,win->window,win->gc,x,y,string,strlen(string));
+   if (xvar->do_flush)
+	   target_pixmap = win->window;
+   else
+	   target_pixmap = win->window_back;
+   XDrawString(xvar->display,target_pixmap,win->gc,x,y,string,strlen(string));
    if (xvar->do_flush)
      XFlush(xvar->display);
 }

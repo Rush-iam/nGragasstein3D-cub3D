@@ -56,7 +56,8 @@ SRC_BONUS :=	control_extra	\
 				screenshot		\
 				terminate		\
 				weapons			\
-				os_adapters/put_image_to_window
+				os_adapters/put_image_to_window	\
+				os_adapters/new_image
 
 ifeq ($(OS),Windows_NT)
 	NAME := $(addsuffix .exe, $(NAME))
@@ -108,7 +109,7 @@ LDLIBS		= -lft				-lmlx
 ifeq ($(PLATFORM), Darwin)
 	LDLIBS	+= -framework OpenGL -framework AppKit -lz
 else
-	LDLIBS	+= -lX11 -lXext -lm
+	LDLIBS	+= -lX11 -lXext -lXrender -lm
 	LIBS	+= $(CUTE_PNG)
 	LDLIBS	+= $(CUTE_PNG)
 	CPPFLAGS+= -I$(CUTE_PNG_DIR)

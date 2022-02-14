@@ -23,6 +23,8 @@ int	mlx_destroy_image(t_xvar *xvar, t_img *img)
     }
   XDestroyImage(img->image);  /* For image & shm-image. Also free img->data */
   XFreePixmap(xvar->display, img->pix);
+  if (img->pict)
+	  XRenderFreePicture(xvar->display, img->pict);
   if (img->gc)
     XFreeGC(xvar->display, img->gc);
   free(img);

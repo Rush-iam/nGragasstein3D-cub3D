@@ -32,6 +32,8 @@ int	mlx_destroy_window(t_xvar *xvar,t_win_list *win)
   xvar->win_list = first.next;
   XDestroyWindow(xvar->display,win->window);
   XFreePixmap(xvar->display, win->window_back);
+  XRenderFreePicture(xvar->display, win->pict);
+  XRenderFreePicture(xvar->display, win->pict_back);
   XFreeGC(xvar->display,win->gc);
   free(win);
   if (xvar->do_flush)

@@ -82,5 +82,5 @@ void	set_ceilfloor_color(char *string, uint32_t *target, t_game *game)
 		terminate(game, ERR_PARSE, "F/C color Blue is wrong (range: 0-255)");
 	else if (*string != '\0')
 		terminate(game, ERR_PARSE, "F/C color line redundant symbols");
-	*target = (r << 16) | (g << 8) | b;
+	*target = (ALPHA_OPAQUE << 24) | (r << 16) | (g << 8) | b;
 }
