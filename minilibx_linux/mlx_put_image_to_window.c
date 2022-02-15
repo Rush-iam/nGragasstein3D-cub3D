@@ -32,8 +32,12 @@ int	mlx_put_image_to_window(t_xvar *xvar,t_win_list *win,t_img *img,
 
 	if (img->pict)
 	{
-		XPutImage(xvar->display,img->pix,gc,img->image,0,0,0,0,
-				  img->width,img->height);
+		if (img->type==MLX_TYPE_XIMAGE)
+			XPutImage(xvar->display,img->pix,gc,img->image,0,0,0,0,
+					  img->width,img->height);
+		else if (img->type==MLX_TYPE_SHM)
+			XShmPutImage(xvar->display,img->pix,gc,img->image,0,0,0,0,
+					  img->width,img->height, False);
 		XRenderComposite(xvar->display, PictOpOver, img->pict, 0, target_picture,
 						 0, 0, 0, 0, x, y, img->width, img->height);
 	}

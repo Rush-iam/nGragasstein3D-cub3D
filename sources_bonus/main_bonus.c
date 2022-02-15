@@ -34,7 +34,7 @@ int	main(int args, char *av[])
 		write_screenshot_and_exit(&game);
 	initialize_hooks(&game);
 	clock_gettime(CLOCK_MONOTONIC, &time);
-	game.tick = 60 * time.tv_sec + 60 * time.tv_nsec / NANSECS_PER_SEC;
+	game.tick = 60 * time.tv_sec + 60 * time.tv_nsec / NANSECS_PER_SEC - 1;
 	srandom(time.tv_nsec);
 	mlx_loop(game.mlx);
 }
