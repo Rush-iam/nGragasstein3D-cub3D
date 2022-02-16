@@ -15,6 +15,10 @@ SRC		= cute_sound.c
 CFLAGS	= -Wall -Wextra -Ofast -march=native
 HEADER	= cute_sound.h
 
+ifeq ($(shell uname -s), Linux)
+	CFLAGS += -I/usr/include/SDL2/
+endif
+
 ifeq ($(OS),Windows_NT)
 	CFLAGS += -D _WIN32
 endif

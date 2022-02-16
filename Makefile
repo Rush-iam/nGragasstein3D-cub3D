@@ -122,7 +122,7 @@ ifeq ($(filter bonus, $(MAKECMDGOALS)), bonus)
 	ifeq ($(PLATFORM), Darwin)
 		LDLIBS	+= -framework AudioUnit
 	else ifeq ($(PLATFORM), Linux)
-		LDLIBS	+= -pthread -ldl
+		LDLIBS	+= -pthread -lSDL2
 	else ifeq ($(OS),Windows_NT)
 		LDLIBS	+= -lpthread -ldsound
 	endif

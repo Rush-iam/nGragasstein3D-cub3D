@@ -16,15 +16,18 @@ void	initialize_sounds(t_game *g)
 {
 	if (SOUND_DISABLED)
 		return ;
-	g->audio.ctx = cs_make_context(0, 44100, 8192, 2, NULL);
-	g->audio.ctx7 = cs_make_context(0, 7042, 1024, MAX_PLAYING_SOUNDS, NULL);
-	g->audio.ctx22 = cs_make_context(0, 22050, 2048, MAX_PLAYING_SOUNDS, NULL);
+	g->audio.ctx = cs_make_context( \
+		0, 44100, 4096 * SOUND_BUFFER_MULTIPLIER, 2, NULL);
+	g->audio.ctx7 = cs_make_context( \
+		0, 7042, 1024, MAX_PLAYING_SOUNDS, NULL);
+	g->audio.ctx22 = cs_make_context( \
+		0, 22050, 1024 * SOUND_BUFFER_MULTIPLIER, MAX_PLAYING_SOUNDS, NULL);
 	cs_spawn_mix_thread(g->audio.ctx);
 	cs_spawn_mix_thread(g->audio.ctx7);
 	cs_spawn_mix_thread(g->audio.ctx22);
-	cs_thread_sleep_delay(g->audio.ctx, 20);
-	cs_thread_sleep_delay(g->audio.ctx7, 20);
-	cs_thread_sleep_delay(g->audio.ctx22, 20);
+	cs_thread_sleep_delay(g->audio.ctx, 10);
+	cs_thread_sleep_delay(g->audio.ctx7, 10);
+	cs_thread_sleep_delay(g->audio.ctx22, 10);
 }
 
 void	sounds(t_game *game)
