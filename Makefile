@@ -67,10 +67,6 @@ INC_DIR := includes/
 OBJ_DIR = objects/
 SRC_BONUS_DIR = sources_bonus/
 
-#SRC_DIR := $(SRC_BONUS_DIR)
-#SRC += $(SRC_BONUS)
-#SRC := $(addsuffix _bonus, $(SRC))
-
 ifeq ($(filter bonus, $(MAKECMDGOALS)), bonus)
 	SWITCH_CLEAN := $(addsuffix .o, $(SRC))
 	SRC_DIR = $(SRC_BONUS_DIR)
@@ -122,9 +118,9 @@ ifeq ($(filter bonus, $(MAKECMDGOALS)), bonus)
 	ifeq ($(PLATFORM), Darwin)
 		LDLIBS	+= -framework AudioUnit
 	else ifeq ($(PLATFORM), Linux)
-		LDLIBS	+= -pthread -lSDL2
+		LDLIBS	+= -lSDL2 -pthread
 	else ifeq ($(OS),Windows_NT)
-		LDLIBS	+= -lpthread -ldsound
+		LDLIBS	+= -lSDL2 -lpthread
 	endif
 endif
 

@@ -99,7 +99,7 @@ int	dead_exit(t_game *game)
 	if (game->effect.type != EF_FIZZLEFADE)
 	{
 		game->effect = (struct s_effect){0, 192, EF_FIZZLEFADE, COLOR_RED, 0};
-		if (SOUND_DISABLED == 0)
+		if (game->audio.disabled == false)
 		{
 			cs_stop_all_sounds(game->audio.ctx);
 			cs_stop_all_sounds(game->audio.ctx7);

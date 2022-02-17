@@ -34,11 +34,9 @@
 
 # ifdef __APPLE__
 #  define ALPHA_OPAQUE 0x00
-#  define SOUND_DISABLED 0
 #  define SOUND_BUFFER_MULTIPLIER 2
 # else
 #  define ALPHA_OPAQUE 0xFF
-#  define SOUND_DISABLED 0
 #  define SOUND_BUFFER_MULTIPLIER 1
 # endif
 
@@ -492,6 +490,7 @@ typedef struct s_game
 	t_img		img_effect;
 	struct		s_sound
 	{
+		bool			disabled;
 		cs_context_t	*ctx;
 		cs_context_t	*ctx7;
 		cs_context_t	*ctx22;

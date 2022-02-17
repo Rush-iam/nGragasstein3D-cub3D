@@ -78,21 +78,31 @@ static void	*png_file_to_image(void *mlx, char *file, int *width, int *height)
 
 static void	*png_file_to_image(void *mlx, char *file, int *width, int *height)
 {
-	const cp_image_t	png_img = cp_load_png(file);
-	void				*mlx_img;
-	char				*mlx_img_data;
-	int					null;
+	cp_image_t	png_img;
+	void		*mlx_img;
+	cp_pixel_t 	*mlx_img_data;
+	int			i;
 
+	png_img = cp_load_png(file);
 	if (png_img.pix == NULL)
 		return (NULL);
+	cp_premultiply(&png_img);
 	mlx_img = mlx_new_image(mlx, png_img.w, png_img.h);
 	if (mlx_img == NULL)
 	{
 		free(png_img.pix);
 		return (NULL);
 	}
-	mlx_img_data = mlx_get_data_addr(mlx_img, &null, &null, &null);
-	ft_memcpy(mlx_img_data, png_img.pix, png_img.w * png_img.h * 4);
+	mlx_img_data = (cp_pixel_t *)mlx_get_data_addr(mlx_img, &i, &i, &i);
+	i = 0;
+	while (i < png_img.w * png_img.h)
+	{
+		mlx_img_data[i].r = png_img.pix[i].b;
+		mlx_img_data[i].g = png_img.pix[i].g;
+		mlx_img_data[i].b = png_img.pix[i].r;
+		mlx_img_data[i].a = png_img.pix[i].a;
+		++i;
+	}
 	*width = png_img.w;
 	*height = png_img.h;
 	free(png_img.pix);

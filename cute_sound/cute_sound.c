@@ -1,6 +1,6 @@
 #define CUTE_SOUND_IMPLEMENTATION
 
-#ifdef __linux__
+#ifndef __APPLE__
 # define CUTE_SOUND_FORCE_SDL
 #endif
 

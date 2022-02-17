@@ -14,14 +14,18 @@
 
 void	initialize_sounds(t_game *g)
 {
-	if (SOUND_DISABLED)
-		return ;
 	g->audio.ctx = cs_make_context( \
 		0, 44100, 4096 * SOUND_BUFFER_MULTIPLIER, 2, NULL);
 	g->audio.ctx7 = cs_make_context( \
 		0, 7042, 1024, MAX_PLAYING_SOUNDS, NULL);
 	g->audio.ctx22 = cs_make_context( \
 		0, 22050, 1024 * SOUND_BUFFER_MULTIPLIER, MAX_PLAYING_SOUNDS, NULL);
+	if (g->audio.ctx == NULL || g->audio.ctx7 == NULL || g->audio.ctx22 == NULL)
+	{
+		printf("Failed to initialize Sound. Disabling it.\n");
+		g->audio.disabled = true;
+		return ;
+	}
 	cs_spawn_mix_thread(g->audio.ctx);
 	cs_spawn_mix_thread(g->audio.ctx7);
 	cs_spawn_mix_thread(g->audio.ctx22);
@@ -34,7 +38,7 @@ void	sounds(t_game *game)
 {
 	uint32_t	i;
 
-	if (SOUND_DISABLED)
+	if (game->audio.disabled)
 		return ;
 	i = 0;
 	while (i < sizeof(game->audio.playing) / sizeof(*game->audio.playing))
@@ -55,7 +59,7 @@ struct s_playback	*sound_play(t_game *game, t_snd *sound, t_fpoint sourcepos)
 	uint32_t		i;
 	cs_context_t	*target_ctx;
 
-	if (SOUND_DISABLED || sound == NULL || sound->file.channels[0] == NULL)
+	if (game->audio.disabled || sound == NULL || sound->file.channels[0] == NULL)
 		return (NULL);
 	i = 0;
 	while (game->audio.playing[i].snd != NULL && \
@@ -80,7 +84,7 @@ void	music_play(t_game *game, t_snd *music)
 {
 	uint32_t	i;
 
-	if (SOUND_DISABLED || music->file.channels[0] == NULL)
+	if (game->audio.disabled || music->file.channels[0] == NULL)
 		return ;
 	i = 0;
 	while (i < sizeof(game->audio.playing) / sizeof(*game->audio.playing))

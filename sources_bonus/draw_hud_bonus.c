@@ -117,11 +117,15 @@ void	hud_digits_bake(struct s_hud *hud, char *num_str, t_upoint pos)
 
 void	draw_fps(t_game *game)
 {
-	static clock_t	clock_cur;
+	static clock_t	clock_prev;
+	const clock_t	clock_cur = clock();
 	int				fps;
 
-	fps = CLOCKS_PER_SEC / (clock() - clock_cur);
-	clock_cur = clock();
-	mlx_string_put(game->mlx, game->win, 0, 20, COLOR_WHITE, \
-		(char []){'0' + fps / 100, '0' + fps / 10 % 10, '0' + fps % 10, '\0'});
+	if (clock_cur != clock_prev)
+	{
+		fps = CLOCKS_PER_SEC / (clock_cur - clock_prev);
+		clock_prev = clock_cur;
+		mlx_string_put(game->mlx, game->win, 0, 20, COLOR_WHITE, \
+        (char[]){'0' + fps / 100, '0' + fps / 10 % 10, '0' + fps % 10, '\0'});
+	}
 }
