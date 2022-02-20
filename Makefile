@@ -86,7 +86,7 @@ LIBFT		= $(LIBFT_DIR)libft.a
 
 PLATFORM := $(shell uname -s)
 ifeq ($(PLATFORM), Darwin)
-	MLX_DIR = minilibx_opengl/
+	MLX_DIR = minilibx_macos_opengl/
 else
 	MLX_DIR = minilibx_linux/
 endif

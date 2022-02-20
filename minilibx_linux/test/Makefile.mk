@@ -19,13 +19,9 @@ ifeq ($(UNAME), Darwin)
 else ifeq ($(UNAME), FreeBSD)
 	# FreeBSD
 	CC = clang
-else ifeq ($(OS),Windows_NT)
-	# Windows
-	CC = clang
 else
 	#Linux and others...
 	CC	= cc
-	LFLAGS += -lbsd
 endif
 
 all: $(NAME)

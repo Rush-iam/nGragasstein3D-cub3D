@@ -66,7 +66,7 @@ static int	gnl_fetch_fd(int fd, char **line, t_buf *buf)
 		newline = ft_memchr(buf[fd].cur + buf[fd].max, '\n', bytes_read);
 		if (newline)
 		{
-			*line = ft_substr(buf[fd].cur, 0, newline - buf[fd].cur);
+			*line = ft_substr(buf[fd].cur, 0, newline - buf[fd].cur - (newline[-1] == '\r'));
 			if (*line == NULL)
 				return (gnl_terminate(-1, fd, line, buf));
 			buf[fd].max += buf[fd].cur + bytes_read - newline - 1;
@@ -98,7 +98,7 @@ int	get_next_line(int fd, char **line)
 	newline = ft_memchr(buf[fd].cur, '\n', buf[fd].max);
 	if (!newline)
 		return (gnl_fetch_fd(fd, line, buf));
-	*line = ft_substr(buf[fd].cur, 0, newline - buf[fd].cur);
+	*line = ft_substr(buf[fd].cur, 0, newline - buf[fd].cur - (newline[-1] == '\r'));
 	if (*line == NULL)
 		return (gnl_terminate(-1, fd, line, buf));
 	buf[fd].max -= newline - buf[fd].cur + 1;
