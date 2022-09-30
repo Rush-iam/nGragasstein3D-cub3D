@@ -22,7 +22,7 @@ endif
 all: $(NAME)
 $(NAME): $(HEADER)
 clean:
-fclean: clean
 	@$(RM) $(NAME)
+fclean: clean
 re: fclean all
 .PHONY: all clean fclean re
